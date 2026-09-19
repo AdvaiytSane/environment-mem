@@ -34,8 +34,11 @@ The optional [Browser Use implementation](../packages/browser-use/README.md) now
 captures real browser actions through this interface. Its experimental HTTP
 driver uses a separate browser-specific upstream schema; it is not evidence that
 general HTTP recall has shipped. The [live report](verification/2026-09-19-browser-use.md)
-records actual capture, missing browser authorization, and the unresolved need
-for useful advisory retrieval without declaring deterministic executor support.
+records actual model-driven capture and missing browser authorization. Advisory
+retrieval without executor capabilities is now prepared as a separate local
+backend change and connected through `mode: "context"`; it is not deployed.
+The inspected browser backend also lacks a wired discovery path from accepted
+events to searchable workflows. See [BROWSER-CONTEXT.md](BROWSER-CONTEXT.md).
 
 The next versioned metadata contract should distinguish:
 
@@ -55,7 +58,7 @@ Developers define this in code. No dashboard setup, sample-paste step, or third 
 
 1. **This repository: CLI connection and capture.** Export the two-method connector, route the Memorable backend's reads and writes through it, and document native/custom hooks. Separate task runs within a session, retain stable call IDs when supplied, deduplicate repeated events, and preserve explicit failure/unknown results. Keep the existing local engine available with a clear label.
    Optional integration packages build on the same two operations; validate Browser Use with real action/results and handle Devin separately according to [DEVIN-INTEGRATION-PLAN.md](DEVIN-INTEGRATION-PLAN.md). Protocol regression checks establish dispatch and error handling only; they do not prove capture, retrieval quality or deployed persistence.
-2. **Private upstream: review the existing HTTP read work.** Confirm authorization, storage backend, procedure schema, ranker reuse, pagination/candidate limits, error behavior and deployed versions. Run a real stored-procedure readback before declaring the endpoint usable. Commit, deploy and document it in the upstream repository.
+2. **Private upstream: finish browser discovery and deploy the reviewed context route, then review the general HTTP read work.** Browser ingestion and workflow retrieval use different tables; accepted events must actually become a discovered workflow before context recall can return them. This is an additional browser-specific service gate. The context-only response is prepared locally, not deployed. For the general CLI path: Confirm authorization, storage backend, procedure schema, ranker reuse, pagination/candidate limits, error behavior and deployed versions. Run a real stored-procedure readback before declaring the endpoint usable. Commit, deploy and document it in the upstream repository.
 3. **Coordinate the durable trace contract.** Preserve accepted, redacted traces separately from reduced procedures. Distinguish durable acceptance, extraction admission and index readiness. Add idempotency/run revisions and explicit scope/condition/outcome semantics where missing. Identify what can be reused before designing migrations.
 4. **This repository: add the documented HTTP transport.** Keep `store` and `recall` as the public operations; select transport at client creation. Add typed responses only when the deployed service has a versioned response contract. Retain the CLI transport for environments that already use it.
 5. **Verify real workflows and retrieval quality.** Complete the evidence gates in [VERIFICATION.md](VERIFICATION.md), then test a second independent coding loop with the same contract. Publish redacted results and measured limitations.

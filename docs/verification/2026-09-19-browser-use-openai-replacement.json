@@ -1,0 +1,171 @@
+{
+  "mode": "llm_agent",
+  "agent_evidence": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "model_output_steps": 3,
+    "model_proposed_actions": [
+      "click",
+      "extract",
+      "done"
+    ],
+    "agent_reported_success": true,
+    "agent_error_count": 0,
+    "reported_total_tokens": 38348
+  },
+  "browser_use_version": "0.13.10",
+  "remote_enabled": false,
+  "run_id": "cf2eae22-3eb1-4344-9335-3f08ac5da514",
+  "events_retained": 3,
+  "verification": {
+    "ok": true,
+    "check": "current_page_url_and_dom_card_count"
+  },
+  "observation": {
+    "url": "https://quotes.toscrape.com/page/2/",
+    "title": "Quotes to Scrape",
+    "quotes": 10
+  },
+  "custom_tool_observed_counts": [],
+  "recall_result": null,
+  "store_result": null,
+  "diagnostics": [
+    {
+      "stage": "recall",
+      "error": "offline"
+    },
+    {
+      "stage": "store",
+      "error": "offline"
+    }
+  ],
+  "wire_diagnostics": [
+    {
+      "stage": "wire",
+      "dropped": 1,
+      "reasons": {
+        "outcome_unknown": 1
+      }
+    }
+  ],
+  "pending_outbox_exists": true,
+  "typed_value_absent_from_journal": true,
+  "journal_sha256": "170366a36bc44c2e90029bbff07bde3f649876643e6cc33c2758f01ee91dc5c8",
+  "failure": null,
+  "local_contract_validation": {
+    "run_id": "cf2eae22-3eb1-4344-9335-3f08ac5da514",
+    "checked_at": "2026-09-19T22:50:40.324Z",
+    "verification_kind": "local_validation_of_actual_agent_outbox_with_upstream_server_validator",
+    "upstream_commit": "101666176b842f1d1053c2c132dcdd2a0640838a",
+    "validator": "services/extraction-api/src/browser-event.ts",
+    "no_network_requests": true,
+    "production_ingestion_verified": false,
+    "journal_sha256": "170366a36bc44c2e90029bbff07bde3f649876643e6cc33c2758f01ee91dc5c8",
+    "outbox_sha256": "8683d7328fffe8c687bb36425f45791519dd212ff411293ee1202768abad6bc3",
+    "capture_completed_rows": 3,
+    "completed_rows": [
+      {
+        "sequence": 1,
+        "phase": "finished",
+        "status": "returned",
+        "verb": "click",
+        "dropped_reason": null,
+        "needs_run_verification": false
+      },
+      {
+        "sequence": 2,
+        "phase": "finished",
+        "status": "returned",
+        "verb": null,
+        "dropped_reason": "outcome_unknown",
+        "needs_run_verification": null
+      },
+      {
+        "sequence": 3,
+        "phase": "finished",
+        "status": "returned",
+        "verb": "end",
+        "dropped_reason": null,
+        "needs_run_verification": true
+      }
+    ],
+    "upload_events": [
+      {
+        "seq": 1,
+        "verb": "click",
+        "result_status": "ok",
+        "run_id_matches": true,
+        "event_ok": true,
+        "fingerprints": [
+          {
+            "field": "before",
+            "ok": true
+          },
+          {
+            "field": "after",
+            "ok": true
+          }
+        ]
+      },
+      {
+        "seq": 3,
+        "verb": "end",
+        "result_status": "ok",
+        "run_id_matches": true,
+        "event_ok": true,
+        "fingerprints": [
+          {
+            "field": "before",
+            "ok": true
+          },
+          {
+            "field": "after",
+            "ok": true
+          }
+        ]
+      }
+    ],
+    "dropped": {
+      "count": 1,
+      "since": "2026-09-19T22:46:44.459Z",
+      "reason": "policy_filtered"
+    },
+    "all_upload_events_valid": true
+  },
+  "screenshot_inspected": true,
+  "local_backend_handler_probe": {
+    "verification_kind": "saved_real_capture_through_real_worker_with_fake_postgres",
+    "durable_storage_verified": false,
+    "production_verified": false,
+    "source_client_run_id": "cf2eae22-3eb1-4344-9335-3f08ac5da514",
+    "source_event_count": 2,
+    "source_events": [
+      {
+        "seq": 1,
+        "verb": "click",
+        "status": "ok"
+      },
+      {
+        "seq": 3,
+        "verb": "end",
+        "status": "ok"
+      }
+    ],
+    "ingest": {
+      "status": 200,
+      "accepted": 2,
+      "rejected": 0,
+      "duplicates": 0,
+      "rejections": [],
+      "run_state": "final"
+    },
+    "captured_step_rows_in_fake_store": 2,
+    "discovered_workflows_in_fake_store": 0,
+    "recall": {
+      "status": 503,
+      "error": "resolve_unavailable",
+      "detail": "no workflows discovered yet"
+    },
+    "caveat": "Fixture database and local fixture credentials. No production service called; no discovered workflows seeded or invented. This does not verify persistence or end-to-end recall."
+  }
+}

@@ -87,9 +87,9 @@ The live example supplies a complete lifecycle.
 
 Recall happens before constructing a fresh Agent, so the Agent receives the
 actual prepared task context at initialization. The stored task stays separate
-from recalled text. The reference is bounded and marked as untrusted material;
-the renderer decides which compatible result to include. This is advisory context,
-not deterministic replay.
+from recalled text. The reference is bounded and marked as untrusted material. Whole steps are kept
+together so shortening the reference cannot remove an approval warning or its
+conditions. This is advisory context, not deterministic replay.
 
 The lower-level lifecycle also works without an LLM:
 
@@ -165,18 +165,26 @@ package does not promise exactly-once storage. The packaged driver treats a
 partial/rejected/truncated ingest response as `partial_ingest`, even if its HTTP
 status is 200, and leaves the original request pending.
 
-Live browser-service authorization, full LLM-driven execution, storage readback,
-and successful paraphrase recall are separate verification gates. Consult the
+Real OpenAI-driven browser execution and local capture have been verified.
+Browser-service authorization, storage readback, and successful paraphrase recall
+remain separate verification gates. Consult the
 repository's dated evidence report for what was actually observed; local
 regression tests do not establish those gates. This package does not yet have
 evidence of a successful hosted browser-memory store-and-recall round trip.
 
-The default runtime advertises no deterministic execution capabilities. The
-backend's compiled-program resolver may therefore return no useful program;
-this is an unresolved advisory-retrieval contract, not an empty-memory guarantee.
-Fingerprints from this conservative mapper also need not match another adapter's
-fingerprints. Consult the [live report](../../docs/verification/2026-09-19-browser-use.md)
-for these limits and the required upstream decisions.
+The default runtime advertises no deterministic execution capabilities. Recall
+requests `mode: "context"` from `/v1/browser/resolve`. A compatible server must
+acknowledge that mode and return a `workflow_reference` with `executable: false`,
+a bounded ordered step list, preconditions, postconditions and explicit approval
+flags. The renderer includes only checked action/role/UI tokens and minimized
+page shapes; it never inserts literal parameter values. Unrenderable target
+identity is called out for independent verification.
+
+An old server returning only a replay program is refused as `context_unsupported`.
+The add-on does not request fake capabilities or fall back to executing a program.
+The matching backend change is prepared on a local private branch and is not
+deployed. See [the context contract and rollout gaps](../../docs/BROWSER-CONTEXT.md).
+Fingerprints from this mapper need not match another adapter's fingerprints.
 
 ## Run the real browser example
 
@@ -204,8 +212,8 @@ the selected provider. A key from one provider is not a key for the other.
 `--env-file` reads only the selected provider's key and Memorable settings.
 Add `--remote` only with authorized Memorable browser-service access.
 The output directory contains private salt settings, journals and a
-screenshot, so keep it outside version control. The existing evidence covers the
-scripted browser mode; consult the dated report for subsequent model-driven runs.
+screenshot, so keep it outside version control. The evidence includes both scripted and real OpenAI-driven browser runs; consult
+the dated report for their results.
 The complete remote memory path remains unverified.
 
 ```sh

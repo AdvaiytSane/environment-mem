@@ -198,3 +198,47 @@ by Git. The default command keeps Memorable offline. See the
 [successful agent summary](2026-09-19-browser-use-openai.json) for the observed
 results and local contract checks. The earlier failed provider attempt remains
 documented rather than being replaced by this success.
+
+## Replacement-key run and local context implementation
+
+After the user replaced the OpenAI credential, a fresh real agent run
+`cf2eae22-3eb1-4344-9335-3f08ac5da514` succeeded through the explicit OpenAI path.
+It produced three model-output steps (`click`, `extract`, `done`), reported no
+agent errors, and retained three completed action records. Independent DOM
+inspection again verified page two and ten quotes; the screenshot was inspected.
+The actual click and completion events passed the existing server's local event
+and fingerprint validators. The extraction outcome stayed unknown and was omitted
+from the upload payload. Browser Use reported 38,348 tokens, not a billed amount.
+
+The Memorable transport was explicitly offline. The outbox remains pending and
+the run has no store receipt, recalled context, or demonstrated memory reuse.
+See the [sanitized replacement-key evidence](2026-09-19-browser-use-openai-replacement.json).
+
+With explicit user approval, the backend's separate `mode: "context"` response
+was prepared on local private branch `codex/browser-advisory-context`, based
+on `101666176b842f1d1053c2c132dcdd2a0640838a`, committed as
+`a019d27fb61754bf219738f2b86bb280c1517064`. The public add-on now requests and
+validates this contract; it refuses replay-only responses. The local change
+retains authorization and policy checks and has not been deployed.
+
+Inspection also found the distinction between event acceptance and workflow
+discovery: the backend writes captured events but the inspected checkout has no
+wired process promoting them into the workflow tables queried by recall. This
+must be resolved before an accepted trace can establish a complete store/recall
+loop. The [handoff contract](../BROWSER-CONTEXT.md) records these remaining gates.
+
+A local probe passed the two actual captured events through the real worker
+handler using its explicitly fake database fixture. It accepted both events and
+finalized the run, created zero workflows, and returned HTTP 503
+`resolve_unavailable` on context recall. No workflow was seeded. This supports
+the wiring diagnosis; it is not evidence of durable storage or production
+retrieval. The uploaded sequence remains 1 then 3, preserving the omitted
+extraction outcome; the server accounts for that as two received events out of
+three expected, which must be considered by any discovery implementation.
+
+Focused client checks cover malformed references, conditions, target identity,
+approval preservation under truncation, and refusal of replay-only responses.
+The full SDK suite completed with 53 Node checks and 19 Python checks. One first
+attempt used the system's unsupported Node 20 and failed on TypeScript loading;
+rerunning with the required Node 24 environment resolved those runtime failures.
+These are supporting regressions, not a substitute for the live memory gates.

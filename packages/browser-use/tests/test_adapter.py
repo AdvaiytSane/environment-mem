@@ -126,6 +126,20 @@ class CaptureTests(unittest.IsolatedAsyncioTestCase):
             self.assertIn("&lt;/memorable-reference&gt;", received["task"])
             self.assertEqual(received["task"].count("</memorable-reference>"), 1)
 
+    async def test_context_limit_never_splits_action_from_conditions_or_approval(self):
+        with tempfile.TemporaryDirectory() as directory:
+            reference = 'Reference only.\n1. click button "delete"; ' + 'condition ' * 1000 + '; human approval required'
+            capture = self.capture(directory, enabled=True, recall_request=lambda record: {},
+                                   render_recall=lambda result: reference, context_bytes=512)
+            await capture.prepare()
+            self.assertIn('Reference truncated', capture.context)
+            self.assertNotIn('click', capture.context)
+            # An oversized first line yields no reference, not a broken action.
+            capture = self.capture(directory, enabled=True, recall_request=lambda record: {},
+                                   render_recall=lambda result: reference.split('\n')[1], context_bytes=512)
+            await capture.prepare()
+            self.assertEqual(capture.context, '')
+
 
 class TransportTests(unittest.IsolatedAsyncioTestCase):
     async def test_real_subprocess_protocol_and_provider_env_scrubbing(self):

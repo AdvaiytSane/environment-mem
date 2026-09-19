@@ -10,6 +10,30 @@ function fail(code, detail = '') {
 }
 const object = value => value && typeof value === 'object' && !Array.isArray(value);
 const count = value => Number.isSafeInteger(value) && value >= 0;
+const policies = new Set(['authentication', 'messages', 'uploads', 'downloads', 'purchases', 'payments', 'destructive']);
+const stepFields = new Set(['id', 'seq', 'op', 'target', 'precondition', 'postcondition', 'policy_class', 'approval_required', 'evidence']);
+function hasBindings(value, depth = 0) {
+  if (depth > 16) return true;
+  if (!value || typeof value !== 'object') return false;
+  return Object.entries(value).some(([key, child]) => ['value', 'literal', 'value_binding', 'compiled_for'].includes(key) || hasBindings(child, depth + 1));
+}
+function validSteps(steps) {
+  const ids = new Set();
+  let previous = -1;
+  return steps.every(step => {
+    if (!object(step) || Object.keys(step).some(key => !stepFields.has(key)) ||
+        typeof step.id !== 'string' || !step.id || step.id.length > 160 || ids.has(step.id) ||
+        !count(step.seq) || step.seq <= previous || typeof step.op !== 'string' ||
+        !(step.target === null || object(step.target)) || !object(step.precondition) || !object(step.postcondition) ||
+        !(step.policy_class === null || policies.has(step.policy_class)) || typeof step.approval_required !== 'boolean' ||
+        !object(step.evidence) || ![step.evidence.runs, step.evidence.ok, step.evidence.fail].every(count) ||
+        typeof step.evidence.score !== 'number' || !Number.isFinite(step.evidence.score) ||
+        step.evidence.score < 0 || step.evidence.score > 1) return false;
+    ids.add(step.id);
+    previous = step.seq;
+    return true;
+  });
+}
 
 export function createAdapter(config = {}) {
   const origins = config.allowedOrigins;
@@ -20,6 +44,12 @@ export function createAdapter(config = {}) {
   async function post(operation, request, { signal }) {
     if (config.offline === true) fail('offline', 'request retained locally; no HTTP request was made');
     if (!object(request)) fail('invalid_request');
+    if (operation === 'recall') {
+      if (request.mode != null && request.mode !== 'context') {
+        fail('invalid_request', 'this add-on supports advisory context, not replay');
+      }
+      request = { ...request, mode: 'context' };
+    }
     const origin = operation === 'store' ? request.run?.origin : request.origin;
     if (!origins.includes(origin)) fail('origin_not_allowed');
     const observedOrigins = operation === 'store'
@@ -81,8 +111,24 @@ export function createAdapter(config = {}) {
         // Keep the outbox. A finalized partial run needs inspection, not blind retry.
         fail('partial_ingest', 'server did not acknowledge the complete submitted batch');
       }
-    } else if (!['complete', 'partial', 'no_match'].includes(result.decision)) {
-      fail('invalid_response', 'missing resolve decision');
+    } else {
+      if (!['complete', 'partial', 'no_match'].includes(result.decision)) {
+        fail('invalid_response', 'missing resolve decision');
+      }
+      if (result.mode !== 'context') {
+        fail('context_unsupported', 'server did not acknowledge advisory context mode');
+      }
+      if (result.program != null || (result.decision === 'no_match' && result.context != null)) {
+        fail('invalid_response', 'unexpected executable program or unmatched context');
+      }
+      if (result.decision !== 'no_match' && (!object(result.context) ||
+          result.context.kind !== 'workflow_reference' || result.context.executable !== false ||
+          !Array.isArray(result.context.steps) || !result.context.steps.length || result.context.steps.length > 50)) {
+        fail('invalid_response', 'missing bounded workflow reference');
+      }
+      if (result.context && (hasBindings(result.context) || !validSteps(result.context.steps))) {
+        fail('invalid_response', 'invalid advisory step metadata');
+      }
     }
     return result;
   }

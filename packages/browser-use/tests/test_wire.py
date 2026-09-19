@@ -8,6 +8,11 @@ from memorable_browser_use.wire import BrowserWire
 
 
 class BrowserWireTests(unittest.TestCase):
+    def reference(self, steps, **overrides):
+        return {"mode": "context", "decision": "partial", "context": {
+            "kind": "workflow_reference", "executable": False, "steps": [{"approval_required": False, **step} for step in steps],
+            **overrides}}
+
     def wire(self, **overrides):
         return BrowserWire(label_salt=b"0123456789abcdef0123456789abcdef",
                            task_label="Search documentation", instance_id=str(uuid.uuid4()),
@@ -108,13 +113,60 @@ class BrowserWireTests(unittest.TestCase):
         private = "customer-private-label"
         state = self.state(wire, url="https://example.com/docs/" + private)
         self.assertEqual(state["fingerprint"]["path_shape"], "/docs/:seg")
-        response = {"decision": "partial", "program": {"steps": [{"op": "navigate", "postcondition": {
-            "p": "url_shape", "origin": "https://example.com", "path_shape": "/docs/" + private}}]}}
+        response = self.reference([{"op": "navigate", "postcondition": {
+            "p": "url_shape", "origin": "https://example.com", "path_shape": "/docs/" + private}}])
         rendered = wire.render_recall(response)
         self.assertIn("https://example.com/docs/:seg", rendered)
         self.assertNotIn(private, rendered)
         with self.assertRaisesRegex(ValueError, "sensitive"):
             self.wire(allowed_path_segments=["api_access_token"])
+
+    def test_recall_requests_context_without_claiming_execution_capabilities(self):
+        wire = self.wire()
+        request = wire.recall_request({"run_id": str(uuid.uuid4()), "initial_state": self.state(wire)})
+        self.assertEqual(request["mode"], "context")
+        self.assertEqual(request["runtime"]["capabilities"], [])
+
+    def test_reference_keeps_conditions_and_approval_but_never_literal_values(self):
+        wire = self.wire()
+        target = {"strategies": [{"by": "role", "role": "button", "name": {"kind": "exact", "tokens": ["submit"]}}]}
+        response = self.reference([{
+            "op": "click", "target": target, "approval_required": True,
+            "precondition": {"p": "element_enabled", "target": target},
+            "postcondition": {"p": "role_count", "role": "listitem", "min": 10},
+            "value": {"literal": "PRIVATE_SECRET"},
+        }], boundary={"reason": "policy", "detail": "PRIVATE_SECRET"})
+        rendered = wire.render_recall(response)
+        self.assertIn('click button "submit"', rendered)
+        self.assertIn('check before: button "submit" enabled', rendered)
+        self.assertIn('verify after: listitem count: min 10', rendered)
+        self.assertIn('Human approval required', rendered)
+        self.assertIn('Partial reference', rendered)
+        self.assertIn('policy restriction', rendered)
+        self.assertNotIn('PRIVATE_SECRET', rendered)
+
+    def test_reference_refuses_program_fallback_and_stops_at_unknown_actions(self):
+        wire = self.wire()
+        with self.assertRaisesRegex(ValueError, "context_unsupported"):
+            wire.render_recall({"decision": "complete", "program": {"steps": [{"op": "click"}]}})
+        with self.assertRaisesRegex(ValueError, "invalid_context_response"):
+            wire.render_recall(self.reference([{"op": "click"}], executable=True))
+        self.assertEqual(wire.render_recall({"mode": "context", "decision": "no_match"}), "")
+        rendered = wire.render_recall(self.reference([{"op": "click"}, {"op": "unknown"}, {"op": "fill"}]))
+        self.assertIn("click", rendered)
+        self.assertNotIn("fill", rendered)
+
+    def test_hashed_identity_is_never_reduced_to_an_unqualified_role(self):
+        wire = self.wire()
+        target = {"strategies": [{"by": "role", "role": "button", "name": {
+            "kind": "sha", "sha": "0123456789abcdef", "salt_id": "12345678"}}]}
+        rendered = wire.render_recall(self.reference([{"op": "click", "target": target,
+            "precondition": {"p": "element_enabled", "target": target}}]))
+        self.assertIn("specific identity requires independent verification", rendered)
+        self.assertIn("Some target or condition details could not be rendered", rendered)
+        self.assertNotIn("0123456789abcdef", rendered)
+        with self.assertRaisesRegex(ValueError, "invalid_context_approval"):
+            wire.render_recall(self.reference([{"op": "click", "approval_required": "true"}]))
 
 
 if __name__ == "__main__":

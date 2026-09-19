@@ -19,7 +19,7 @@ async function fixture(t) {
   delete process.env.MEMORABLE_API_KEY;
   delete process.env.MEMORABLE_API_URL;
   const calls = [];
-  let reply = { status: 200, body: { decision: 'no_match' } };
+  let reply = { status: 200, body: { mode: 'context', decision: 'no_match' } };
   const server = createServer(async (request, response) => {
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
@@ -51,7 +51,7 @@ test('browser driver uses the isolated config and documented resolve/ingest rout
   const f = await fixture(t);
   const adapter = f.adapter();
   const request = { origin, task: 'Find a product', metadata: { test: true } };
-  assert.deepEqual(await adapter.recall(request, context()), { decision: 'no_match' });
+  assert.deepEqual(await adapter.recall(request, context()), { mode: 'context', decision: 'no_match' });
   f.respond({ status: 200, body: { accepted: 1, duplicates: 1, rejected: 0, run_state: 'final' } });
   const receipt = await adapter.store(trace(), context());
   assert.equal(receipt.duplicates, 1);
@@ -59,7 +59,7 @@ test('browser driver uses the isolated config and documented resolve/ingest rout
   assert.ok(f.calls.every(call => call.method === 'POST'));
   assert.ok(f.calls.every(call => call.headers.authorization === 'Bearer test-only-browser-key'));
   assert.ok(f.calls.every(call => call.headers['content-type'] === 'application/json'));
-  assert.deepEqual(f.calls[0].body, request);
+  assert.deepEqual(f.calls[0].body, { ...request, mode: 'context' });
   assert.deepEqual(f.calls[1].body, trace());
   assert.ok(f.calls.every(call => !JSON.stringify(call.body).includes('test-only-browser-key')));
 });
@@ -104,7 +104,7 @@ test('authorization failures retain machine-readable codes and required scope', 
 
 test('a no_match response is distinct from service outages and malformed responses', async t => {
   const f = await fixture(t);
-  assert.deepEqual(await f.adapter().recall({ origin }, context()), { decision: 'no_match' });
+  assert.deepEqual(await f.adapter().recall({ origin }, context()), { mode: 'context', decision: 'no_match' });
   f.respond({ status: 503, body: { error: 'unavailable', decision: 'no_match' } });
   await assert.rejects(f.adapter().recall({ origin }, context()), error => error.code === 'unavailable' && /HTTP 503/.test(error.message));
   f.respond({ status: 200, body: { decision: 'unexpected' } });
@@ -144,6 +144,30 @@ test('offline mode never submits a request even when credentials are available',
   await assert.rejects(adapter.recall({ origin }, context()), { code: 'offline' });
   await assert.rejects(adapter.store(trace(), context()), { code: 'offline' });
   assert.equal(f.calls.length, 0);
+});
+
+test('advisory recall refuses replay-only servers and malformed references', async t => {
+  const f = await fixture(t);
+  const step = { id: 's_1', seq: 1, op: 'click', target: null, precondition: { p: 'always' }, postcondition: { p: 'always' }, policy_class: null, approval_required: false, evidence: { runs: 1, ok: 1, fail: 0, score: 0.8 } };
+  const reference = { kind: 'workflow_reference', executable: false, steps: [step] };
+  f.respond({ status: 200, body: { mode: 'context', decision: 'partial', context: reference } });
+  assert.deepEqual((await f.adapter().recall({ origin }, context())).context, reference);
+  assert.equal(f.calls[0].body.mode, 'context');
+  await assert.rejects(f.adapter().recall({ origin, mode: 'replay' }, context()), { code: 'invalid_request' });
+  assert.equal(f.calls.length, 1, 'replay request is refused before the network');
+  f.respond({ status: 200, body: { decision: 'no_match' } });
+  await assert.rejects(f.adapter().recall({ origin }, context()), { code: 'context_unsupported' });
+  for (const body of [
+    { mode: 'context', decision: 'complete', program: { steps: [] }, context: reference },
+    { mode: 'context', decision: 'complete' },
+    { mode: 'context', decision: 'no_match', context: reference },
+    ...[{ approval_required: 'true' }, { value: { literal: 'PRIVATE' } }, { postcondition: null }, { seq: -1 }, { evidence: {} }].map(change => ({ mode: 'context', decision: 'partial', context: { ...reference, steps: [{ ...step, ...change }] } })),
+    ...[true, undefined].map(executable => ({ mode: 'context', decision: 'partial', context: { ...reference, executable } })),
+    ...[[], Array(51).fill({ op: 'click' })].map(steps => ({ mode: 'context', decision: 'partial', context: { ...reference, steps } })),
+  ]) {
+    f.respond({ status: 200, body });
+    await assert.rejects(f.adapter().recall({ origin }, context()), { code: 'invalid_response' });
+  }
 });
 
 test('redirects never forward the bearer credential to a redirected route', async t => {

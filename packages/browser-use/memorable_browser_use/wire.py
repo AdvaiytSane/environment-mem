@@ -349,7 +349,7 @@ class BrowserWire:
 
     def recall_request(self, record: dict[str, Any]) -> dict[str, Any]:
         fingerprint = self._fingerprint(record.get("initial_state"))
-        return {"task": self.task_label, "origin": fingerprint["origin"], "state": fingerprint,
+        return {"mode": "context", "task": self.task_label, "origin": fingerprint["origin"], "state": fingerprint,
                 "recent_states": [], "runtime": self._runtime(), "parameters": {"known": [], "unavailable": []},
                 "constraints": {"min_confidence": 0.7, "resume_from": None},
                 "client_run_id": str(uuid.UUID(record["run_id"]))}
@@ -395,53 +395,112 @@ class BrowserWire:
             body["dropped"] = {"count": len(dropped), "since": run["started_at"], "reason": "policy_filtered"}
         return body
 
-    def render_recall(self, response: dict[str, Any]) -> str:
-        """Render a server program as reference only; never execute its steps."""
-        if response.get("error"):
-            raise ValueError("salt_mismatch" if response.get("error") == "salt_mismatch" else "browser_recall_refused")
-        body = response.get("body", response)
-        if isinstance(body, Mapping) and body.get("error") == "salt_mismatch":
-            raise ValueError("salt_mismatch")
-        if not isinstance(body, Mapping) or body.get("decision") not in {"complete", "partial"}:
-            return ""
-        program = body.get("program")
-        if not isinstance(program, Mapping) or not isinstance(program.get("steps"), list):
-            return ""
-        # Only closed action/role/name tokens and checked URL shapes are rendered;
-        # never task strings, parameter values, selector literals or error text.
-        lines = []
-        for step in program["steps"][:50]:
-            if not isinstance(step, Mapping):
+    def _reference_target(self, selector: Any) -> str:
+        if not isinstance(selector, Mapping) or not isinstance(selector.get("strategies"), list):
+            return "target identity requires independent verification"
+        for strategy in selector["strategies"][:8]:
+            if not isinstance(strategy, Mapping):
                 continue
-            verb = step.get("op", step.get("verb"))
-            if verb not in set(ACTION_VERBS.values()) | {"clear", "scroll_to", "assert", "wait_for"}:
+            role = strategy.get("role")
+            if role not in ROLES:
                 continue
-            label = verb
-            selector = step.get("target")
-            if isinstance(selector, Mapping) and isinstance(selector.get("strategies"), list):
-                for strategy in selector["strategies"]:
-                    if not isinstance(strategy, Mapping):
-                        continue
-                    role = strategy.get("role")
-                    if role in ROLES:
-                        label += " " + role
-                    matcher = strategy.get("name")
-                    tokens = matcher.get("tokens", []) if isinstance(matcher, Mapping) else []
-                    if isinstance(tokens, list) and tokens and len(tokens) <= 6 and all(isinstance(token, str) and token in UI_WORDS for token in tokens):
-                        label += ' "' + " ".join(tokens) + '"'
-                    if role in ROLES:
-                        break
-            postcondition = step.get("postcondition")
-            if isinstance(postcondition, Mapping) and postcondition.get("p") == "url_shape":
-                origin, path = postcondition.get("origin"), postcondition.get("path_shape")
+            label = role
+            matcher = strategy.get("name")
+            tokens = matcher.get("tokens", []) if isinstance(matcher, Mapping) else []
+            exact = isinstance(matcher, Mapping) and matcher.get("kind") == "exact"
+            if isinstance(tokens, list) and 0 < len(tokens) <= 6 and all(isinstance(token, str) and token in UI_WORDS for token in tokens):
+                label += ' "' + " ".join(tokens) + '"'
+            elif matcher is not None:
+                label += " (specific identity requires independent verification)"
+            if selector.get("within") is not None or strategy.get("by") != "role" or (matcher is not None and not exact and tokens):
+                label += " (additional target constraints require independent verification)"
+            return label
+        return "target identity requires independent verification"
+
+    def _reference_condition(self, predicate: Any, depth: int = 0) -> str:
+        if not isinstance(predicate, Mapping) or depth > 2:
+            return "additional condition requires independent checking"
+        kind = predicate.get("p")
+        if kind == "always":
+            return ""
+        if kind in {"url_shape", "state_matches"}:
+            shape = predicate.get("fingerprint") if kind == "state_matches" else predicate
+            if isinstance(shape, Mapping):
+                origin, path = shape.get("origin"), shape.get("path_shape")
                 if isinstance(origin, str) and re.fullmatch(r"https?://[a-z0-9.-]+(?::\d+)?", origin) and isinstance(path, str) and len(path) <= 200 and re.fullmatch(r"/[a-z0-9._:/-]*", path):
-                    # Even a server-returned path must cross this adapter's
-                    # static-route gate before reaching a model's context.
                     try:
                         safe_origin, safe_path, _ = self._url(origin + path)
                     except ValueError:
                         pass
                     else:
-                        label += " (expected page shape: " + safe_origin + safe_path + ")"
+                        suffix = "; page fingerprint must also match" if kind == "state_matches" else ""
+                        return "page shape " + safe_origin + safe_path + suffix
+        if kind in {"element_present", "element_absent", "element_enabled", "element_checked"}:
+            target = self._reference_target(predicate.get("target"))
+            if target:
+                if kind == "element_checked" and isinstance(predicate.get("checked"), bool):
+                    return target + (" checked" if predicate["checked"] else " unchecked")
+                if kind != "element_checked":
+                    return target + " " + kind.removeprefix("element_")
+        if kind == "role_count" and predicate.get("role") in ROLES:
+            bounds = []
+            for key in ("min", "max"):
+                value = predicate.get(key)
+                if isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 1_000_000:
+                    bounds.append(key + " " + str(value))
+            if bounds:
+                return predicate["role"] + " count: " + ", ".join(bounds)
+        if kind in {"all", "any"} and isinstance(predicate.get("of"), list) and 0 < len(predicate["of"]) <= 6:
+            items = [self._reference_condition(item, depth + 1) or "unconditional" for item in predicate["of"]]
+            return "(" + (" AND " if kind == "all" else " OR ").join(items) + ")"
+        return "additional condition requires independent checking"
+
+    def render_recall(self, response: dict[str, Any]) -> str:
+        """Render explicit advisory context; a replay program is not a substitute."""
+        if response.get("error"):
+            raise ValueError("salt_mismatch" if response.get("error") == "salt_mismatch" else "browser_recall_refused")
+        body = response.get("body", response)
+        if isinstance(body, Mapping) and body.get("error") == "salt_mismatch":
+            raise ValueError("salt_mismatch")
+        if not isinstance(body, Mapping) or body.get("mode") != "context":
+            raise ValueError("context_unsupported")
+        if body.get("decision") == "no_match":
+            return ""
+        context = body.get("context")
+        if body.get("decision") not in {"complete", "partial"} or body.get("program") is not None or not isinstance(context, Mapping) or context.get("kind") != "workflow_reference" or context.get("executable") is not False or not isinstance(context.get("steps"), list) or not 0 < len(context["steps"]) <= 50:
+            raise ValueError("invalid_context_response")
+        # Only closed action/role/name tokens and checked URL shapes are rendered;
+        # never task strings, parameter values, selector literals or error text.
+        lines = []
+        for step in context["steps"]:
+            if not isinstance(step, Mapping):
+                break
+            if not isinstance(step.get("approval_required"), bool):
+                raise ValueError("invalid_context_approval")
+            verb = step.get("op", step.get("verb"))
+            if verb not in set(ACTION_VERBS.values()) | {"clear", "scroll_to", "assert", "wait_for"}:
+                break
+            label = verb
+            if step.get("approval_required") is True:
+                label = "Human approval required before any action: " + label
+            if step.get("target") is not None or verb not in {"navigate", "end", "assert", "wait_for", "scroll_to", "scroll"}:
+                label += " " + self._reference_target(step.get("target"))
+            for field, heading in (("precondition", "check before"), ("postcondition", "verify after")):
+                condition = self._reference_condition(step.get(field))
+                if condition:
+                    label += "; " + heading + ": " + condition
             lines.append(f"{len(lines) + 1}. {label}")
-        return "Historical reference only; these are not executable replay instructions.\n" + "\n".join(lines) if lines else ""
+        if not lines:
+            return ""
+        header = "Historical reference only; these are not executable replay instructions."
+        if body["decision"] == "partial" or len(lines) != len(context["steps"]):
+            header += " Partial reference; uncovered work must be handled independently."
+        if any("independent verification" in line or "independent checking" in line for line in lines):
+            header += " Some target or condition details could not be rendered; verify them independently."
+        boundary = context.get("boundary")
+        reasons = {"policy": "policy restriction", "parameter": "unavailable parameter",
+                   "step_budget": "step limit", "context_redaction": "metadata restriction",
+                   "context_budget": "context size limit", "uncompilable_target": "target metadata gap"}
+        if isinstance(boundary, Mapping) and boundary.get("reason") in reasons:
+            header += " Reference stops at a " + reasons[boundary["reason"]] + "."
+        return header + "\n" + "\n".join(lines)
