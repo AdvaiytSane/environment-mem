@@ -1,0 +1,112 @@
+{
+  "mode": "scripted_browser_use_tools",
+  "browser_use_version": "0.13.10",
+  "remote_enabled": false,
+  "run_id": "041f5b33-1965-4dff-ae8b-f2dd56fefcd5",
+  "events_retained": 5,
+  "verification": {
+    "ok": true,
+    "check": "current_page_url_and_dom_card_count"
+  },
+  "observation": {
+    "url": "https://quotes.toscrape.com/page/2/",
+    "title": "Quotes to Scrape",
+    "quotes": 10
+  },
+  "custom_tool_observed_counts": [
+    10
+  ],
+  "recall_result": null,
+  "store_result": null,
+  "diagnostics": [
+    {
+      "stage": "recall",
+      "error": "offline"
+    },
+    {
+      "stage": "store",
+      "error": "offline"
+    }
+  ],
+  "wire_diagnostics": [
+    {
+      "stage": "wire",
+      "dropped": 2,
+      "reasons": {
+        "target_not_observed": 1,
+        "unsupported_verb": 1
+      }
+    }
+  ],
+  "pending_outbox_exists": true,
+  "typed_value_absent_from_journal": true,
+  "journal_sha256": "1f2acb45c02da5e3cc90308e75e494593b1b9f3e6792edea375b3c2b944c5b04",
+  "failure": null,
+  "local_contract_validation": {
+    "kind": "actual Browser Use outbox checked against upstream validators locally; no service request",
+    "checked_at": "2026-09-19T22:16:07.280Z",
+    "upstream_commit": "101666176b842f1d1053c2c132dcdd2a0640838a",
+    "checks": [
+      {
+        "run_id": "041f5b33-1965-4dff-ae8b-f2dd56fefcd5",
+        "event_count": 3,
+        "dropped": {
+          "count": 2,
+          "since": "2026-09-19T22:15:14.765Z",
+          "reason": "policy_filtered"
+        },
+        "capabilities": [],
+        "events": [
+          {
+            "seq": 1,
+            "verb": "navigate",
+            "status": "ok",
+            "ok": true,
+            "fingerprints": [
+              {
+                "position": "before",
+                "ok": true
+              },
+              {
+                "position": "after",
+                "ok": true
+              }
+            ]
+          },
+          {
+            "seq": 2,
+            "verb": "click",
+            "status": "ok",
+            "ok": true,
+            "fingerprints": [
+              {
+                "position": "before",
+                "ok": true
+              },
+              {
+                "position": "after",
+                "ok": true
+              }
+            ]
+          },
+          {
+            "seq": 5,
+            "verb": "end",
+            "status": "ok",
+            "ok": true,
+            "fingerprints": [
+              {
+                "position": "before",
+                "ok": true
+              },
+              {
+                "position": "after",
+                "ok": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

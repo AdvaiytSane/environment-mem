@@ -11,6 +11,7 @@ import { report } from './report.ts';
 import { writeConsole } from './console.ts';
 import { stateDir } from './paths.ts';
 import { backendFor, memorableConnection, pendingMemorable, syncMemorable } from './memorable.ts';
+import { adapterCommand } from './sdk/adapters.ts';
 
 const HELP = `headstart  the second session starts where the first one finished
 
@@ -22,6 +23,7 @@ const HELP = `headstart  the second session starts where the first one finished
   recall --procedure <slug>  read a Memorable procedure through the active connection
   connection           show selected backend and pending Memorable submissions
   sync                 retry pending Memorable submissions (same workflow IDs)
+  memory <recall|store> --adapter <file>  JSON bridge to an optional SDK adapter
   facts                print what headstart knows about this repo
   doc [--write]        a repository doc generated from recorded sessions; --write puts it in AGENTS.md and CLAUDE.md
   list                 list stored procedures
@@ -52,6 +54,7 @@ async function main(argv: string[]): Promise<void> {
   const [cmd, ...args] = argv;
   const cwd = process.cwd();
   switch (cmd) {
+    case 'memory': return adapterCommand(args);
     case 'hook': return runHook(args[0]);
     case 'init': {
       const dir = stateDir(cwd);
@@ -159,4 +162,11 @@ async function main(argv: string[]): Promise<void> {
   }
 }
 
-main(process.argv.slice(2)).catch(e => { console.error(e?.stack ?? String(e)); process.exit(1); });
+main(process.argv.slice(2)).catch(e => {
+  if (process.argv[2] === 'memory') {
+    process.stdout.write(JSON.stringify({ schema: 'memorable.adapter.v1', operation: process.argv[3],
+      error: { code: typeof e?.code === 'string' && /^[a-z_]{1,80}$/.test(e.code) ? e.code : 'adapter_error',
+        message: e instanceof Error ? e.message.slice(0, 4096) : 'adapter failed' } }) + '\n');
+  } else console.error(e?.stack ?? String(e));
+  process.exit(1);
+});

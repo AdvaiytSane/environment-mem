@@ -41,14 +41,16 @@ test('local checkout and packed npm artifact expose runnable SDK and CLI', { tim
     const observed = JSON.parse(run(process.execPath, ['--input-type=module', '-e', `
       import { createMemorable } from 'headstart/memorable';
       import { createMemorable as rootExport } from 'headstart';
+      import { loadAdapter, invokeAdapter } from 'headstart/adapters';
       import { binCommand } from './node_modules/headstart/dist/install.js';
       const client = createMemorable();
       console.log(JSON.stringify({ store: typeof client.store, recall: typeof client.recall,
-        sameExport: rootExport === createMemorable, hookCommand: binCommand() }));
+        sameExport: rootExport === createMemorable, adapterExports: [typeof loadAdapter, typeof invokeAdapter], hookCommand: binCommand() }));
     `], consumer));
     assert.equal(observed.store, 'function');
     assert.equal(observed.recall, 'function');
     assert.equal(observed.sameExport, true);
+    assert.deepEqual(observed.adapterExports, ['function', 'function']);
     assert.ok(observed.hookCommand.includes(join('dist', 'cli.js')));
     const manifest = JSON.parse(readFileSync(join(consumer, 'node_modules', 'headstart', 'package.json'), 'utf8'));
     assert.equal(manifest.exports['./memorable'].types, './src/sdk/index.ts');

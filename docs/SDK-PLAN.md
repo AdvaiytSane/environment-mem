@@ -28,6 +28,15 @@ Current recall modes are routing choices (`auto`, `single`, `chain`) for existin
 
 The application owns hook placement, task boundaries, redaction and how recalled material is used. Hooks/injection are optional conveniences. The SDK must not execute retrieved instructions automatically. Deterministic replay would need its own state checks and execution policy; returning a procedure does not provide it.
 
+The optional adapter interface keeps the main command generic. A developer-selected local module exports `createAdapter(config)` and implements the same `recall(request, {signal})` / `store(request, {signal})` operations. `headstart memory <recall|store> --adapter <file>` passes JSON requests and returns a versioned JSON envelope; Node callers use `headstart/adapters`. Each add-on defines its own trace schema and connection behavior. Browser Use and Devin mappings belong in optional directories/packages, with no browser dependency in the core SDK. The envelope does not turn the existing upstream text commands into structured hosted APIs. See [CONNECTIONS.md](CONNECTIONS.md) for the protocol and limits.
+
+The optional [Browser Use implementation](../packages/browser-use/README.md) now
+captures real browser actions through this interface. Its experimental HTTP
+driver uses a separate browser-specific upstream schema; it is not evidence that
+general HTTP recall has shipped. The [live report](verification/2026-09-19-browser-use.md)
+records actual capture, missing browser authorization, and the unresolved need
+for useful advisory retrieval without declaring deterministic executor support.
+
 The next versioned metadata contract should distinguish:
 
 | Definition | Purpose |
@@ -45,6 +54,7 @@ Developers define this in code. No dashboard setup, sample-paste step, or third 
 ## 3. Delivery order and ownership
 
 1. **This repository: CLI connection and capture.** Export the two-method connector, route the Memorable backend's reads and writes through it, and document native/custom hooks. Separate task runs within a session, retain stable call IDs when supplied, deduplicate repeated events, and preserve explicit failure/unknown results. Keep the existing local engine available with a clear label.
+   Optional integration packages build on the same two operations; validate Browser Use with real action/results and handle Devin separately according to [DEVIN-INTEGRATION-PLAN.md](DEVIN-INTEGRATION-PLAN.md). Protocol regression checks establish dispatch and error handling only; they do not prove capture, retrieval quality or deployed persistence.
 2. **Private upstream: review the existing HTTP read work.** Confirm authorization, storage backend, procedure schema, ranker reuse, pagination/candidate limits, error behavior and deployed versions. Run a real stored-procedure readback before declaring the endpoint usable. Commit, deploy and document it in the upstream repository.
 3. **Coordinate the durable trace contract.** Preserve accepted, redacted traces separately from reduced procedures. Distinguish durable acceptance, extraction admission and index readiness. Add idempotency/run revisions and explicit scope/condition/outcome semantics where missing. Identify what can be reused before designing migrations.
 4. **This repository: add the documented HTTP transport.** Keep `store` and `recall` as the public operations; select transport at client creation. Add typed responses only when the deployed service has a versioned response contract. Retain the CLI transport for environments that already use it.

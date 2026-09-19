@@ -9,6 +9,7 @@ This branch provides a Node.js connection to the existing Memorable CLI. The cur
 | Node.js coding loop | Import `createMemorable` from `headstart/memorable` | Call `recall` before the task and `store` after capturing its actual calls/results |
 | Host with command hooks | Headstart hook adapter with backend `memorable` | Enable compatible hook events, pass stable identifiers and verify actual delivery |
 | Any program that can run a command | Call the published CLI directly | Run `memorable recall "task"` before work and pipe the extraction envelope to `memorable ingest -` afterward |
+| Custom trace schema or optional integration package | `headstart memory <recall\|store> --adapter <local-module>` | Implement the same two operations in a developer-selected module; the core dispatches JSON without interpreting browser or platform fields |
 | MCP client | Existing `memorable mcp` | Configure the client and confirm which tools the selected CLI version exposes; read access does not automatically capture writes |
 | HTTP-only or browser environment | Future HTTP transport | Wait for verified, documented upstream store/read semantics; extraction alone is insufficient |
 
@@ -71,6 +72,18 @@ Direct SDK session/workflow IDs must be 1–200 letters, numbers, dots, undersco
 The connector reports stdout/stderr and command completion. Treat nonzero exits/timeouts as errors; do not interpret them as “no matches.” A successful `store` command does not prove durable hosted storage. The process deadline terminates the launched process group where supported, but an upstream store can already have taken effect before timeout; retrying is not guaranteed exactly once. `recall({ query, mode: 'single' })` and `recall({ query, mode: 'chain' })` select the existing CLI paths; they do not expose vector/keyword algorithm switches.
 
 With the Memorable backend, `headstart recall --procedure <slug>` reads the full rendered procedure. `headstart recall --json` is rejected because the upstream CLI response is text. The prompt hook injects a bounded candidate listing as reference material; it does not automatically fetch or execute every listed procedure.
+
+For an optional package, export `createAdapter(config)` from a local JavaScript module. It returns `recall(request, {signal})` and `store(request, {signal})`, both asynchronous. The package defines its request/result schema and owns validation, hooks, redaction, retrieval compatibility and backend connection. Browser-specific logic belongs in that package; the main command only dispatches the two operations. A simple adapter can delegate both methods to `createMemorable()`; a richer adapter must document how it preserves fields that the generic extraction envelope cannot represent.
+
+```sh
+headstart memory recall --adapter ./memory-adapter.mjs <<'JSON'
+{"config": {}, "request": {"query": "Fix duplicate payment retries"}}
+JSON
+```
+
+The command's adapter path selects executable code; fields inside the request do not choose a module. Successful stdout is one JSON envelope: `{ "schema": "memorable.adapter.v1", "operation": "recall", "result": ... }`. Errors return a nonzero exit and an `error.message` envelope. Adapter code must reserve stdout for this protocol and send diagnostics to stderr. This protocol is independent of the published Memorable CLI's text output and does not create an upstream `--json` feature or HTTP recall endpoint.
+
+Node callers can import `loadAdapter` and `invokeAdapter` from `headstart/adapters`; `invokeAdapter(adapter, 'recall', request, {timeoutMs})` uses the same result envelope. Input to the CLI is capped at 8 MiB and successful serialized output at 2 MiB. Operation deadlines default to 30 seconds; direct SDK calls accept 1–120,000 milliseconds. The signal is cooperative cancellation in the same process, not a sandbox or rollback. Module import/factory initialization happens before this deadline; a caller launching an adapter as a subprocess should also impose an outer process deadline. Use only developer-approved modules and JSON-compatible results.
 
 ## 3. Place capture and recall at real boundaries
 

@@ -8,6 +8,7 @@
   "exports": {
     ".": { "types": "./src/sdk/index.ts", "default": "./dist/sdk/index.js" },
     "./memorable": { "types": "./src/sdk/index.ts", "default": "./dist/sdk/index.js" },
+    "./adapters": { "types": "./src/sdk/adapters.ts", "default": "./dist/sdk/adapters.js" },
     "./package.json": "./package.json"
   },
   "files": ["bin/", "dist/", "src/", "scripts/build.mjs", "docs/CONNECTIONS.md"],

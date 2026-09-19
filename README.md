@@ -9,6 +9,7 @@ This repository's package and executable remain named **`headstart`**. The conne
 | Component | Responsibility | Status |
 |---|---|---|
 | This repository | Importable connector, coding-agent hook adapter, integration documentation, verification evidence | Branch implementation |
+| Optional [Browser Use package](packages/browser-use/README.md) | Python capture, page metadata and a browser-specific transport through the same CLI | Real browser capture verified; hosted round trip blocked |
 | [Memorable upstream](https://github.com/NIkhil-cmd-cmd/memorable-gbrain) | CLI, shared procedure/retrieval code, extraction service and other Memorable applications | Separate private monorepo; not just a GBrain plugin |
 | Existing `memorable-cli` | `ingest -`, `recall`, `show`, `chain`, and local MCP access | Published CLI; see [CLI docs](https://www.memorable.sh/docs/cli) |
 | Existing HTTP API | Extraction and query embeddings | [Documented API](https://www.memorable.sh/docs/api); extraction response alone is not a durable storage receipt |
@@ -75,9 +76,28 @@ Failed submissions remain in the local outbox. `headstart connection` reports pe
 
 For a custom agent, call the SDK from your own lifecycle directly. You do not need the hook installer, a dashboard, or a pasted sample trace.
 
+Platform packages remain optional. The core exports `loadAdapter` / `invokeAdapter`
+from `headstart/adapters` and offers `headstart memory store|recall --adapter <file>`.
+Developers can implement a local module with those two methods without changing
+the main CLI. The [Browser Use add-on](packages/browser-use/README.md) uses that
+interface; it adds no browser dependency to the core. Its experimental driver
+targets the browser-specific backend contract, because published `memorable ingest`
+does not preserve browser targets and input shapes. This does not establish a
+general deployed HTTP recall API.
+
+The [Devin plan](docs/DEVIN-INTEGRATION-PLAN.md) distinguishes native CLI hooks
+from hosted session APIs. The [integration shortlist](docs/INTEGRATION-SHORTLIST.md)
+covers AI SDK, LangChain, Mastra and Pydantic AI without requiring Browser Use.
+
 Use the [one-prompt integration handoff](docs/AGENT-SETUP.md) to have a coding agent connect another application and report what it actually verified.
 
 ## Evidence and limits
+
+The [Browser Use live report](docs/verification/2026-09-19-browser-use.md) records
+a real public website run with captured navigation and click targets, a retained
+outbox, independently checked page contents and explicit omissions. This was a
+scripted Browser Use execution, not an LLM-driven Agent run. Memorable browser
+authorization and model credentials still block the full store/recall experiment.
 
 The [September 19 live check](docs/verification/2026-09-19.md) reached the extraction service, persisted a procedure locally and read it back in fresh CLI processes. Close wording and an exact filename retrieved it; a paraphrase missed. The hook returned context, but native Claude verification was blocked by revoked authentication before tools ran. Hosted durability, HTTP recall and native context consumption remain unverified. [VERIFICATION.md](docs/VERIFICATION.md) defines the remaining evidence gates.
 
