@@ -1,0 +1,14 @@
+{
+  "name": "headstart",
+  "version": "0.1.0",
+  "description": "Warm-start coding-agent sessions from what the last session did, and measure the saving.",
+  "type": "module",
+  "bin": { "headstart": "./bin/headstart" },
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "eval": "node src/cli.ts eval",
+    "report": "node src/cli.ts report"
+  },
+  "license": "MIT"
+}

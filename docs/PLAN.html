@@ -1,0 +1,150 @@
+<title>Headstart for Devin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --bg:#f6f5f1;--ink:#1c1b18;--mute:#6b6862;--line:#d9d6cd;--panel:#ffffff;
+  --accent:#8a4b1f;--ok:#2f6b3a;--warn:#9a5a00;--bad:#9c2b2b;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--warn:#e0a94c;--bad:#e07b7b;}}
+:root[data-theme="dark"]{--bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--warn:#e0a94c;--bad:#e07b7b;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55;margin:0;padding:0 20px}
+main{max-width:720px;margin:0 auto;padding-block:48px 96px}
+h1{font-size:34px;line-height:1.15;margin:0 0 6px;font-weight:600;text-wrap:balance}
+.sub{color:var(--mute);margin:0 0 40px;font-size:16px}
+h2{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:44px 0 12px;font-family:var(--mono);font-weight:500}
+p{margin:0 0 14px;max-width:65ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:65ch}
+li{margin:0 0 6px}
+code,pre{font-family:var(--mono);font-size:13.5px}
+code{background:var(--panel);border:1px solid var(--line);padding:1px 5px;border-radius:3px}
+pre{background:var(--panel);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;margin:0 0 16px;line-height:1.5}
+pre code{border:0;padding:0;background:none}
+table{border-collapse:collapse;width:100%;margin:0 0 16px;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);font-weight:500}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{overflow-x:auto}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px}
+.flow div{background:var(--panel);border:1px solid var(--line);padding:12px;font-size:14px}
+.flow b{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:6px}
+@media (max-width:640px){.flow{grid-template-columns:1fr 1fr}}
+.tag{font-family:var(--mono);font-size:12px;padding:1px 6px;border:1px solid var(--line);border-radius:3px;color:var(--mute)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+</style>
+<main>
+<h1>Headstart for Devin</h1>
+<p class="sub">HackMIT 2026. One CLI that makes the second coding-agent session on a repo cheaper than the first, and proves it with numbers. Renamed from "warm": Cognition uses that word for sandbox pools.</p>
+
+<h2>Status</h2>
+<ul>
+<li class="ok">headstart CLI built and tested: hooks, deterministic extract, recall, injection, <code>skills</code>, <code>install</code>, eval with four arms, report, console page. Repo <code>~/Documents/GitHub/headstart</code>, uncommitted.</li>
+<li class="ok">Three eval rounds done: 162 Claude Code runs, 72 Devin CLI runs. Numbers below. Two hostile critiques in <code>docs/critique-1.md</code> and <code>docs/critique-2.md</code>, both acted on.</li>
+<li class="ok">Memorable side built locally, not pushed: <code>memorable hook devin</code>, <code>install-hooks devin</code>, <code>skills</code>, <code>devin verify</code>, a Devin section on <code>/start/agents.md</code>, and <code>docs/DEVIN-INTEGRATION.md</code> answering Advaiyt's six capabilities. 270 CLI tests pass. Dev build installed as the durable CLI on this machine.</li>
+<li class="warn">Devin free weekly quota is exhausted (the eval used it). Live <code>devin verify</code> waits on on-demand usage or booth credits. The same path ran end to end against a fake Devin that replays the real hook payloads.</li>
+</ul>
+
+<h2>Results after three rounds, Claude Code runner, sonnet, n=18 per arm</h2>
+<table>
+<tr><th>arm</th><th class="num">context tokens</th><th class="num">tool calls</th><th class="num">seconds</th><th class="num">cost per session</th></tr>
+<tr><td>cold</td><td class="num">937,931</td><td class="num">16.6</td><td class="num">62</td><td class="num">$0.394</td></tr>
+<tr><td>hand-written AGENTS.md (control)</td><td class="num">-25%</td><td class="num">-26%</td><td class="num">-10%</td><td class="num">-13%</td></tr>
+<tr><td>procedure injection, round 2</td><td class="num">-18%</td><td class="num">-9%</td><td class="num">-9%</td><td class="num">-7%</td></tr>
+<tr><td>procedure injection, round 1</td><td class="num">-21%</td><td class="num">-13%</td><td class="num">-8%</td><td class="num">-12%</td></tr>
+<tr><td>generated AGENTS.md from procedures, round 3</td><td class="num">-11%</td><td class="num">-8%</td><td class="num">-10%</td><td class="num">-2%</td></tr>
+<tr><td>repo facts at session start only</td><td class="num">-8%</td><td class="num">-5%</td><td class="num">-4%</td><td class="num">-2%</td></tr>
+</table>
+<p>All tests pass in every arm after the endpoint-2 prompt fix. Standard deviations and 95% intervals are in <code>results/claude-sonnet-r3/report.md</code>; at n=18 the interval on the cost delta is about the size of the effect, so "7 to 12%" is the honest range, not a point. Context tokens are 97 out of 100 cache reads on Claude Code; cost is the paid number.</p>
+<p>What the three rounds say. A recorded procedure handed to the next session cuts tool calls by about a tenth and cost by 7 to 12%, with nothing written by hand. A person's four-line repo doc still does twice that. The doc carries the mechanism ("a route only takes effect once it is in ROUTES in src/registry.js"); the recording carries the co-change ("src/registry.js changed in 6 of 6 endpoint tasks"), and agents re-read to find the mechanism. Round 2 rewrote injection as counted rules and did not close the gap. Round 3 wrote the same content as a repo file and did worse than hook injection, so the channel is not the reason either. Calls before the first edit went up in every injected arm: the agent checks the claims before acting.</p>
+<p>Devin CLI runner, free model, 66 clean runs: procedure injection -10% context tokens, -5% tool calls; doc arm mixed; facts arm worse. High variance and a quota-skewed sample, not for a slide. Rerun on a paid model when usage is back.</p>
+
+<h2>What that means for the pitch</h2>
+<ul>
+<li>Cognition table: "sessions two onward run about 10% fewer tool calls and 7 to 12% cheaper on this repo, no human-written docs, tests still pass". Then the doc row, unprompted: a person's doc does 25%, and the two stack in principle. Show the table, then the live run.</li>
+<li>Token Company: the memory layer makes no model call. Recall and extraction are deterministic; the only LLM cost in the product is the agent's own session, which is what shrinks.</li>
+<li>Fleet row stays labelled as a projection with its interval. At $0.39 a session on sonnet the fleet saving is hundreds of dollars per 9,000 sessions; the ACU-minutes column is what Devin bills in.</li>
+</ul>
+
+<h2>What it is</h2>
+<p><code>headstart</code> is a CLI that sits under Devin CLI, Claude Code and Codex through their hook files. It records what a session actually did (commands run, files read, files written, what verified the result), turns that into a short procedure, and hands the procedure to the next session on the same repo before its first prompt. The next session skips discovery: no re-reading the build setup, no re-finding where things live, no re-learning how to run tests.</p>
+<p>The product on screen is a table, not a memory browser: tokens, tool calls, seconds and cost per session, cold against warm, and the same delta multiplied by a fleet.</p>
+
+<h2>Why Devin cares</h2>
+<p>Devin's person said: not memory, savings. Nine thousand VM sessions, and what happens to context. Every one of those sessions on the same repo repeats the same discovery in its own context window. That discovery is the most expensive and least useful part of the trace. Warm start removes it from sessions two through nine thousand.</p>
+<p>So the pitch leads with the saving and the context. Memory is the mechanism, named once. If the number holds, memory is the thing they will want after all.</p>
+<table>
+<tr><th>Metric</th><th>Cold session</th><th>Warm session</th><th>Fleet of 9,000</th></tr>
+<tr><td>Input tokens before first edit</td><td class="num">measured</td><td class="num">measured</td><td class="num">delta x 9,000</td></tr>
+<tr><td>Tool calls per task</td><td class="num">measured</td><td class="num">measured</td><td class="num">delta x 9,000</td></tr>
+<tr><td>Wall seconds</td><td class="num">measured</td><td class="num">measured</td><td class="num">delta x 9,000</td></tr>
+<tr><td>Tests pass</td><td class="num">measured</td><td class="num">measured</td><td class="num">must not drop</td></tr>
+</table>
+<p>Every cell comes from the eval below. Nothing on the slide is a projection except the last column, and that column is labelled as one.</p>
+
+<h2>How it works</h2>
+<div class="flow">
+<div><b>capture</b>PostToolUse and Stop hooks append each tool call to a per-session trace. Devin CLI reads Claude-format hook files, so one hook file covers Devin CLI, Claude Code and Codex. Warp has no hooks: capture there is <code>oz run conversation get</code> or a manual export, recall is the skills file.</div>
+<div><b>extract</b>Deterministic. Trace in, procedure out: ordered steps grouped by read, search, write, execute; preconditions (what was read before the first write); postconditions (the command that verified it). No model call.</div>
+<div><b>inject</b>SessionStart gets repo facts (verify command, entry files, hub files). UserPromptSubmit gets the one procedure that matches the prompt. Both as <code>additionalContext</code>, wrapped as reference data. <code>skills</code> writes the same procedures as SKILL.md for harnesses without hooks (Warp) and for cloud Devin.</div>
+<div><b>measure</b>Each session's usage, tool-call count, duration and test result land in a results file. <code>headstart report</code> prints the table and the fleet projection.</div>
+</div>
+<pre><code>headstart install              # .claude/settings.json hooks (Devin CLI reads the same file), ~/.codex/hooks.json
+headstart hook &lt;Event&gt;         # stdin: hook event. appends trace, extracts on Stop, injects on start and prompt
+headstart recall "add a flag"  # the procedure a prompt would receive
+headstart skills               # .agents/skills/*/SKILL.md (Devin, Warp, Codex) and .claude/skills/*/SKILL.md
+headstart eval --runner claude --repeats 2
+headstart report results/&lt;dir&gt;  # table, fleet projection, console.html</code></pre>
+<p>Store is pluggable. Default is a local JSONL file written this weekend. A second adapter shells out to <code>memorable ingest</code> and <code>memorable recall</code>, disclosed as a pre-event dependency, off by default.</p>
+
+<h2>Eval design</h2>
+<ul>
+<li>Fixture: a 120 to 180 file Node service with a test suite and a non-obvious test command. Nine tasks in three shapes, three each: add a CLI flag, add an endpoint, fix a seeded bug. Hidden tests are copied in after the agent stops.</li>
+<li>Four arms per task, each in a fresh copy: <b>cold</b> (nothing), <b>doc</b> (a hand-written AGENTS.md, the control the critic asked for), <b>facts</b> (repo facts at session start only), <b>full</b> (facts plus the matching procedure at prompt time). Warm arms never see a procedure from the same task.</li>
+<li>Runner today: <code>claude -p --output-format json</code>, which reports usage, turns, duration and cost. Runner at the venue: <code>devin -p --export</code> once Devin CLI is installed and logged in. Same hooks, same table.</li>
+<li>Metrics: context tokens (input plus cache reads plus cache writes, summed over turns), output tokens, tool calls, calls before the first edit, turns, seconds, cost, tests pass. Mean and standard deviation reported. Fleet projection in tokens, minutes, ACU (15 minutes each) and dollars.</li>
+<li>Improvement loop: read the warm traces, find what the agent still re-discovers, tighten extraction or injection, rerun. Stop when warm tool calls stop falling.</li>
+</ul>
+
+<h2>Sponsor map</h2>
+<table>
+<tr><th>Challenge</th><th>Prize</th><th>What the demo shows them</th></tr>
+<tr><td>Cognition, Best Use of Devin</td><td>$5,000</td><td>Devin CLI given a head start by sessions from any harness, and its own. Skills written without anyone clicking Create PR. Savings per session, fleet projection.</td></tr>
+<tr><td>OpenAI Challenge</td><td>ChatGPT Pro, credits</td><td>Codex captured through the same hook. Codex used to build the CLI.</td></tr>
+<tr><td>The Token Company</td><td>$500, SF interview</td><td>The cold vs warm token column. Savings inside the product, which is what they ask for.</td></tr>
+<tr><td>Warp, Best Developer Tool</td><td>Keychron per member</td><td>A CLI for agent developers. Warp's agent discovers the same <code>.agents/skills</code> files.</td></tr>
+</table>
+<p>HackMIT track: none. Judging criteria for overall prizes are Innovation 30, Technical 30, Impact 30, Learning 10.</p>
+
+<h2>What the research and the critic said</h2>
+<p>Past HackMIT overall winners are human-scale stories with a live demo (a beehive, a wildfire claim, a bike route). A fleet chart does not win the overall prize. Sponsor prizes go to whoever leans hardest on the sponsor's own stack, and CLI or benchmark-shaped tools have won Cognition prizes elsewhere. Most likely wins: Cognition and The Token Company. Least likely: overall, and OpenAI.</p>
+<p>The critic's five hits, all taken: Devin already auto-suggests Skills and Knowledge, so the pitch is "we keep Skills current from every harness, not only Devin sessions", not "memory for Devin". Devin bills in ACU, so the report shows minutes and ACU next to tokens. "Warm" is Cognition's word for sandbox pools, so the name changed. Two tasks per shape lets a reviewer say the warm run reused a near-duplicate, so it is three, and a static-doc control arm is in. Repeats and spread are reported.</p>
+<p>Three booth questions for Cognition are in <code>docs/critique-1.md</code>, section 6. Ask them before the demo.</p>
+
+<h2>Rules</h2>
+<p>Code of Conduct: code written before hacking starts disqualifies, except public open-source libraries, and any undisclosed library or API is cheating. Everything in the <code>headstart</code> repo is written this weekend, in a new repo, not inside memorable-gbrain or memorable-cli. The <code>memorable</code> adapter is off by default, 20 lines that shell out to the public npm package, and named as a prior dependency in the Plume write-up. Devin CLI, Claude Code and Codex are named as the harnesses under test.</p>
+
+<h2>Memorable, next week</h2>
+<p>Built today in <code>memorable-gbrain</code>, local only: <code>memorable install-hooks devin</code> writes <code>~/.config/devin/config.json</code> (verified to fire); <code>memorable hook devin</code> journals every turn and hands the trace to a detached <code>memorable ingest</code> on Stop, marks a session that ends without Stop as interrupted and never stores it; <code>memorable skills</code> writes <code>.agents/skills/*/SKILL.md</code> for cloud Devin, Warp and Codex; <code>memorable devin verify</code> is the acceptance test from Advaiyt's note. <code>/start/agents.md</code> has the Devin path. Capability table and gaps are in <code>memorable-gbrain/docs/DEVIN-INTEGRATION.md</code>.</p>
+<p>Same code, different backend. <code>HEADSTART_BACKEND=memorable</code> sends each procedure through <code>memorable ingest</code> so it lands in the dashboard. <code>headstart install</code> is <code>/start</code> paths 1 and 2 as one command; <code>headstart hook</code> on stdin is path 3. <code>headstart report</code> is the number every team puts on its slide. Blocker for next week is unchanged: the Worker diff with <code>/v1/recall</code> and <code>/start</code> are uncommitted and not on prod.</p>
+
+<h2>What happens now</h2>
+<ol>
+<li>Two research agents run in parallel: past HackMIT winners and what they had in common; a critic that argues why this loses and where Devin says no.</li>
+<li>Build the CLI end to end in <code>~/Documents/GitHub/headstart</code>: hook, extract, recall, inject, skills, eval, report, console. Done.</li>
+<li>Run the eval with the Claude runner on the real fixture. Publish the first table.</li>
+<li>Read the critic and the numbers. Change what they say to change. Rerun.</li>
+<li>Second critic pass on the real numbers. Rewrite the Devin pitch from what survived.</li>
+</ol>
+
+<h2>Open risks</h2>
+<ul>
+<li><span class="warn">Devin CLI is installed but not logged in.</span> Until <code>devin auth login</code> runs, the eval runs on Claude Code with identical hooks. Then the same command with <code>--runner devin</code>.</li>
+<li><span class="warn">Devin's hook payload has no transcript path and uses tool names <code>exec</code> and <code>edit</code>.</span> The trace comes from the events themselves, so this is a name map, not a redesign.</li>
+<li><span class="warn">Warm could not save much on tiny tasks.</span> Discovery cost scales with repo size. The fixture must be big enough that discovery is real: a few hundred files, a non-obvious test command.</li>
+<li><span class="bad">Judges may read it as a startup wrapper.</span> Answer: new repo, new code, one disclosed optional adapter, and a number they can check in the results folder.</li>
+<li><span class="warn">Devin said they are not interested in memory.</span> The slide never says memory first. It says: sessions 2 to 9,000 cost this much less.</li>
+</ul>
+</main>

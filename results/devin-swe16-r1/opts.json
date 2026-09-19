@@ -1,0 +1,17 @@
+{
+  "tasks": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/tasks.json",
+  "fixture": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/repo",
+  "out": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/results/devin-swe16-r1",
+  "arms": [
+    "cold",
+    "doc",
+    "facts",
+    "full"
+  ],
+  "repeats": 2,
+  "runner": "devin",
+  "model": "",
+  "parallel": 2,
+  "staticDoc": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/static-doc/AGENTS.md",
+  "timeoutMs": 720000
+}

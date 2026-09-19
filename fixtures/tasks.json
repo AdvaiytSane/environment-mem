@@ -1,0 +1,65 @@
+[
+  {
+    "id": "flag-1",
+    "shape": "flag",
+    "prompt": "Add a --json flag to the stats CLI command. When it is passed, print the stats as JSON instead of the current text output.",
+    "hidden_test": "fixtures/checks/flag-1.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "flag-2",
+    "shape": "flag",
+    "prompt": "Add a --limit <n> flag to the list command so it only prints the first n rows.",
+    "hidden_test": "fixtures/checks/flag-2.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "flag-3",
+    "shape": "flag",
+    "prompt": "Add a --format flag to the users command that accepts csv or table. It should keep printing the current plain rows by default and print CSV when csv is passed.",
+    "hidden_test": "fixtures/checks/flag-3.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "endpoint-1",
+    "shape": "endpoint",
+    "prompt": "Add a GET /health/deps endpoint that reports which internal dependencies the app relies on, returning JSON like {\"ok\": true, \"deps\": [...]}.",
+    "hidden_test": "fixtures/checks/endpoint-1.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "endpoint-2",
+    "shape": "endpoint",
+    "prompt": "Add a GET /users/:id/summary endpoint that returns JSON with the fields id, name, orderCount (how many orders the user has placed) and totalCents (their total spend in cents). Return 404 for an unknown user.",
+    "hidden_test": "fixtures/checks/endpoint-2.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "endpoint-3",
+    "shape": "endpoint",
+    "prompt": "Add a DELETE /orders/:id endpoint. It should return 404 for an order id that does not exist and 204 when the order is deleted.",
+    "hidden_test": "fixtures/checks/endpoint-3.test.js",
+    "visible_failing_test": null
+  },
+  {
+    "id": "bugfix-1",
+    "shape": "bugfix",
+    "prompt": "Refunded orders are still being counted toward a customer's order total. Fix the total so it excludes refunded orders.",
+    "hidden_test": "fixtures/checks/bugfix-1.test.js",
+    "visible_failing_test": "test/orders-total.test.js"
+  },
+  {
+    "id": "bugfix-2",
+    "shape": "bugfix",
+    "prompt": "The CSV export command writes its header row in the wrong column order compared to the data rows. Fix the header so it lines up with the values.",
+    "hidden_test": "fixtures/checks/bugfix-2.test.js",
+    "visible_failing_test": "test/cli-export.test.js"
+  },
+  {
+    "id": "bugfix-3",
+    "shape": "bugfix",
+    "prompt": "One of the report command's date range calculations is off by a month at the boundary, so some months come back with the wrong number of days. Find and fix it.",
+    "hidden_test": "fixtures/checks/bugfix-3.test.js",
+    "visible_failing_test": "test/dates-range.test.js"
+  }
+]

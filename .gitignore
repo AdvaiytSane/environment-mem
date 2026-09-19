@@ -1,0 +1,5 @@
+node_modules/
+.headstart/
+results/*/work/
+!results/.keep
+*.log
