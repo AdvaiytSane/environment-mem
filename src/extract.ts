@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Procedure, Step, TraceEvent } from './types.ts';
 import { repoName } from './paths.ts';
-import { succeeded, toSteps } from './trace.ts';
+import { commandOf, succeeded, toSteps } from './trace.ts';
 
 const MAX_STEPS = 40;
 
@@ -26,10 +26,15 @@ export function verifyForm(command: string): string | null {
 }
 
 export function extract(events: TraceEvent[], cwd: string): Procedure | null {
+  // Legacy callers may pass an entire session journal. A procedure belongs
+  // to the latest prompt, never to a concatenation of unrelated tasks.
+  const promptStart = events.findLastIndex(e => e.event === 'prompt');
+  if (promptStart > 0) events = events.slice(promptStart);
   const prompts = events.filter(e => e.event === 'prompt' && e.prompt).map(e => e.prompt!.trim());
   const steps = toSteps(events, cwd);
   if (!steps.length) return null;
   const sessionId = events[0].session_id;
+  const runId = events.find(e => e.run_id)?.run_id;
 
   const firstWrite = steps.findIndex(s => s.cls === 'write');
   const lastWrite = steps.map(s => s.cls).lastIndexOf('write');
@@ -38,12 +43,15 @@ export function extract(events: TraceEvent[], cwd: string): Procedure | null {
     .map(s => s.cls === 'search' ? `grep "${s.target}"` : s.target!)).slice(0, 12);
 
   const toolEvents = events.filter(e => e.event === 'tool');
-  const okCommands = new Set(
-    toolEvents.filter(e => succeeded(e) && e.tool_input && typeof e.tool_input.command === 'string')
-      .map(e => (e.tool_input!.command as string).replace(/\s+/g, ' ').trim().slice(0, 200)),
-  );
+  // A later failed/unknown attempt must not inherit success from an earlier
+  // execution of the same command. cmd and command are the same input seam.
+  const commandResults = new Map<string, boolean>();
+  for (const e of toolEvents) {
+    const command = commandOf(e.tool_input);
+    if (command) commandResults.set(command, succeeded(e));
+  }
   const after = lastWrite < 0 ? [] : steps.slice(lastWrite + 1);
-  const postconditions = uniq(after.filter(s => s.command && okCommands.has(s.command)).map(s => verifyForm(s.command!)).filter(Boolean) as string[]).slice(-2);
+  const postconditions = uniq(after.filter(s => s.command && commandResults.get(s.command) === true).map(s => verifyForm(s.command!)).filter(Boolean) as string[]).slice(-2);
 
   const files_written = uniq(steps.filter(s => s.cls === 'write' && s.target).map(s => s.target!));
   const files_read = uniq(steps.filter(s => s.cls === 'read' && s.target).map(s => s.target!));
@@ -63,8 +71,9 @@ export function extract(events: TraceEvent[], cwd: string): Procedure | null {
     : steps;
 
   return {
-    id: createHash('sha1').update(sessionId + title).digest('hex').slice(0, 12),
+    id: createHash('sha1').update(runId ? `${sessionId}\0${runId}` : sessionId + title).digest('hex').slice(0, 12),
     session_id: sessionId,
+    ...(runId ? { run_id: runId } : {}),
     task_id: process.env.HEADSTART_TASK_ID,
     repo: repoName(cwd),
     created_at: new Date().toISOString(),

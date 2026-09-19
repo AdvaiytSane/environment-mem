@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "memorable": {
+      "command": "memorable",
+      "args": ["mcp"]
+    }
+  }
+}

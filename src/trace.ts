@@ -27,15 +27,17 @@ function str(v: unknown): string | undefined {
   return typeof v === 'string' && v.length ? v : undefined;
 }
 
-export function targetOf(input: Record<string, unknown> | undefined, cwd: string): string | undefined {
-  if (!input) return undefined;
+export function targetOf(value: unknown, cwd: string): string | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const input = value as Record<string, unknown>;
   const p = str(input.file_path) ?? str(input.path) ?? str(input.file) ?? str(input.notebook_path)
     ?? str(input.target_file) ?? str(input.pattern) ?? str(input.query);
   return p ? rel(p, cwd) : undefined;
 }
 
-export function commandOf(input: Record<string, unknown> | undefined): string | undefined {
-  if (!input) return undefined;
+export function commandOf(value: unknown): string | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const input = value as Record<string, unknown>;
   const c = str(input.command) ?? str(input.cmd);
   return c ? c.replace(/\s+/g, ' ').trim().slice(0, 200) : undefined;
 }
@@ -46,9 +48,11 @@ export function rel(p: string, cwd: string): string {
 }
 
 export function succeeded(ev: TraceEvent): boolean {
+  if (typeof ev.result?.exit_code === 'number' && ev.result.exit_code !== 0) return false;
+  if (typeof ev.result?.ok === 'boolean') return ev.result.ok;
+  if (typeof ev.result?.exit_code === 'number') return ev.result.exit_code === 0;
   if (typeof ev.ok === 'boolean') return ev.ok;
-  const h = (ev.response_head ?? '').toLowerCase();
-  return !/(^|\n)(error|fail|exception|traceback|command failed|exit code [1-9])/i.test(h);
+  return false;
 }
 
 const READ_CMDS = /^(cat|head|tail|less|more|bat|sed -n)\b/;

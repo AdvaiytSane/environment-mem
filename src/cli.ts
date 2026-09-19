@@ -10,6 +10,7 @@ import { ARMS, runEval, type Arm } from './eval.ts';
 import { report } from './report.ts';
 import { writeConsole } from './console.ts';
 import { stateDir } from './paths.ts';
+import { backendFor, memorableConnection, pendingMemorable, syncMemorable } from './memorable.ts';
 
 const HELP = `headstart  the second session starts where the first one finished
 
@@ -18,6 +19,9 @@ const HELP = `headstart  the second session starts where the first one finished
   uninstall            remove headstart hooks from those files
   hook <Event>         stdin: one hook event (SessionStart | UserPromptSubmit | PostToolUse | Stop)
   recall "<task>"      print the best procedure for a task, --json for raw
+  recall --procedure <slug>  read a Memorable procedure through the active connection
+  connection           show selected backend and pending Memorable submissions
+  sync                 retry pending Memorable submissions (same workflow IDs)
   facts                print what headstart knows about this repo
   doc [--write]        a repository doc generated from recorded sessions; --write puts it in AGENTS.md and CLAUDE.md
   list                 list stored procedures
@@ -52,6 +56,7 @@ async function main(argv: string[]): Promise<void> {
     case 'init': {
       const dir = stateDir(cwd);
       const backend = flag(args, 'backend', process.env.HEADSTART_BACKEND ?? 'local');
+      if (backend !== 'local' && backend !== 'memorable') throw new Error('backend must be local or memorable');
       const cfg = { backend, created_at: new Date().toISOString() };
       writeFileSync(join(dir, 'config.json'), JSON.stringify(cfg, null, 2) + '\n');
       console.log(`wrote ${join(dir, 'config.json')} (backend ${backend})`);
@@ -68,11 +73,33 @@ async function main(argv: string[]): Promise<void> {
     }
     case 'uninstall': { for (const p of uninstall(cwd)) console.log(`cleaned ${p}`); return; }
     case 'recall': {
-      const q = args.filter(a => !a.startsWith('--')).join(' ');
+      const words = args.filter((a, i) => !a.startsWith('--') && !['--limit', '--procedure'].includes(args[i - 1]));
+      const q = words.join(' ');
+      if (backendFor(cwd) === 'memorable') {
+        if (args.includes('--json')) throw new Error('The published Memorable CLI returns text; --json is unavailable for this connection.');
+        const procedureId = flag(args, 'procedure');
+        const result = await memorableConnection(cwd).recall(procedureId
+          ? { procedureId } : { query: q, mode: args.includes('--chain') ? 'chain' : args.includes('--single') ? 'single' : 'auto' });
+        process.stdout.write(result.stdout);
+        process.stderr.write(result.stderr);
+        return;
+      }
+      if (args.includes('--procedure')) throw new Error('--procedure requires the memorable backend');
       const hits = recall(cwd, q, { k: Number(flag(args, 'limit', '3')), minScore: 0 });
       if (args.includes('--json')) return console.log(JSON.stringify(hits, null, 2));
       if (!hits.length) return console.log('no matching procedures');
       for (const h of hits) console.log(renderProcedure(h), '\n');
+      return;
+    }
+    case 'connection': {
+      return console.log(JSON.stringify({ backend: backendFor(cwd), transport: backendFor(cwd) === 'memorable' ? 'cli' : 'local',
+        pendingSubmissions: pendingMemorable(cwd).length, durableRemoteStorage: 'unverified' }, null, 2));
+    }
+    case 'sync': {
+      for (const result of await syncMemorable(cwd)) {
+        process.stdout.write(result.stdout);
+        process.stderr.write(result.stderr);
+      }
       return;
     }
     case 'doc': {

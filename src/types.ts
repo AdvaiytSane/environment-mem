@@ -4,9 +4,13 @@ export interface TraceEvent {
   ts: number;
   event: 'prompt' | 'tool' | 'stop' | 'start';
   session_id: string;
+  run_id?: string;
+  event_id?: string;
   cwd: string;
   tool_name?: string;
-  tool_input?: Record<string, unknown>;
+  tool_call_id?: string;
+  tool_input?: unknown;
+  result?: { ok?: boolean; exit_code?: number };
   ok?: boolean;
   response_head?: string;
   prompt?: string;
@@ -24,6 +28,7 @@ export interface Step {
 export interface Procedure {
   id: string;
   session_id: string;
+  run_id?: string;
   task_id?: string;
   repo: string;
   created_at: string;

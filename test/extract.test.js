@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { extract } from '../src/extract.ts';
-import { classify, toSteps } from '../src/trace.ts';
+import { classify, succeeded, toSteps } from '../src/trace.ts';
 import { renderProcedure } from '../src/inject.ts';
 
 const cwd = '/repo';
@@ -54,4 +54,22 @@ test('injection is wrapped as reference data and stays short', () => {
 
 test('extract returns null for a session with no tool calls', () => {
   assert.equal(extract([session[0]], cwd), null);
+});
+
+test('unknown outcomes never become verification and cmd aliases retain observed success', () => {
+  assert.equal(succeeded({ ...ev('Bash', { command: 'npm test' }), ok: undefined, response_head: 'looks fine' }), false);
+  const events = [session[0], ev('Write', { path: 'a.ts' }), {
+    ...ev('exec_command', { cmd: 'npm test' }), result: { exit_code: 0, ok: true },
+  }];
+  assert.deepEqual(extract(events, cwd).postconditions, ['npm test']);
+  events.push({ ...ev('exec_command', { cmd: 'npm test' }), ok: undefined });
+  assert.deepEqual(extract(events, cwd).postconditions, []);
+});
+
+test('legacy session extraction selects the latest prompt boundary', () => {
+  const events = [...session, { ...session[0], prompt: 'second task' }, ev('Write', { path: 'second.ts' })];
+  const procedure = extract(events, cwd);
+  assert.equal(procedure.prompt, 'second task');
+  assert.deepEqual(procedure.files_written, ['second.ts']);
+  assert.equal(procedure.total_calls, 1);
 });
