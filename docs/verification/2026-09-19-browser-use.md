@@ -19,8 +19,9 @@ DOM query verified the final URL was `https://quotes.toscrape.com/page/2/` and
 the page contained ten quote cards. A screenshot was inspected locally.
 
 These were predetermined tool calls, **not decisions produced by an LLM**.
-The example also includes an explicit `--agent` mode, which was not run because
-no Browser Use model key was available.
+The example also includes an explicit `--agent` mode, which was not run during
+that initial experiment because no Browser Use model key was available. A later
+attempt using the supplied key is recorded below; authentication was rejected.
 
 | Observation | Actual result |
 | --- | --- |
@@ -108,8 +109,10 @@ uv pip install --python /path/to/venv/bin/python -e packages/browser-use
 ```
 
 This defaults to real browser execution with offline memory. With legitimately
-configured browser-service access and `BROWSER_USE_API_KEY`, add `--remote --agent`
-for the next experiment. Keep the same private output settings across repeated
+configured browser-service access and `OPENAI_API_KEY`, add
+`--remote --agent --provider openai --env-file .env` for the next experiment.
+Alternatively, choose `--provider browser-use` with `BROWSER_USE_API_KEY`.
+Keep the same private output settings across repeated
 runs so the salt and installation ID remain stable. Do not commit that directory.
 
 The next evidence gates are: a fully accepted ingest receipt; independent readback
@@ -124,3 +127,74 @@ installed separately, and its packaged driver reached the real main CLI.
 Loopback HTTP checks used fake credentials to verify refusal, partial receipts,
 timeouts, response limits and redirect handling. These checks support the live
 observations above; they do not replace the outstanding production gates.
+
+## Follow-up: model provider mismatch
+
+At approximately 22:29 UTC on September 19, the real `--agent` example was run
+using the user's new `.env` value. The value was loaded into the process without
+being printed, and unrelated provider keys remained excluded from the Memorable
+subprocess. The real Browser Use client used the production endpoint and model
+`bu-2-0`.
+
+Browser Use returned HTTP **401, “Invalid API key.”** The host's normal failure
+loop retried, then ended without executing any model-selected tools. The separate
+page check correctly failed: the browser was still on the first page. Run
+`d722f54b-c821-4ec5-872e-906fdbd9f213` retained zero completed action events and
+produced no store request. No successful LLM execution is claimed.
+
+A local check confirmed that the client received exactly the configured value,
+with no surrounding whitespace, embedded newline, placeholder or accidental
+variable assignment. No further authenticated request was made after that
+diagnosis until the user clarified its provider. The key was not included in
+published evidence.
+
+The user then confirmed this was an **OpenAI key**. It had been placed in the
+Browser Use placeholder. The 401 therefore establishes a provider mismatch, not
+an invalid OpenAI credential. The earlier request sent that key to Browser Use.
+The variable was renamed to `OPENAI_API_KEY` while preserving its value, and the
+example now requires an explicit provider, selects that provider's key and
+endpoint, and stops after one unsuccessful agent step without a recovery retry.
+It supports `--env-file` so loading the selected key is part of the reproducible
+command. The OpenAI path uses Browser Use's `ChatOpenAI` implementation and the
+[documented GPT-4.1 mini model](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+
+The Memorable configuration file was unchanged since September 13, and no new
+Memorable credential was supplied. Its earlier authorization refusal was not
+retried; memory stayed explicitly offline. Model authorization and authorized
+Memorable browser access are separate requirements, alongside the advisory
+retrieval contract described above.
+
+See the [sanitized failed-run summary](2026-09-19-browser-use-agent.json). Raw
+provider logs, screenshots and the `.env` file remain local and outside the
+committed evidence.
+
+**Corrected provider: successful real agent run.** With the same key routed
+directly to OpenAI, `gpt-4.1-mini` produced three model-output steps: `click`,
+`extract`, and `done`. The wrapper retained three completed actions for run
+`d2a597c4-905f-41bf-ad1a-bffbc9a159ff`. The host reported no step errors. An
+independent DOM check verified page two and ten quote cards, and the resulting
+screenshot was inspected. Browser Use reported 51,308 total tokens; this is host
+usage reporting, not a billed-cost measurement.
+
+Two events were eligible for the browser API: the observed successful link click
+and independently verified completion. The extraction tool's outcome stayed
+unknown under the conservative default mapper, so it retained an explicit local
+omission record. The task-level check does not retroactively prove every
+individual extraction result. The pending outbox was retained because memory
+was explicitly offline. No hosted store receipt, recalled memory, or memory
+context consumption is claimed.
+
+Reproduce the corrected model route using:
+
+```sh
+/path/to/venv/bin/python packages/browser-use/examples/live_browser.py \
+  --agent --provider openai --env-file .env \
+  --node /path/to/node24 --cli dist/cli.js \
+  --chrome /path/to/chrome --output /private/path/openai-browser-evidence
+```
+
+The `.env` file holds `OPENAI_API_KEY`, remains owner-readable only and is ignored
+by Git. The default command keeps Memorable offline. See the
+[successful agent summary](2026-09-19-browser-use-openai.json) for the observed
+results and local contract checks. The earlier failed provider attempt remains
+documented rather than being replaced by this success.

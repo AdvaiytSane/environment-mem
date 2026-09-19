@@ -95,9 +95,10 @@ Use the [one-prompt integration handoff](docs/AGENT-SETUP.md) to have a coding a
 
 The [Browser Use live report](docs/verification/2026-09-19-browser-use.md) records
 a real public website run with captured navigation and click targets, a retained
-outbox, independently checked page contents and explicit omissions. This was a
-scripted Browser Use execution, not an LLM-driven Agent run. Memorable browser
-authorization and model credentials still block the full store/recall experiment.
+outbox, independently checked page contents and explicit omissions. The initial
+scripted check was followed by a successful OpenAI-driven Browser Use Agent run.
+Memorable browser authorization and its advisory-retrieval contract still block
+the full store/recall experiment.
 
 The [September 19 live check](docs/verification/2026-09-19.md) reached the extraction service, persisted a procedure locally and read it back in fresh CLI processes. Close wording and an exact filename retrieved it; a paraphrase missed. The hook returned context, but native Claude verification was blocked by revoked authentication before tools ran. Hosted durability, HTTP recall and native context consumption remain unverified. [VERIFICATION.md](docs/VERIFICATION.md) defines the remaining evidence gates.
 

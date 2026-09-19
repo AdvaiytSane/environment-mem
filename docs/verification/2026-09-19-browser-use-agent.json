@@ -1,0 +1,57 @@
+{
+  "mode": "llm_agent",
+  "browser_use_version": "0.13.10",
+  "remote_enabled": false,
+  "run_id": "d722f54b-c821-4ec5-872e-906fdbd9f213",
+  "events_retained": 0,
+  "verification": {
+    "ok": false,
+    "check": "current_page_url_and_dom_card_count"
+  },
+  "observation": {
+    "url": "https://quotes.toscrape.com/",
+    "title": "Quotes to Scrape",
+    "quotes": 10
+  },
+  "custom_tool_observed_counts": [],
+  "recall_result": null,
+  "store_result": null,
+  "diagnostics": [
+    {
+      "stage": "recall",
+      "error": "offline"
+    },
+    {
+      "stage": "store",
+      "error": "store_skipped_by_mapper"
+    }
+  ],
+  "wire_diagnostics": [
+    {
+      "stage": "wire",
+      "reason": "no_verified_events"
+    }
+  ],
+  "pending_outbox_exists": false,
+  "typed_value_absent_from_journal": true,
+  "journal_sha256": "341aef114b9775e550155c6815c7893704728185436fb9120f6bfc9fe805e622",
+  "failure": "AssertionError",
+  "provider_authentication": {
+    "service": "Browser Use",
+    "model": "bu-2-0",
+    "http_status": 401,
+    "error": "Invalid API key",
+    "client_loaded_exact_env_value": true,
+    "production_endpoint": true,
+    "credentials_changed": false,
+    "diagnosis": "User confirmed the supplied key belongs to OpenAI; this was a provider mismatch, not a verified invalid OpenAI key.",
+    "subsequent_correction": "Moved the unchanged value to OPENAI_API_KEY and selected the direct OpenAI provider."
+  },
+  "memorable_access": {
+    "new_key_provided": false,
+    "config_modified_utc": "2026-09-13T00:26:44.431378+00:00",
+    "remote_attempted": false,
+    "prior_refusal": "insufficient_scope: procedures:resolve"
+  },
+  "checked_at": "2026-09-19T22:29:12Z"
+}

@@ -30,8 +30,18 @@ TASK = "Visit page two of the public quotes website and confirm there are ten qu
 
 
 async def exercise(args):
-    if args.agent and not os.environ.get("BROWSER_USE_API_KEY"):
-        raise RuntimeError("--agent requires BROWSER_USE_API_KEY; no model request was made")
+    if args.agent and not args.provider:
+        raise RuntimeError("--agent requires an explicit --provider openai or browser-use")
+    key_name = "OPENAI_API_KEY" if args.provider == "openai" else "BROWSER_USE_API_KEY"
+    if args.env_file:
+        from dotenv import dotenv_values
+        values = dotenv_values(args.env_file)
+        for name in (key_name, "MEMORABLE_API_KEY", "MEMORABLE_API_URL", "MEMORABLE_HOME"):
+            if values.get(name):
+                os.environ[name] = values[name]
+    if args.agent and not os.environ.get(key_name):
+        raise RuntimeError(f"--provider {args.provider} requires {key_name}; no model request was made")
+    model_name = args.model or ("gpt-4.1-mini" if args.provider == "openai" else "bu-2-0")
     output = Path(args.output).resolve()
     output.mkdir(parents=True, exist_ok=True, mode=0o700)
     settings = output / "local-settings.json"
@@ -51,6 +61,7 @@ async def exercise(args):
         failure = None
         observation = None
         custom_seen = []
+        agent_evidence = None
         try:
             await session.start()
             tools = Tools()
@@ -76,10 +87,26 @@ async def exercise(args):
             await capture.prepare()
             wrapped = capture.wrap_tools(tools)
             if args.agent:
-                from browser_use import ChatBrowserUse
-                agent = Agent(task=capture.task_with_context, llm=ChatBrowserUse(), tools=wrapped,
-                              browser_session=session, use_judge=False)
-                await agent.run(max_steps=8)
+                if args.provider == "openai":
+                    from browser_use import ChatOpenAI
+                    llm = ChatOpenAI(model=model_name, api_key=os.environ[key_name],
+                                     base_url="https://api.openai.com/v1", timeout=60, max_retries=0)
+                else:
+                    from browser_use import ChatBrowserUse
+                    llm = ChatBrowserUse(model=model_name, api_key=os.environ[key_name],
+                                         base_url="https://llm.api.browser-use.com", timeout=60, max_retries=0)
+                agent = Agent(task=capture.task_with_context, llm=llm, tools=wrapped,
+                              browser_session=session, use_judge=False, max_failures=1,
+                              final_response_after_failure=False)
+                history = await agent.run(max_steps=8)
+                agent_evidence = {
+                    "provider": args.provider, "model": model_name,
+                    "model_output_steps": len(history.model_outputs()),
+                    "model_proposed_actions": history.action_names(),
+                    "agent_reported_success": history.is_successful(),
+                    "agent_error_count": sum(error is not None for error in history.errors()),
+                    "reported_total_tokens": history.usage.total_tokens if history.usage else None,
+                }
             else:
                 # Exercise the same execution boundary used by Agent, without
                 # pretending these predetermined actions were chosen by a model.
@@ -118,6 +145,7 @@ async def exercise(args):
                                 if (row := json.loads(line)).get("status") == "transport_completed"} if receipts.exists() else set()
                 summary = {
                     "mode": "llm_agent" if args.agent else "scripted_browser_use_tools",
+                    "agent_evidence": agent_evidence,
                     "browser_use_version": browser_use_version, "remote_enabled": args.remote,
                     "run_id": capture.record["run_id"], "events_retained": len(capture.record["events"]),
                     "verification": capture.record["verification"], "observation": observation,
@@ -141,5 +169,8 @@ if __name__ == "__main__":
     parser.add_argument("--chrome", help="optional Chrome/Chromium executable; fresh profile is always used")
     parser.add_argument("--output", required=True, help="private output directory, outside version control")
     parser.add_argument("--remote", action="store_true", help="submit to configured Memorable browser service")
-    parser.add_argument("--agent", action="store_true", help="run a real LLM-driven Agent; requires BROWSER_USE_API_KEY")
+    parser.add_argument("--agent", action="store_true", help="run a real LLM-driven Agent with an explicitly selected provider")
+    parser.add_argument("--provider", choices=["openai", "browser-use"], help="required with --agent; chooses the matching key and endpoint")
+    parser.add_argument("--model", help="defaults to gpt-4.1-mini for OpenAI or bu-2-0 for Browser Use")
+    parser.add_argument("--env-file", help="optional local .env path; reads only the chosen provider and Memorable settings")
     asyncio.run(exercise(parser.parse_args()))

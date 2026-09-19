@@ -188,11 +188,25 @@ python packages/browser-use/examples/live_browser.py \
 
 Use the Python environment containing Browser Use and this package. The default
 executes real browser actions on a public website, independently checks its
-contents, and keeps memory offline. Add `--agent` only with a configured
-`BROWSER_USE_API_KEY`; add `--remote` only with authorized Memorable browser-service
-access. The output directory contains private salt settings, journals and a
+contents, and keeps memory offline. Choose the model provider explicitly:
+
+```sh
+# .env contains OPENAI_API_KEY; requests go directly to OpenAI.
+python packages/browser-use/examples/live_browser.py \
+  --agent --provider openai --env-file .env \
+  --node /path/to/node24 --cli dist/cli.js \
+  --chrome /path/to/chrome --output /private/path/browser-evidence
+```
+
+OpenAI defaults to `gpt-4.1-mini`. Alternatively, `--provider browser-use` requires
+`BROWSER_USE_API_KEY` and defaults to `bu-2-0`. `--model` overrides the model within
+the selected provider. A key from one provider is not a key for the other.
+`--env-file` reads only the selected provider's key and Memorable settings.
+Add `--remote` only with authorized Memorable browser-service access.
+The output directory contains private salt settings, journals and a
 screenshot, so keep it outside version control. The existing evidence covers the
-scripted browser mode; the model-driven remote path remains unverified.
+scripted browser mode; consult the dated report for subsequent model-driven runs.
+The complete remote memory path remains unverified.
 
 ```sh
 PYTHONPATH=packages/browser-use python -m unittest discover -s packages/browser-use/tests -v
