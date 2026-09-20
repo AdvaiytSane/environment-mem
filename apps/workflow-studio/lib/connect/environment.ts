@@ -1,0 +1,5 @@
+export const frameworks=['Browser Use','Devin','Dimensional','Claude Code','Codex','Custom agent'] as const;
+export const roles=['filter','semantic','context','private'] as const;
+export type Environment={id:string;name:string;framework:string;repo:string;dashboardUrl:string;intent:string;captureAt:string;recallAt:string;metadata:{key:string;use:string}[];createdAt:string;updatedAt:string};
+export const newEnvironment=():Environment=>({id:crypto.randomUUID(),name:'',framework:'Custom agent',repo:'',dashboardUrl:'',intent:'',captureAt:'task_complete',recallAt:'before_task',metadata:[{key:'project',use:'filter'},{key:'task',use:'semantic'},{key:'workflow',use:'semantic'},{key:'steps',use:'semantic'},{key:'outcome',use:'filter'},{key:'verification',use:'context'}],createdAt:'',updatedAt:''});
+export function environmentDefinition(e:Environment){return {schema:'memorable.environment.setup.v1',name:e.name,framework:e.framework,repository:e.repo,workflow:e.intent,hooks:{store:e.captureAt,recall:e.recallAt},metadata:Object.fromEntries(e.metadata.map(f=>[f.key,{use:f.use}])),status:'awaiting_integration'};}

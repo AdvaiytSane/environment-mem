@@ -1,0 +1,442 @@
+{
+  "task": "Audit https://quotes.toscrape.com using the rendered browser website. Visit every one of its ten quote-listing pages. For each page report its page number, quote count, number of quotes carrying the exact tag love, first quote author, and last quote author. Then open the site's author biography pages for Albert Einstein, Marilyn Monroe, Jane Austen, Mark Twain, and Bob Marley; report each author's birth date and birth location exactly as displayed. Return all ten page rows, total quote count, total love-tagged quote count, and the five author rows. Use the site's browser pages and links; do not use external search, direct HTTP requests, or programmatic multi-page scraping. You may keep working notes in files. Even if given a past workflow, revisit every required page and verify its current data. Do not treat historical results as current answers. The evaluate tool may read the current page DOM, but must not fetch other pages. The extract tool takes a natural-language question, not a CSS selector. For exact numerical counts use evaluate on the current DOM rather than estimating from text extraction. Save page-specific results before navigating away. Preserve the birth location text including any leading in. Follow actual author links instead of guessing URLs.",
+  "task_sha256": "760ac8b77240fb98b77750ba04e26315ba1dd7ac980447de51b807bf760fd7e9",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "browser_use": "0.13.10",
+  "settings": {
+    "temperature": 0,
+    "seed": 42,
+    "vision": false,
+    "max_steps": 80,
+    "max_actions_per_step": 5,
+    "judge": false,
+    "excluded_tools": [
+      "search"
+    ],
+    "max_completion_tokens": 8192,
+    "fresh_profiles": true
+  },
+  "pricing": {
+    "source": "https://developers.openai.com/api/docs/models/gpt-4.1-mini",
+    "checked": "2026-09-20",
+    "per_million_input": 0.4,
+    "per_million_cached_input": 0.1,
+    "per_million_output": 1.6
+  },
+  "runs": [
+    {
+      "condition": "baseline",
+      "status": "failed",
+      "prepare_seconds": 0.107,
+      "agent_seconds": 296.138,
+      "error_type": "ValidationError",
+      "usage": {
+        "input_tokens": 975054,
+        "output_tokens": 31807,
+        "cached_input_tokens": 796288,
+        "total_tokens": 1006861,
+        "api_calls": 74,
+        "all_responses_have_usage": true,
+        "estimated_model_cost_usd": 0.2020264,
+        "uncached_equivalent_cost_usd": 0.4409128
+      },
+      "diagnostics": [],
+      "run_id": "e3099d68-761b-44a8-8e46-0b9ead737d12",
+      "receipt": {
+        "id": "e3099d68-761b-44a8-8e46-0b9ead737d12",
+        "procedureId": "procedures/metadata-961055df29af64226e985baaf5bb0c5100eda975",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+        "embedding": {
+          "status": "ready",
+          "model": "cf:@cf/baai/bge-m3",
+          "dimensions": 1024
+        }
+      },
+      "verification": {
+        "ok": false,
+        "method": "independent saved DOM observations; no valid final result returned",
+        "errors": [
+          "missing_structured_result",
+          "token_budget_reached"
+        ],
+        "stop_reason": "token_budget_reached",
+        "listing_pages_visited": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "author_pages_visited": [
+          "Albert Einstein"
+        ]
+      },
+      "captured_actions": 73,
+      "model_steps_source": "Unavailable: original history was not persisted after structured-output validation failed. Last callback index is provided separately; compare provider API calls instead.",
+      "store_seconds": 1.023,
+      "context_bytes": 0,
+      "reference_in_provider_request": false,
+      "recall_ids": [],
+      "finalization_recovered": true,
+      "finalization_note": "Structured-output parsing raised after the budget stop. Reconstructed the exact normalized finished action events from the durable capture journal; stored with outcome unverified and runOutcome interrupted. No successful result inferred.",
+      "last_recorded_step_index": 67,
+      "model_steps": null
+    },
+    {
+      "condition": "with-memory",
+      "status": "completed",
+      "prepare_seconds": 1.105,
+      "agent_seconds": 240.412,
+      "store_seconds": 0.719,
+      "run_id": "bc437651-2d59-4b77-a5c0-6cba8370eafa",
+      "verification": {
+        "ok": false,
+        "method": "independent DOM observations on every visited required page and exact final-output comparison",
+        "errors": [
+          "page_results_differ_from_observed_DOM",
+          "author_results_differ_from_observed_DOM",
+          "wrong_total_quotes"
+        ],
+        "listing_pages_visited": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "author_pages_visited": [
+          "Albert Einstein",
+          "Bob Marley",
+          "Jane Austen",
+          "Marilyn Monroe",
+          "Mark Twain"
+        ]
+      },
+      "model_steps": 59,
+      "action_count": 67,
+      "action_counts": {
+        "navigate": 20,
+        "evaluate": 8,
+        "click": 27,
+        "extract": 8,
+        "switch": 2,
+        "close": 1,
+        "done": 1
+      },
+      "agent_errors": 0,
+      "usage": {
+        "input_tokens": 830992,
+        "output_tokens": 21565,
+        "cached_input_tokens": 709376,
+        "total_tokens": 852557,
+        "api_calls": 66,
+        "all_responses_have_usage": true,
+        "estimated_model_cost_usd": 0.154088,
+        "uncached_equivalent_cost_usd": 0.3669008
+      },
+      "browser_use_usage": {
+        "total_prompt_tokens": 830992,
+        "total_prompt_cost": 0.0,
+        "total_prompt_cached_tokens": 709376,
+        "total_prompt_cached_cost": 0.0,
+        "total_prompt_cache_creation_tokens": 0,
+        "total_prompt_cache_creation_cost": 0.0,
+        "total_completion_tokens": 21565,
+        "total_completion_cost": 0.0,
+        "total_tokens": 852557,
+        "total_cost": 0.0,
+        "entry_count": 66,
+        "by_model": {
+          "gpt-4.1-mini-2025-04-14": {
+            "model": "gpt-4.1-mini-2025-04-14",
+            "prompt_tokens": 830992,
+            "completion_tokens": 21565,
+            "total_tokens": 852557,
+            "cost": 0.0,
+            "invocations": 66,
+            "average_tokens_per_invocation": 12917.530303030304
+          }
+        }
+      },
+      "captured_actions": 59,
+      "context_bytes": 3811,
+      "reference_in_provider_request": true,
+      "recall_ids": [
+        "e3099d68-761b-44a8-8e46-0b9ead737d12"
+      ],
+      "recall_embedding": {
+        "status": "ready",
+        "model": "cf:@cf/baai/bge-m3",
+        "dimensions": 1024
+      },
+      "receipt": {
+        "id": "bc437651-2d59-4b77-a5c0-6cba8370eafa",
+        "procedureId": "procedures/metadata-35e9ac42631744fc92ac6744c23e5a8fc72c79fc",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+        "embedding": {
+          "status": "ready",
+          "model": "cf:@cf/baai/bge-m3",
+          "dimensions": 1024
+        }
+      },
+      "diagnostics": []
+    }
+  ],
+  "complete": true,
+  "embedding_cost_usd": null,
+  "embedding_cost_note": "Existing API returns vector/model but no billable token or monetary usage; not treated as free.",
+  "injection_policy": "Explicitly labeled unsuccessful attempt; outcome=unverified. No verified-workflow claim.",
+  "comparison": {
+    "total_tokens": {
+      "baseline": 1006861,
+      "with_memory": 852557,
+      "reduction_percent": 15.33
+    },
+    "input_tokens": {
+      "baseline": 975054,
+      "with_memory": 830992,
+      "reduction_percent": 14.77
+    },
+    "output_tokens": {
+      "baseline": 31807,
+      "with_memory": 21565,
+      "reduction_percent": 32.2
+    },
+    "estimated_model_cost_usd": {
+      "baseline": 0.2020264,
+      "with_memory": 0.154088,
+      "reduction_percent": 23.73
+    },
+    "uncached_equivalent_cost_usd": {
+      "baseline": 0.4409128,
+      "with_memory": 0.3669008,
+      "reduction_percent": 16.79
+    }
+  },
+  "both_verified": false,
+  "provenance": {
+    "benchmark_script_sha256": "3e6be398c93aa73a92af3219a0798d66a56748d8f820f88c12afa1b1aaf216c4",
+    "sdk_commit": "ede2b4d105968af6662845d1e41ec9cbc83faee1",
+    "private_cli_commit": "68d941a0330101aa90763d09caf505eef016a47a",
+    "cli_build_sha256": "9504275fe658e015325c4ef928377019a79f9e2d12a8c834496aa218d811d273",
+    "browser_use_commit": "d8110c5ff87ccba887aaa726cdb780f2f84bef8d",
+    "notes": [
+      "Other concurrent SDK work is present and excluded from this experiment.",
+      "Native CLI metadata transport; no HTTP browser resolve endpoint.",
+      "No task results are supplied to either agent by the verifier."
+    ],
+    "setup_revision": "v3: task uses five existing authors; same DOM-counting guidance and tool settings in both conditions",
+    "treatment_script_sha256": "5d0db283762c752bc070fac9f035ae9754ed6693877902f04670cc26bb5607be",
+    "treatment_changes": [
+      "Resume support for failed baseline; outcome=unverified with explicit failed-attempt renderer.",
+      "Handle missing structured output as verification failure instead of raising before finalization.",
+      "Same task, provider model, generation settings, tool registry, step limit and token budget."
+    ]
+  },
+  "benchmark_limits": {
+    "max_steps": 80,
+    "token_stop_threshold": 1000000,
+    "note": "Checked between agent steps; an in-flight call can overshoot. Baseline reached this cap, so completion-time/token comparisons are censored."
+  },
+  "limitations": [
+    "Single pair; no statistical or causal savings claim.",
+    "Neither condition passed independent task verification.",
+    "The repeated run used an explicitly marked failed-attempt reference, not a verified workflow.",
+    "Reference contains the first 50 of 73 captured baseline actions, including 32 unknown-detail markers.",
+    "Model API cost estimated from actual provider usage and published rates; Memorable embedding cost unavailable.",
+    "Provider prompt caching and fixed baseline-then-treatment order can affect measured cost.",
+    "Two unsuccessful setup attempts preceded this pair and are included below."
+  ],
+  "preliminary_attempts": [
+    {
+      "version": "v1",
+      "note": "Task mistakenly requested an absent author (Oscar Wilde); verifier excluded HTTP author pages; numerical/extraction errors and truncated model response.",
+      "status": "failed",
+      "usage": {
+        "input_tokens": 548123,
+        "output_tokens": 24768,
+        "cached_input_tokens": 434688,
+        "total_tokens": 572891,
+        "api_calls": 61,
+        "all_responses_have_usage": true,
+        "estimated_model_cost_usd": 0.1284716,
+        "uncached_equivalent_cost_usd": 0.258878
+      },
+      "verification": {
+        "ok": false,
+        "method": "independent DOM observations on every visited required page and exact final-output comparison",
+        "errors": [
+          "not_all_five_author_pages_visited",
+          "page_results_differ_from_observed_DOM",
+          "author_results_differ_from_observed_DOM",
+          "wrong_total_love_quotes"
+        ],
+        "listing_pages_visited": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "author_pages_visited": []
+      },
+      "agent_seconds": 218.979
+    },
+    {
+      "version": "v2",
+      "note": "Verifier and output cap fixed, but the absent-author task mistake remained. Final answer had incorrect page counts.",
+      "status": "failed",
+      "usage": {
+        "input_tokens": 334731,
+        "output_tokens": 9909,
+        "cached_input_tokens": 276096,
+        "total_tokens": 344640,
+        "api_calls": 39,
+        "all_responses_have_usage": true,
+        "estimated_model_cost_usd": 0.066918,
+        "uncached_equivalent_cost_usd": 0.1497468
+      },
+      "verification": {
+        "ok": false,
+        "method": "independent DOM observations on every visited required page and exact final-output comparison",
+        "errors": [
+          "not_all_five_author_pages_visited",
+          "page_results_differ_from_observed_DOM",
+          "author_results_differ_from_observed_DOM",
+          "wrong_total_quotes",
+          "wrong_total_love_quotes"
+        ],
+        "listing_pages_visited": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "author_pages_visited": [
+          "Albert Einstein",
+          "Jane Austen",
+          "Marilyn Monroe",
+          "Mark Twain"
+        ]
+      },
+      "agent_seconds": 101.637
+    }
+  ],
+  "treatment_answer_differences": [
+    {
+      "category": "pages",
+      "item": 8,
+      "differences": {
+        "quote_count": {
+          "answer": 8,
+          "observed": 10
+        }
+      }
+    },
+    {
+      "category": "pages",
+      "item": 9,
+      "differences": {
+        "love_count": {
+          "answer": 0,
+          "observed": 1
+        }
+      }
+    },
+    {
+      "category": "authors",
+      "item": "Albert Einstein",
+      "differences": {
+        "birth_date": {
+          "answer": "March 14,1879",
+          "observed": "March 14, 1879"
+        },
+        "birth_location": {
+          "answer": "in Ulm,Germany",
+          "observed": "in Ulm, Germany"
+        }
+      }
+    },
+    {
+      "category": "authors",
+      "item": "Marilyn Monroe",
+      "differences": {
+        "birth_date": {
+          "answer": "June01,1926",
+          "observed": "June 01, 1926"
+        }
+      }
+    },
+    {
+      "category": "authors",
+      "item": "Jane Austen",
+      "differences": {
+        "birth_date": {
+          "answer": "December16,1775",
+          "observed": "December 16, 1775"
+        },
+        "birth_location": {
+          "answer": "in Steventon Rectory,Hampshire,The United Kingdom",
+          "observed": "in Steventon Rectory, Hampshire, The United Kingdom"
+        }
+      }
+    },
+    {
+      "category": "authors",
+      "item": "Mark Twain",
+      "differences": {
+        "birth_date": {
+          "answer": "November30,1835",
+          "observed": "November 30, 1835"
+        },
+        "birth_location": {
+          "answer": "in Florida,Missouri,The United States",
+          "observed": "in Florida, Missouri, The United States"
+        }
+      }
+    },
+    {
+      "category": "authors",
+      "item": "Bob Marley",
+      "differences": {
+        "birth_date": {
+          "answer": "February06,1945",
+          "observed": "February 06, 1945"
+        },
+        "birth_location": {
+          "answer": "in Nine Mile,Saint Ann,Jamaica",
+          "observed": "in Nine Mile, Saint Ann, Jamaica"
+        }
+      }
+    }
+  ],
+  "estimated_total_model_cost_including_preliminary_attempts_usd": 0.551504,
+  "injected_reference_sha256": "53ffedd3f239e1af9c859d7b6ba1d4a298897f0a23c2c4d9f6d268f68d7e301d"
+}

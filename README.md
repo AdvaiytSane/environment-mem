@@ -25,6 +25,17 @@ a paraphrased task and received its reference in model messages. See the
 [live evidence](docs/verification/2026-09-19-metadata-browser.md).
 **Requires the companion private CLI patch; not yet published on npm.**
 
+## Dashboard and recorded demos
+
+The [Workflow Studio source](apps/workflow-studio/README.md) includes the
+central environment console, metadata setup, and visual replay player with
+captured Browser Use and Dimensional traces. [Open the hosted demo](https://memorable-workflow-studio.ahsane692499.chatgpt.site/?environment=replay).
+
+See the [Browser Use recorder](docs/verification/2026-09-20-browser-replay.md)
+and the [long-task benchmark](docs/verification/2026-09-20-long-browser-task.md)
+for provenance and limits. The latter contains failed runs, not a verified
+successful-task savings claim.
+
 ## What lives where
 
 | Component | Responsibility | Status |
