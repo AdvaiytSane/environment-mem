@@ -64,7 +64,7 @@ export interface ExtractPayload {
   session_id: string; prompt: string; harness: string; repo?: string; recalled_from?: string[];
   /** Local procedure ids: the one this session stored, the ones it was handed. Mapped to hosted ids at post time. */
   local_id?: string; recalled_local?: string[];
-  tool_calls: Array<{ name: string; input: unknown; result?: { ok?: boolean; exit_code?: number } }>;
+  tool_calls: Array<{ name: string; input: unknown; result?: { ok?: boolean; exit_code?: number }; at_ms?: number }>;
   cost?: { input_tokens?: number; cached_input_tokens?: number; output_tokens?: number; model?: string; duration_ms?: number };
 }
 
@@ -82,16 +82,18 @@ export function extractPayload(events: TraceEvent[], repo?: string): ExtractPayl
     for (const r of roots) out = out.split(r + '/').join('').split(r).join('.');
     return out;
   };
+  const t0 = events[0].ts;
   const tool_calls = tools.map(e => {
     const cls = classify(e.tool_name!);
     const raw = typeof e.tool_input === 'string' ? (() => { try { return JSON.parse(e.tool_input as unknown as string); } catch { return { raw: e.tool_input }; } })() : (e.tool_input ?? {});
     const input = Object.fromEntries(Object.entries(raw as Record<string, unknown>).map(([k, v]) => [k, rel(v)]));
     // Preserve observed fields; a missing result is neither success nor failure.
     const result = e.result ? { ...e.result } : e.ok === undefined ? undefined : { ok: e.ok };
-    return { name: cls && NAME[cls] ? NAME[cls] : e.tool_name!, input, result };
+    // When the step happened, from the session's first event, so a trace can be replayed in time.
+    return { name: cls && NAME[cls] ? NAME[cls] : e.tool_name!, input, result, at_ms: Math.max(0, e.ts - t0) };
   }).filter(t => classify(t.name) !== null);
   const recalled = events.flatMap(e => e.event === 'recall' ? (e.ids ?? []) : []);
-  const t0 = events[0].ts, t1 = events[events.length - 1].ts;
+  const t1 = events[events.length - 1].ts;
   return {
     session_id: first.session_id, prompt, harness: HARNESS[harnessOf(tools.map(e => e.tool_name!))] ?? 'generic', repo,
     recalled_local: recalled.length ? [...new Set(recalled)] : undefined,

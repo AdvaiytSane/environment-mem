@@ -168,3 +168,28 @@ td .good { color: var(--good); } td .bad { color: var(--bad); } td .dash { color
 .runpanel select, .runpanel input { flex: 1; min-width: 0; font: var(--t-body); color: var(--fg); background: var(--sunk); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; }
 .runpanel .go { font: var(--t-small); color: #000; background: #fff; border: 0; border-radius: 4px; padding: 6px 12px; cursor: pointer; }
 .runpanel .note { font: var(--t-small); color: var(--fg-3); }
+
+/* The race view: two lanes side by side, counting while they run. */
+.race-top { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s3); }
+.race-top select { background: var(--cell); color: var(--fg); border: 1px solid var(--border); border-radius: var(--r-input); padding: 7px 10px; font: var(--t-body); max-width: 560px; }
+.race-top .note { color: var(--subtle); font: 400 12px/16px var(--ui); }
+.race-prompt { color: var(--muted); font: 400 14px/20px var(--ui); max-width: 1100px; margin-bottom: var(--s4); }
+.race-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+.race-side { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); overflow: hidden; min-height: 420px; display: flex; flex-direction: column; }
+.race-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.race-label { font: var(--t-label); text-transform: uppercase; letter-spacing: var(--track); color: var(--muted); }
+.race-label.warm { color: var(--acc-mint); }
+.race-nums { font: 400 11px/16px var(--mono); color: var(--subtle); }
+.race-nums b { color: var(--fg); font-weight: 500; font-size: 13px; }
+.race-nums i { font-style: normal; margin-left: 6px; text-transform: uppercase; letter-spacing: var(--track); font-size: 10px; }
+.race-nums i.ok { color: var(--acc-mint); } .race-nums i.bad { color: var(--acc-red); } .race-nums i.run { color: var(--acc-sky); }
+.race-steps { list-style: none; margin: 0; padding: 0; overflow: auto; max-height: 62vh; }
+.race-steps li { display: flex; align-items: baseline; gap: 10px; padding: 6px 14px; border-bottom: 1px solid var(--border); font: 400 12px/16px var(--mono); }
+.race-steps li.handed { color: var(--acc-mint); background: color-mix(in srgb, var(--acc-mint) 8%, transparent); }
+.race-steps .n { color: var(--subtle); width: 20px; text-align: right; flex-shrink: 0; }
+.race-steps .tool { width: 56px; flex-shrink: 0; text-transform: uppercase; font-size: 10px; letter-spacing: var(--track); color: var(--subtle); }
+.race-steps .tool.sky { color: var(--acc-sky); } .race-steps .tool.lav { color: var(--acc-lav); } .race-steps .tool.mint { color: var(--acc-mint); }
+.race-steps .txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg); }
+.race-steps .at { color: var(--subtle); flex-shrink: 0; }
+.race-delta { display: flex; gap: var(--s5); margin-top: var(--s4); font: var(--t-label); text-transform: uppercase; letter-spacing: var(--track); color: var(--subtle); }
+.race-delta b { font-weight: 500; color: var(--fg); } .race-delta b.ok { color: var(--acc-mint); } .race-delta b.bad { color: var(--acc-warm); }

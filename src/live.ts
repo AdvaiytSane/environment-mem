@@ -200,6 +200,50 @@ export function serveLive(o: LiveOpts): void {
       });
       return;
     }
+    // The race: the same task twice at once, without and with memory, each
+    // in its own lane, read back step by step while both run.
+    if (url.pathname === '/api/race' && req.method === 'POST') {
+      let body = '';
+      req.on('data', d => { body += d; });
+      req.on('end', () => {
+        let b: { agent?: string; task?: string } = {};
+        try { b = JSON.parse(body || '{}'); } catch {}
+        const agent = b.agent === 'claude' ? 'claude' : 'devin';
+        const task = String(b.task ?? '').trim();
+        if (!task) { res.writeHead(400, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'task' })); return; }
+        const cli = new URL('./cli.ts', import.meta.url).pathname;
+        const live = o.live ? resolve(o.live) : resolve('results/live');
+        const id = Date.now().toString(36).slice(-5);
+        for (const [side, inject] of [['cold', '0'], ['warm', 'full']] as const) {
+          const args = ['run', '--agent', agent, '--lane', `race-${id}-${side}`, '--task', task, '--inject', inject, '--record', '0', '--live', live];
+          const child = spawn(process.execPath, [cli, ...args], { cwd: process.cwd(), env: process.env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+          child.stdout.on('data', d => process.stdout.write(`[race ${side}] ${d}`)); child.stderr.on('data', d => process.stderr.write(`[race ${side}] ${d}`));
+          child.unref();
+        }
+        res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify({ ok: true, id, agent, task, startedAt: Date.now() }));
+      });
+      return;
+    }
+    if (url.pathname === '/api/race' && req.method === 'GET') {
+      const id = url.searchParams.get('id') ?? '';
+      const live = o.live ? resolve(o.live) : resolve('results/live');
+      const side = (name: string) => {
+        const wd = join(live, `race-${id}-${name}`);
+        const sdir = join(wd, '.headstart', 'sessions');
+        let events: Array<{ ts: number; event: string; tool_name?: string; tool_input?: Record<string, unknown>; ok?: boolean; ids?: string[] }> = [];
+        if (existsSync(sdir)) for (const f of readdirSync(sdir)) { const evs = readFileSync(join(sdir, f), 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)); if (evs.length > events.length) events = evs; }
+        const t0 = events[0]?.ts ?? 0;
+        const short = (v: unknown) => { const t = typeof v === 'string' ? v : JSON.stringify(v ?? ''); return t.split(wd + '/').join('').slice(0, 120); };
+        const steps = events.filter(e => e.event === 'tool' && e.tool_name && !/todo|skill|task|ask_user/i.test(e.tool_name)).map(e => {
+          const i = (e.tool_input ?? {}) as Record<string, unknown>;
+          return { at: Math.round((e.ts - t0) / 100) / 10, tool: e.tool_name, text: short(i.command ?? i.cmd ?? i.file_path ?? i.path ?? i.pattern ?? i.query ?? i), ok: e.ok !== false };
+        });
+        const handed = events.find(e => e.event === 'recall')?.ids?.length ?? 0;
+        const read = (f: string) => { const p = join(wd, '.headstart', f); try { return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null; } catch { return null; } };
+        return { exists: existsSync(wd), startedAt: t0 || null, steps, handed, progress: read('progress.json'), result: read('run-result.json') };
+      };
+      res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-cache' }); res.end(JSON.stringify({ id, cold: side('cold'), warm: side('warm') })); return;
+    }
     if (url.pathname === '/api/graph') { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(graph)); return; }
     if (url.pathname === '/api/summary') { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(summary())); return; }
     if (url.pathname === '/api/handoffs') { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(handoffRows())); return; }

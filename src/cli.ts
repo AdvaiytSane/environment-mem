@@ -15,7 +15,7 @@ import { connectCommand } from './connect.ts';
 import { serveLive } from './live.ts';
 import { buildGraph, readStores } from './graph.ts';
 import { writeVault } from './obsidian.ts';
-import { describe, loadTasks, orchestrate, runOne, type Plan, type RunSpec } from './run.ts';
+import { buildRaceSpecs, describe, loadTasks, orchestrate, raceId, runOne, type Plan, type RunSpec } from './run.ts';
 import { api, extractRemote, readPending } from './api.ts';
 import { stateDir, storePath } from './paths.ts';
 
@@ -49,6 +49,8 @@ const HELP = `headstart  the second session starts where the first one finished
   backfill --results <dir>  post every recorded eval session in a results directory (cold first, then the runs that were handed something), with its measured cost
   demo                 before and after, one command: the same task cold, then with memory on, two lanes
                        --agent devin|claude --task <id or text> [--warm-agent devin|claude] [--model sonnet]
+  race                 the same task twice at once, cold and warm, both posted to the hosted store under one race id
+                       --task <id or text> [--agent devin|claude] [--model <id>]
   orchestrate          waves of runs from a plan; a wave runs at once, the next wave recalls what it stored
                        [--plan fixtures/orchestrate-demo.json] [--fresh] [--agent claude|devin] [--live <dir>] [--repo <dir>] [--model <id>]
 
@@ -282,6 +284,30 @@ async function main(argv: string[]): Promise<void> {
       console.log(`\nbefore ${cold.calls} steps, ${cold.discovery} before the first edit, ${cold.durationS}s`);
       console.log(`after  ${warm.calls} steps, ${warm.discovery} before the first edit, ${warm.durationS}s  (${d(cold.calls, warm.calls)} steps, ${d(cold.discovery, warm.discovery)} before the first edit, ${d(cold.durationS, warm.durationS)} seconds)`);
       if (warm.handed) console.log(`handed: ${warm.handed.from.map(f => `${f.harness ?? 'a procedure'} ${f.task_id ?? ''}`.trim()).join(', ')}`);
+      return;
+    }
+    case 'race': {
+      // race --task "...": the same task cold and warm, at once, both real
+      // sessions posted to the hosted store labelled race:<id> so the
+      // console can pull them by id as they land.
+      const agent = (flag(args, 'agent', 'claude') as RunSpec['agent']);
+      const task = flag(args, 'task'); if (!task) { console.error('race needs --task <id or text>'); process.exit(2); }
+      const model = flag(args, 'model', 'sonnet');
+      const live = resolve(flag(args, 'live', 'results/live')!);
+      const store = resolve(flag(args, 'store', join(live, 'store.jsonl'))!);
+      const repo = resolve(flag(args, 'repo', 'fixtures/repo')!);
+      const tasks = loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(','));
+      mkdirSync(live, { recursive: true });
+      const id = raceId();
+      const consoleUrl = (process.env.HEADSTART_CONSOLE_URL ?? 'https://headstart-demo.vercel.app').replace(/\/$/, '');
+      console.log(`race ${id}  open ${consoleUrl}/dash/enterprise/race?id=${id}`);
+      const { cold, warm } = buildRaceSpecs(id, { agent, task, model });
+      const [coldR, warmR] = await Promise.all([cold, warm].map(spec =>
+        runOne(spec, { live, store, repo, tasks }).then(r => { console.log(describe(r)); return r; })));
+      const d = (a: number, b: number) => (a === b ? 'same' : a > b ? `${a - b} fewer` : `${b - a} more`);
+      console.log(`before ${coldR.calls} steps, ${coldR.discovery} before the first edit, ${coldR.durationS}s`);
+      console.log(`after  ${warmR.calls} steps, ${warmR.discovery} before the first edit, ${warmR.durationS}s  (${d(coldR.calls, warmR.calls)} steps, ${d(coldR.discovery, warmR.discovery)} before the first edit, ${d(coldR.durationS, warmR.durationS)} seconds)`);
+      if (coldR.error || warmR.error) process.exitCode = 1;
       return;
     }
     case 'orchestrate': {

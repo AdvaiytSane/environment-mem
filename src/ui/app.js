@@ -5,6 +5,7 @@ import { mountTimeline } from './timeline.js';
 import { mountLanes } from './lanes.js';
 import { mountMeasured } from './measured.js';
 import { mountHanded } from './handed.js';
+import { mountRace } from './race.js';
 
 // The wiring. Views are modules with one contract each:
 //   graph.setData(g, slots) / .select(id) / .focus(id) / .arrival(inject) / .stored(ev) / .filter(hidden)
@@ -20,6 +21,7 @@ const matrix = mountMatrix($('#matrix'));
 const timeline = mountTimeline($('#timeline'));
 const lanes = mountLanes();
 const measured = mountMeasured($('#measured'));
+mountRace($('#race'));
 const handed = mountHanded($('#handed'));
 let G = null, SLOTS = new Map(), SUMMARY = null, view = 'graph';
 const hidden = new Set();

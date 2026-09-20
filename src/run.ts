@@ -16,6 +16,8 @@ export type Agent = 'claude' | 'devin';
 export interface RunSpec {
   lane: string; agent: Agent; task: string; taskId?: string;
   inject?: 'full' | 'facts' | '0'; record?: boolean; model?: string; repo?: string; timeoutMin?: number;
+  /** The session's repo label (HEADSTART_REPO), so the posted payload's `repo` reads however the caller wants it grouped. Default 'live'. */
+  repoLabel?: string;
 }
 export interface RunResult {
   lane: string; agent: Agent; taskId: string; sessionId?: string; calls: number; discovery: number;
@@ -36,6 +38,22 @@ export function resolveTask(spec: RunSpec, tasks: Task[]): { id: string; prompt:
   const byId = tasks.find(t => t.id === spec.taskId || t.id === spec.task);
   if (byId) return { id: byId.id, prompt: byId.prompt };
   return { id: spec.taskId ?? slug(spec.task), prompt: spec.task };
+}
+
+const ID_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz';
+/** 8-char race id: groups a race's two lanes under one `repo` label the console can query by. */
+export function raceId(): string {
+  return Array.from({ length: 8 }, () => ID_CHARS[Math.floor(Math.random() * ID_CHARS.length)]).join('');
+}
+
+/** The cold (nothing handed) and warm (memory on) RunSpecs for one race, both labelled `race:<id>` so both sessions' posted payloads carry it as `repo`. */
+export function buildRaceSpecs(id: string, opts: { agent: Agent; task: string; model?: string }): { cold: RunSpec; warm: RunSpec } {
+  const repoLabel = `race:${id}`;
+  const base = { agent: opts.agent, task: opts.task, model: opts.model, record: true, repoLabel };
+  return {
+    cold: { ...base, lane: `race-${id}-cold`, inject: '0' },
+    warm: { ...base, lane: `race-${id}-warm`, inject: 'full' },
+  };
 }
 
 /** A fresh copy of the repo for this lane, hooks installed, one git commit. */
@@ -68,7 +86,22 @@ function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.Proces
     const child = spawn(agent, args, { cwd: wd, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'], detached: grouped });
     let out = '', err = '', sessionId: string | undefined, spawnError: string | undefined, timedOut = false;
     child.on('error', e => { spawnError = (e as NodeJS.ErrnoException).code === 'ENOENT' ? `${agent} is not installed or is not on PATH` : `${agent} could not start: ${e.message}`; });
-    child.stdout.on('data', d => { const s = String(d); out += s; onOut(s); const m = s.match(/"session_id"\s*:\s*"([^"]+)"/); if (m) sessionId = m[1]; });
+    // Running token totals, written beside the trace as the agent streams,
+    // so a live view can count while the run is still going.
+    const live = { input: 0, cached: 0, output: 0, messages: 0 };
+    let partial = '';
+    child.stdout.on('data', d => {
+      const s = String(d); out += s; onOut(s);
+      const m = s.match(/"session_id"\s*:\s*"([^"]+)"/); if (m) sessionId = m[1];
+      if (agent !== 'claude') return;
+      partial += s; const lines = partial.split('\n'); partial = lines.pop() ?? '';
+      let changed = false;
+      for (const l of lines) {
+        if (!l.startsWith('{')) continue;
+        try { const j = JSON.parse(l); const u = j.type === 'assistant' ? j.message?.usage : null; if (u) { live.input += u.input_tokens ?? 0; live.cached += u.cache_read_input_tokens ?? 0; live.output += u.output_tokens ?? 0; live.messages++; changed = true; } } catch {}
+      }
+      if (changed) { try { mkdirSync(join(wd, '.headstart'), { recursive: true }); writeFileSync(join(wd, '.headstart', 'progress.json'), JSON.stringify({ ...live, at: Date.now() })); } catch {} }
+    });
     child.stderr.on('data', d => { err += d; });
     const timer = setTimeout(() => {
       timedOut = true;
@@ -128,7 +161,7 @@ export async function runOne(spec: RunSpec, opts: { live: string; store: string;
   const { id, prompt } = resolveTask(spec, opts.tasks);
   const wd = prepareLane(opts.live, spec.lane, spec.repo ?? opts.repo);
   const env: NodeJS.ProcessEnv = {
-    HEADSTART_STORE: resolve(opts.store), HEADSTART_REPO: 'live', HEADSTART_TASK_ID: id,
+    HEADSTART_STORE: resolve(opts.store), HEADSTART_REPO: spec.repoLabel ?? 'live', HEADSTART_TASK_ID: id,
     HEADSTART_INJECT: spec.inject ?? 'full', HEADSTART_RECORD: spec.record === false ? '0' : '1',
     HEADSTART_DEFER_EXTRACT: '1',
   };
