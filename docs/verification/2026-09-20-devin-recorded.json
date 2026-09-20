@@ -1,0 +1,1052 @@
+{
+  "schema": "memorable.recorded-demo.v1",
+  "label": "Recorded Devin evaluation",
+  "recorded": true,
+  "fresh_agent_execution": false,
+  "recorded_date": "2026-09-19",
+  "reviewed_date": "2026-09-20",
+  "source_commit": "87807eb084a2c1dd65a62967e0719b27087a7c10",
+  "runner": "Devin CLI",
+  "model_label": "sonnet",
+  "provenance": {
+    "source_repository": "https://github.com/AdvaiytSane/environment-mem",
+    "sources": [
+      {
+        "path": "results/devin-sonnet-r1/runs.jsonl",
+        "sha256": "ab0cc7fd218e1f4c2376b73bb8fb0a242e700cd5ff681534fc73c6b891573783"
+      },
+      {
+        "path": "results/devin-sonnet-r1/opts.json",
+        "sha256": "d66bb76164fbabb14b10894870a7bddf2923e09fa0907f7c5c40d1d5847ac4b2"
+      },
+      {
+        "path": "results/devin-sonnet-r1/store.jsonl",
+        "sha256": "da08393b4a8cf9318f4776c027bf9667c91f523c0b409d8d1de83d0dbfe02325"
+      },
+      {
+        "path": "results/devin-sonnet-r1/report.md",
+        "sha256": "4e3e6ec226a5259d514a3ac0fb8259e97ca6ac011e7a56f036ddfb7db3666be3"
+      },
+      {
+        "path": "src/eval.ts",
+        "sha256": "bc876309193e4b5fc5c09f8c1b2d043240b43764de08e83d87606f8c41771e2b"
+      },
+      {
+        "path": "src/recall.ts",
+        "sha256": "52039a3bc7bfb6805df241399b295c3d62f922ff4286bef9da2329037a708d69"
+      },
+      {
+        "path": "src/hook.ts",
+        "sha256": "67ab0f9d33a2a3cbee15196183746e71482583eb950c6109791d31ba6390fc8f"
+      },
+      {
+        "path": "fixtures/tasks.json",
+        "sha256": "666bdaedaa215fd6d56b338d791e87de768df5d6c710703c85ba5a9b70a604cf"
+      }
+    ],
+    "token_metrics": "Provider-reported Devin ATIF counters as copied into the committed runner summaries; original exports are not committed and were not revalidated.",
+    "time_metrics": "Measured by the original evaluation runner; rounded wall-clock seconds, not provider billing.",
+    "tool_metrics": "Derived by the original runner from hook event logs; original logs are not committed.",
+    "outcomes": "Recorded hidden-check pass flags; no final working copies or raw check outputs are committed, so not independently rerun here.",
+    "injection": "Recorded character counts from hook logs; exact recalled procedure IDs and final model input unavailable.",
+    "cost": "Unavailable. Historical cost_usd=0 was a runner placeholder, converted to null here."
+  },
+  "comparison": {
+    "design": "Same fixture, task ID, repeat number, runner, and model alias across three arms. All 18 matched triplets included.",
+    "cold": "No local Headstart context injection; cold runs populate the local procedure store.",
+    "doc": "Static repository instructions via AGENTS.md and CLAUDE.md; no learned recall.",
+    "full": "Repository facts plus procedural recall from other task IDs. Same task ID excluded by HEADSTART_EXCLUDE_TASK in evaluated harness design.",
+    "repeat_pairing": "Matched by repeat number for presentation, not a paired randomized trial.",
+    "backend": "Local Headstart JSONL storage with lexical and gzip-compression-distance ranking. This dataset does not establish hosted Memorable retrieval, embeddings, or the proposed metadata SDK.",
+    "limitations": [
+      "Nine synthetic coding tasks, two repeats each; no causal or general production savings claim.",
+      "Raw ATIF exports, hook logs, and final worktrees unavailable in committed evidence.",
+      "Recorded result generation commit is not separately pinned; current source may differ from the code that originally ran.",
+      "Historical scripts defaulted unknown metrics to zero; these rows are all nonzero, but absent raw exports prevent a direct provider audit.",
+      "Full arm is not better on every metric or task; discovery calls rise and bugfix context tokens rise.",
+      "Static-document control has nearly identical aggregate token use to the learned-memory arm.",
+      "No measured dollar or ACU savings; no fleet projection included."
+    ]
+  },
+  "summary": {
+    "cold": {
+      "runs": 18,
+      "recorded_check_passes": 18,
+      "context_tokens": 593882.444,
+      "input_tokens": 22948.278,
+      "cache_read": 570934.167,
+      "output_tokens": 3595.333,
+      "tool_calls": 17.667,
+      "discovery_calls": 8.722,
+      "duration_s": 64.5
+    },
+    "doc": {
+      "runs": 18,
+      "recorded_check_passes": 18,
+      "context_tokens": 463359.111,
+      "input_tokens": 21470.278,
+      "cache_read": 441888.833,
+      "output_tokens": 3083,
+      "tool_calls": 14.611,
+      "discovery_calls": 7.833,
+      "duration_s": 51.889
+    },
+    "full": {
+      "runs": 18,
+      "recorded_check_passes": 18,
+      "context_tokens": 462349.611,
+      "input_tokens": 21947.889,
+      "cache_read": 440401.722,
+      "output_tokens": 3335.833,
+      "tool_calls": 16.5,
+      "discovery_calls": 10.389,
+      "duration_s": 54.333
+    }
+  },
+  "pairs": [
+    {
+      "task_id": "flag-2",
+      "task": "Add a --limit <n> flag to the list command so it only prints the first n rows.",
+      "shape": "flag",
+      "repeat": 1,
+      "cold": {
+        "session_id": "thirsty-satellite",
+        "context_tokens": 422542,
+        "uncached_input_tokens": 21194,
+        "cached_input_tokens": 401348,
+        "output_tokens": 1725,
+        "tool_calls": 13,
+        "calls_before_first_edit": 8,
+        "duration_s": 41,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "zenith-emmental",
+        "context_tokens": 325257,
+        "uncached_input_tokens": 19112,
+        "cached_input_tokens": 306145,
+        "output_tokens": 1807,
+        "tool_calls": 12,
+        "calls_before_first_edit": 8,
+        "duration_s": 33,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "thin-caper",
+        "context_tokens": 378501,
+        "uncached_input_tokens": 16591,
+        "cached_input_tokens": 361910,
+        "output_tokens": 2475,
+        "tool_calls": 15,
+        "calls_before_first_edit": 9,
+        "duration_s": 40,
+        "recorded_check_pass": true,
+        "injected_chars": 1282,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "631edc269685"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "flag-1",
+      "task": "Add a --json flag to the stats CLI command. When it is passed, print the stats as JSON instead of the current text output.",
+      "shape": "flag",
+      "repeat": 1,
+      "cold": {
+        "session_id": "snowy-bobcat",
+        "context_tokens": 421574,
+        "uncached_input_tokens": 22855,
+        "cached_input_tokens": 398719,
+        "output_tokens": 2107,
+        "tool_calls": 13,
+        "calls_before_first_edit": 8,
+        "duration_s": 43,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "toothsome-blade",
+        "context_tokens": 442927,
+        "uncached_input_tokens": 21482,
+        "cached_input_tokens": 421445,
+        "output_tokens": 2565,
+        "tool_calls": 16,
+        "calls_before_first_edit": 10,
+        "duration_s": 41,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "nettle-lens",
+        "context_tokens": 514867,
+        "uncached_input_tokens": 19955,
+        "cached_input_tokens": 494912,
+        "output_tokens": 2546,
+        "tool_calls": 15,
+        "calls_before_first_edit": 10,
+        "duration_s": 55,
+        "recorded_check_pass": true,
+        "injected_chars": 1235,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "0369603843bd"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-1",
+      "task": "Add a GET /health/deps endpoint that reports which internal dependencies the app relies on, returning JSON like {\"ok\": true, \"deps\": [...]}.",
+      "shape": "endpoint",
+      "repeat": 1,
+      "cold": {
+        "session_id": "innovative-longan",
+        "context_tokens": 590904,
+        "uncached_input_tokens": 25706,
+        "cached_input_tokens": 565198,
+        "output_tokens": 2939,
+        "tool_calls": 18,
+        "calls_before_first_edit": 10,
+        "duration_s": 56,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "stitch-coin",
+        "context_tokens": 425337,
+        "uncached_input_tokens": 17280,
+        "cached_input_tokens": 408057,
+        "output_tokens": 2463,
+        "tool_calls": 15,
+        "calls_before_first_edit": 7,
+        "duration_s": 47,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "small-gorilla",
+        "context_tokens": 530836,
+        "uncached_input_tokens": 29416,
+        "cached_input_tokens": 501420,
+        "output_tokens": 3431,
+        "tool_calls": 18,
+        "calls_before_first_edit": 9,
+        "duration_s": 50,
+        "recorded_check_pass": true,
+        "injected_chars": 1241,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "0f401a36bf79"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "flag-3",
+      "task": "Add a --format flag to the users command that accepts csv or table. It should keep printing the current plain rows by default and print CSV when csv is passed.",
+      "shape": "flag",
+      "repeat": 1,
+      "cold": {
+        "session_id": "workable-spandex",
+        "context_tokens": 739568,
+        "uncached_input_tokens": 26206,
+        "cached_input_tokens": 713362,
+        "output_tokens": 3824,
+        "tool_calls": 22,
+        "calls_before_first_edit": 11,
+        "duration_s": 72,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "prism-motorist",
+        "context_tokens": 608672,
+        "uncached_input_tokens": 22333,
+        "cached_input_tokens": 586339,
+        "output_tokens": 3719,
+        "tool_calls": 21,
+        "calls_before_first_edit": 10,
+        "duration_s": 64,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "boulder-sternum",
+        "context_tokens": 357198,
+        "uncached_input_tokens": 25494,
+        "cached_input_tokens": 331704,
+        "output_tokens": 2483,
+        "tool_calls": 16,
+        "calls_before_first_edit": 10,
+        "duration_s": 41,
+        "recorded_check_pass": true,
+        "injected_chars": 1194,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "1e23bb1b4fc5"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-2",
+      "task": "Add a GET /users/:id/summary endpoint that returns JSON with the fields id, name, orderCount (how many orders the user has placed) and totalCents (their total spend in cents). Return 404 for an unknown user.",
+      "shape": "endpoint",
+      "repeat": 1,
+      "cold": {
+        "session_id": "abundance-pigment",
+        "context_tokens": 735152,
+        "uncached_input_tokens": 31520,
+        "cached_input_tokens": 703632,
+        "output_tokens": 4737,
+        "tool_calls": 20,
+        "calls_before_first_edit": 8,
+        "duration_s": 74,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "necessary-lantana",
+        "context_tokens": 612349,
+        "uncached_input_tokens": 28142,
+        "cached_input_tokens": 584207,
+        "output_tokens": 4679,
+        "tool_calls": 20,
+        "calls_before_first_edit": 9,
+        "duration_s": 73,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "fluff-anchovy",
+        "context_tokens": 621151,
+        "uncached_input_tokens": 28915,
+        "cached_input_tokens": 592236,
+        "output_tokens": 6664,
+        "tool_calls": 28,
+        "calls_before_first_edit": 23,
+        "duration_s": 85,
+        "recorded_check_pass": true,
+        "injected_chars": 1275,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "04cbd26722f1"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-3",
+      "task": "Add a DELETE /orders/:id endpoint. It should return 404 for an order id that does not exist and 204 when the order is deleted.",
+      "shape": "endpoint",
+      "repeat": 1,
+      "cold": {
+        "session_id": "elastic-watch",
+        "context_tokens": 701011,
+        "uncached_input_tokens": 23507,
+        "cached_input_tokens": 677504,
+        "output_tokens": 3680,
+        "tool_calls": 20,
+        "calls_before_first_edit": 12,
+        "duration_s": 67,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "golden-foundation",
+        "context_tokens": 518674,
+        "uncached_input_tokens": 19131,
+        "cached_input_tokens": 499543,
+        "output_tokens": 3369,
+        "tool_calls": 15,
+        "calls_before_first_edit": 5,
+        "duration_s": 53,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "zinc-jeep",
+        "context_tokens": 312102,
+        "uncached_input_tokens": 22007,
+        "cached_input_tokens": 290095,
+        "output_tokens": 3076,
+        "tool_calls": 16,
+        "calls_before_first_edit": 6,
+        "duration_s": 43,
+        "recorded_check_pass": true,
+        "injected_chars": 1275,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "81bfbde4414e"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-1",
+      "task": "Refunded orders are still being counted toward a customer's order total. Fix the total so it excludes refunded orders.",
+      "shape": "bugfix",
+      "repeat": 1,
+      "cold": {
+        "session_id": "lively-space",
+        "context_tokens": 517318,
+        "uncached_input_tokens": 19584,
+        "cached_input_tokens": 497734,
+        "output_tokens": 1931,
+        "tool_calls": 15,
+        "calls_before_first_edit": 8,
+        "duration_s": 46,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "assorted-jupiter",
+        "context_tokens": 293557,
+        "uncached_input_tokens": 19485,
+        "cached_input_tokens": 274072,
+        "output_tokens": 1498,
+        "tool_calls": 8,
+        "calls_before_first_edit": 4,
+        "duration_s": 29,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "lizard-robin",
+        "context_tokens": 400783,
+        "uncached_input_tokens": 25072,
+        "cached_input_tokens": 375711,
+        "output_tokens": 2957,
+        "tool_calls": 17,
+        "calls_before_first_edit": 14,
+        "duration_s": 44,
+        "recorded_check_pass": true,
+        "injected_chars": 1243,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "c5584c97c6d6"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-3",
+      "task": "One of the report command's date range calculations is off by a month at the boundary, so some months come back with the wrong number of days. Find and fix it.",
+      "shape": "bugfix",
+      "repeat": 1,
+      "cold": {
+        "session_id": "maze-christmas",
+        "context_tokens": 265684,
+        "uncached_input_tokens": 13948,
+        "cached_input_tokens": 251736,
+        "output_tokens": 2394,
+        "tool_calls": 8,
+        "calls_before_first_edit": 6,
+        "duration_s": 37,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "zesty-wishbone",
+        "context_tokens": 376367,
+        "uncached_input_tokens": 23594,
+        "cached_input_tokens": 352773,
+        "output_tokens": 3174,
+        "tool_calls": 11,
+        "calls_before_first_edit": 8,
+        "duration_s": 53,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "pinto-cheque",
+        "context_tokens": 278568,
+        "uncached_input_tokens": 16129,
+        "cached_input_tokens": 262439,
+        "output_tokens": 2268,
+        "tool_calls": 8,
+        "calls_before_first_edit": 4,
+        "duration_s": 35,
+        "recorded_check_pass": true,
+        "injected_chars": 1266,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "45856186099b"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-2",
+      "task": "The CSV export command writes its header row in the wrong column order compared to the data rows. Fix the header so it lines up with the values.",
+      "shape": "bugfix",
+      "repeat": 1,
+      "cold": {
+        "session_id": "mountain-neon",
+        "context_tokens": 652269,
+        "uncached_input_tokens": 26732,
+        "cached_input_tokens": 625537,
+        "output_tokens": 6174,
+        "tool_calls": 20,
+        "calls_before_first_edit": 14,
+        "duration_s": 105,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "mirage-trombone",
+        "context_tokens": 581484,
+        "uncached_input_tokens": 25397,
+        "cached_input_tokens": 556087,
+        "output_tokens": 6525,
+        "tool_calls": 17,
+        "calls_before_first_edit": 14,
+        "duration_s": 102,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "peridot-midnight",
+        "context_tokens": 493427,
+        "uncached_input_tokens": 17020,
+        "cached_input_tokens": 476407,
+        "output_tokens": 3047,
+        "tool_calls": 15,
+        "calls_before_first_edit": 11,
+        "duration_s": 58,
+        "recorded_check_pass": true,
+        "injected_chars": 1284,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "c345396a0a6e"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "flag-2",
+      "task": "Add a --limit <n> flag to the list command so it only prints the first n rows.",
+      "shape": "flag",
+      "repeat": 2,
+      "cold": {
+        "session_id": "copper-spark",
+        "context_tokens": 576243,
+        "uncached_input_tokens": 25943,
+        "cached_input_tokens": 550300,
+        "output_tokens": 2502,
+        "tool_calls": 17,
+        "calls_before_first_edit": 8,
+        "duration_s": 49,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "befitting-vulcanodon",
+        "context_tokens": 272845,
+        "uncached_input_tokens": 16002,
+        "cached_input_tokens": 256843,
+        "output_tokens": 1526,
+        "tool_calls": 8,
+        "calls_before_first_edit": 3,
+        "duration_s": 28,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "flower-bead",
+        "context_tokens": 349939,
+        "uncached_input_tokens": 16617,
+        "cached_input_tokens": 333322,
+        "output_tokens": 2362,
+        "tool_calls": 16,
+        "calls_before_first_edit": 9,
+        "duration_s": 45,
+        "recorded_check_pass": true,
+        "injected_chars": 1282,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "b03af198663d"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "flag-1",
+      "task": "Add a --json flag to the stats CLI command. When it is passed, print the stats as JSON instead of the current text output.",
+      "shape": "flag",
+      "repeat": 2,
+      "cold": {
+        "session_id": "feather-sync",
+        "context_tokens": 738391,
+        "uncached_input_tokens": 23425,
+        "cached_input_tokens": 714966,
+        "output_tokens": 3246,
+        "tool_calls": 21,
+        "calls_before_first_edit": 10,
+        "duration_s": 61,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "brawny-acorn",
+        "context_tokens": 434845,
+        "uncached_input_tokens": 18186,
+        "cached_input_tokens": 416659,
+        "output_tokens": 2178,
+        "tool_calls": 13,
+        "calls_before_first_edit": 7,
+        "duration_s": 43,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "modest-diploma",
+        "context_tokens": 362624,
+        "uncached_input_tokens": 20072,
+        "cached_input_tokens": 342552,
+        "output_tokens": 2755,
+        "tool_calls": 16,
+        "calls_before_first_edit": 11,
+        "duration_s": 45,
+        "recorded_check_pass": true,
+        "injected_chars": 1235,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "1da48b94c171"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "flag-3",
+      "task": "Add a --format flag to the users command that accepts csv or table. It should keep printing the current plain rows by default and print CSV when csv is passed.",
+      "shape": "flag",
+      "repeat": 2,
+      "cold": {
+        "session_id": "wool-ocicat",
+        "context_tokens": 638796,
+        "uncached_input_tokens": 20296,
+        "cached_input_tokens": 618500,
+        "output_tokens": 4125,
+        "tool_calls": 23,
+        "calls_before_first_edit": 10,
+        "duration_s": 68,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "sleepy-wash",
+        "context_tokens": 475048,
+        "uncached_input_tokens": 20844,
+        "cached_input_tokens": 454204,
+        "output_tokens": 3043,
+        "tool_calls": 19,
+        "calls_before_first_edit": 11,
+        "duration_s": 45,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "broken-beaufort",
+        "context_tokens": 542743,
+        "uncached_input_tokens": 20611,
+        "cached_input_tokens": 522132,
+        "output_tokens": 2877,
+        "tool_calls": 16,
+        "calls_before_first_edit": 11,
+        "duration_s": 60,
+        "recorded_check_pass": true,
+        "injected_chars": 1194,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "720d9580182f"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-1",
+      "task": "Add a GET /health/deps endpoint that reports which internal dependencies the app relies on, returning JSON like {\"ok\": true, \"deps\": [...]}.",
+      "shape": "endpoint",
+      "repeat": 2,
+      "cold": {
+        "session_id": "holistic-visage",
+        "context_tokens": 462491,
+        "uncached_input_tokens": 18249,
+        "cached_input_tokens": 444242,
+        "output_tokens": 2979,
+        "tool_calls": 17,
+        "calls_before_first_edit": 7,
+        "duration_s": 59,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "full-flannel",
+        "context_tokens": 454675,
+        "uncached_input_tokens": 20070,
+        "cached_input_tokens": 434605,
+        "output_tokens": 2474,
+        "tool_calls": 13,
+        "calls_before_first_edit": 7,
+        "duration_s": 47,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "atlantic-museum",
+        "context_tokens": 492193,
+        "uncached_input_tokens": 20792,
+        "cached_input_tokens": 471401,
+        "output_tokens": 2722,
+        "tool_calls": 14,
+        "calls_before_first_edit": 7,
+        "duration_s": 48,
+        "recorded_check_pass": true,
+        "injected_chars": 1241,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "8ea7b1acc94d"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-3",
+      "task": "Add a DELETE /orders/:id endpoint. It should return 404 for an order id that does not exist and 204 when the order is deleted.",
+      "shape": "endpoint",
+      "repeat": 2,
+      "cold": {
+        "session_id": "spiffy-crepe",
+        "context_tokens": 808817,
+        "uncached_input_tokens": 25682,
+        "cached_input_tokens": 783135,
+        "output_tokens": 5098,
+        "tool_calls": 22,
+        "calls_before_first_edit": 7,
+        "duration_s": 85,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "lean-dish",
+        "context_tokens": 668253,
+        "uncached_input_tokens": 33528,
+        "cached_input_tokens": 634725,
+        "output_tokens": 4573,
+        "tool_calls": 22,
+        "calls_before_first_edit": 11,
+        "duration_s": 64,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "serene-mail",
+        "context_tokens": 435204,
+        "uncached_input_tokens": 23823,
+        "cached_input_tokens": 411381,
+        "output_tokens": 3372,
+        "tool_calls": 16,
+        "calls_before_first_edit": 8,
+        "duration_s": 49,
+        "recorded_check_pass": true,
+        "injected_chars": 1275,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "580e634edc0d"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "endpoint-2",
+      "task": "Add a GET /users/:id/summary endpoint that returns JSON with the fields id, name, orderCount (how many orders the user has placed) and totalCents (their total spend in cents). Return 404 for an unknown user.",
+      "shape": "endpoint",
+      "repeat": 2,
+      "cold": {
+        "session_id": "pepper-william",
+        "context_tokens": 1120539,
+        "uncached_input_tokens": 29985,
+        "cached_input_tokens": 1090554,
+        "output_tokens": 7460,
+        "tool_calls": 27,
+        "calls_before_first_edit": 9,
+        "duration_s": 125,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "airy-marimba",
+        "context_tokens": 773211,
+        "uncached_input_tokens": 27098,
+        "cached_input_tokens": 746113,
+        "output_tokens": 5235,
+        "tool_calls": 20,
+        "calls_before_first_edit": 5,
+        "duration_s": 90,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "neighborly-robin",
+        "context_tokens": 474383,
+        "uncached_input_tokens": 24480,
+        "cached_input_tokens": 449903,
+        "output_tokens": 5106,
+        "tool_calls": 21,
+        "calls_before_first_edit": 10,
+        "duration_s": 62,
+        "recorded_check_pass": true,
+        "injected_chars": 1275,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "53e30ba3d283"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-1",
+      "task": "Refunded orders are still being counted toward a customer's order total. Fix the total so it excludes refunded orders.",
+      "shape": "bugfix",
+      "repeat": 2,
+      "cold": {
+        "session_id": "south-houseboat",
+        "context_tokens": 490655,
+        "uncached_input_tokens": 22163,
+        "cached_input_tokens": 468492,
+        "output_tokens": 1784,
+        "tool_calls": 15,
+        "calls_before_first_edit": 4,
+        "duration_s": 46,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "hollow-daffodil",
+        "context_tokens": 386569,
+        "uncached_input_tokens": 19628,
+        "cached_input_tokens": 366941,
+        "output_tokens": 1922,
+        "tool_calls": 11,
+        "calls_before_first_edit": 8,
+        "duration_s": 44,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "changeable-browser",
+        "context_tokens": 504701,
+        "uncached_input_tokens": 19574,
+        "cached_input_tokens": 485127,
+        "output_tokens": 2364,
+        "tool_calls": 14,
+        "calls_before_first_edit": 8,
+        "duration_s": 45,
+        "recorded_check_pass": true,
+        "injected_chars": 1243,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "ce1a37d36202"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-3",
+      "task": "One of the report command's date range calculations is off by a month at the boundary, so some months come back with the wrong number of days. Find and fix it.",
+      "shape": "bugfix",
+      "repeat": 2,
+      "cold": {
+        "session_id": "precious-book",
+        "context_tokens": 333661,
+        "uncached_input_tokens": 15433,
+        "cached_input_tokens": 318228,
+        "output_tokens": 2466,
+        "tool_calls": 10,
+        "calls_before_first_edit": 6,
+        "duration_s": 45,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "succulent-darkness",
+        "context_tokens": 340706,
+        "uncached_input_tokens": 17615,
+        "cached_input_tokens": 323091,
+        "output_tokens": 2130,
+        "tool_calls": 10,
+        "calls_before_first_edit": 6,
+        "duration_s": 37,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "wistful-crest",
+        "context_tokens": 401197,
+        "uncached_input_tokens": 21983,
+        "cached_input_tokens": 379214,
+        "output_tokens": 2972,
+        "tool_calls": 12,
+        "calls_before_first_edit": 6,
+        "duration_s": 57,
+        "recorded_check_pass": true,
+        "injected_chars": 1266,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "9524efdab064"
+      ],
+      "full_recalled_procedure_ids": null
+    },
+    {
+      "task_id": "bugfix-2",
+      "task": "The CSV export command writes its header row in the wrong column order compared to the data rows. Fix the header so it lines up with the values.",
+      "shape": "bugfix",
+      "repeat": 2,
+      "cold": {
+        "session_id": "rich-jaguar",
+        "context_tokens": 474269,
+        "uncached_input_tokens": 20641,
+        "cached_input_tokens": 453628,
+        "output_tokens": 5545,
+        "tool_calls": 17,
+        "calls_before_first_edit": 11,
+        "duration_s": 82,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "doc": {
+        "session_id": "cloudy-cougar",
+        "context_tokens": 349688,
+        "uncached_input_tokens": 17538,
+        "cached_input_tokens": 332150,
+        "output_tokens": 2614,
+        "tool_calls": 12,
+        "calls_before_first_edit": 8,
+        "duration_s": 41,
+        "recorded_check_pass": true,
+        "injected_chars": 0,
+        "dollars": null
+      },
+      "full": {
+        "session_id": "peridot-fragrance",
+        "context_tokens": 871876,
+        "uncached_input_tokens": 26511,
+        "cached_input_tokens": 845365,
+        "output_tokens": 6568,
+        "tool_calls": 24,
+        "calls_before_first_edit": 21,
+        "duration_s": 116,
+        "recorded_check_pass": true,
+        "injected_chars": 1284,
+        "dollars": null
+      },
+      "cold_procedure_ids": [
+        "a971799a10b8"
+      ],
+      "full_recalled_procedure_ids": null
+    }
+  ],
+  "aggregate_change_full_vs_cold_percent": {
+    "context_tokens": -22.15,
+    "input_tokens": -4.36,
+    "cache_read": -22.86,
+    "output_tokens": -7.22,
+    "tool_calls": -6.61,
+    "discovery_calls": 19.11,
+    "duration_s": -15.76
+  },
+  "shape_summary": {
+    "flag": {
+      "cold": {
+        "context_tokens": 589519,
+        "tool_calls": 18.167,
+        "duration_s": 55.667
+      },
+      "doc": {
+        "context_tokens": 426599,
+        "tool_calls": 14.833,
+        "duration_s": 42.333
+      },
+      "full": {
+        "context_tokens": 417645.333,
+        "tool_calls": 15.667,
+        "duration_s": 47.667
+      }
+    },
+    "endpoint": {
+      "cold": {
+        "context_tokens": 736485.667,
+        "tool_calls": 20.667,
+        "duration_s": 77.667
+      },
+      "doc": {
+        "context_tokens": 575416.5,
+        "tool_calls": 17.5,
+        "duration_s": 62.333
+      },
+      "full": {
+        "context_tokens": 477644.833,
+        "tool_calls": 18.833,
+        "duration_s": 56.167
+      }
+    },
+    "bugfix": {
+      "cold": {
+        "context_tokens": 455642.667,
+        "tool_calls": 14.167,
+        "duration_s": 60.167
+      },
+      "doc": {
+        "context_tokens": 388061.833,
+        "tool_calls": 11.5,
+        "duration_s": 51
+      },
+      "full": {
+        "context_tokens": 491758.667,
+        "tool_calls": 15,
+        "duration_s": 59.167
+      }
+    }
+  }
+}
