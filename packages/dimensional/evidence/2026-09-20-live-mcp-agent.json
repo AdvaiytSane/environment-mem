@@ -1,0 +1,189 @@
+{
+  "schema": "memorable.dimensional.evidence.v1",
+  "mode": "live_local_mcp_readiness",
+  "robot_simulation": false,
+  "autonomous_agent": true,
+  "model": "gpt-4.1-mini",
+  "embedding": "off",
+  "tool_names": [
+    "agent_send",
+    "list_modules",
+    "server_status"
+  ],
+  "runs": [
+    {
+      "case": "first",
+      "mission_id": "3d4f26ee-604d-4dd8-96e1-063281fde435",
+      "verified": true,
+      "execution": "agent",
+      "elapsed_ms": 3884.51,
+      "token_usage": {
+        "input_tokens": 287,
+        "output_tokens": 148,
+        "total_tokens": 435
+      },
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 2,
+      "stored": true,
+      "receipt": {
+        "id": "3d4f26ee-604d-4dd8-96e1-063281fde435",
+        "procedureId": "procedures/metadata-eefc30b1ec9ee5828c6666e65bb872470a8b73f8",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "989d8341ed1faa7b47cc08674bff0f99b9c3ee8f42e8952ce85e5dc62de6dbd5",
+        "embedding": {
+          "status": "off",
+          "model": null,
+          "dimensions": 0
+        }
+      },
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "recall",
+      "mission_id": "3b3296bf-67b8-426f-9a85-6be2a7e0cba2",
+      "verified": true,
+      "execution": "agent",
+      "elapsed_ms": 2514.66,
+      "token_usage": {
+        "input_tokens": 391,
+        "output_tokens": 161,
+        "total_tokens": 552
+      },
+      "context_received_by_runner": true,
+      "context_chars": 325,
+      "context_delivered_to_model": true,
+      "captured_calls": 2,
+      "stored": true,
+      "receipt": {
+        "id": "3b3296bf-67b8-426f-9a85-6be2a7e0cba2",
+        "procedureId": "procedures/metadata-84036a638dc5beee2b0d6b776b2c76ada9b1178c",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "989d8341ed1faa7b47cc08674bff0f99b9c3ee8f42e8952ce85e5dc62de6dbd5",
+        "embedding": {
+          "status": "off",
+          "model": null,
+          "dimensions": 0
+        }
+      },
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": [
+        "3d4f26ee-604d-4dd8-96e1-063281fde435"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "case": "disabled",
+      "mission_id": "b64188de-ae22-4237-8546-375727b97bd3",
+      "verified": true,
+      "execution": "scripted",
+      "elapsed_ms": 11.31,
+      "token_usage": null,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 0,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "kill_switch",
+      "mission_id": "89723a0d-87c4-4153-a478-054ef939fd4b",
+      "verified": true,
+      "execution": "scripted",
+      "elapsed_ms": 7.32,
+      "token_usage": null,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 0,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "missing_cli",
+      "mission_id": "f23ccc45-0664-4d90-83d5-5801928d684c",
+      "verified": true,
+      "execution": "scripted",
+      "elapsed_ms": 10.99,
+      "token_usage": null,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "cli_unavailable"
+        },
+        {
+          "stage": "store",
+          "error": "cli_unavailable"
+        }
+      ],
+      "pending_store_retained": true,
+      "matched_ids": []
+    },
+    {
+      "case": "no_consent",
+      "mission_id": "f35afa0e-58a8-417c-b9d9-46f9ef7ee0e3",
+      "verified": true,
+      "execution": "scripted",
+      "elapsed_ms": 11.57,
+      "token_usage": null,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "consent_required"
+        },
+        {
+          "stage": "store",
+          "error": "consent_required"
+        }
+      ],
+      "pending_store_retained": true,
+      "matched_ids": []
+    },
+    {
+      "case": "wrong_map",
+      "mission_id": "d4783e5a-f6bb-4d7a-9a03-7c6ce9566f47",
+      "verified": true,
+      "execution": "scripted",
+      "elapsed_ms": 9.07,
+      "token_usage": null,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "context_delivered_to_model": false,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    }
+  ],
+  "complete": true
+}
