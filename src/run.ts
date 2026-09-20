@@ -1,6 +1,6 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { spawn, spawnSync } from 'node:child_process';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { claudeFormatHooks } from './install.ts';
 import { api, extractRemote, pendingPath, readPending } from './api.ts';
 import type { Task } from './eval.ts';
@@ -21,6 +21,8 @@ export interface RunResult {
   lane: string; agent: Agent; taskId: string; sessionId?: string; calls: number; discovery: number;
   handed: { n: number; from: Array<{ harness?: string; task_id?: string; created_at?: string }>; agree?: unknown } | null;
   stored: boolean; durationS: number; pushed?: string; error?: string;
+  cost: Cost;
+  verification: { status: 'passed' | 'failed' | 'not_run'; reason?: string };
 }
 export interface Plan { live?: string; store?: string; repo?: string; model?: string; /** task files, merged; default fixtures/tasks.json */ tasks?: string[]; waves: RunSpec[][] }
 
@@ -49,7 +51,7 @@ export function prepareLane(live: string, lane: string, repo: string): string {
 }
 
 export interface Cost { input_tokens?: number; cached_input_tokens?: number; output_tokens?: number; model?: string; duration_ms?: number; dollars?: number }
-function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.ProcessEnv, model: string | undefined, timeoutMs: number, onOut: (s: string) => void): Promise<{ code: number | null; sessionId?: string; err: string; cost: Cost }> {
+function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.ProcessEnv, model: string | undefined, timeoutMs: number, onOut: (s: string) => void): Promise<{ code: number | null; sessionId?: string; err: string; cost: Cost; failure?: string }> {
   return new Promise(res => {
     const childEnv: NodeJS.ProcessEnv = { ...process.env, ...env };
     delete childEnv.CLAUDECODE; delete childEnv.CLAUDE_CODE_ENTRYPOINT;
@@ -62,12 +64,17 @@ function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.Proces
       args = ['-p', prompt, '--permission-mode', 'dangerous', '--respect-workspace-trust', 'false', '--export', join(wd, '.headstart', 'devin-export.json')];
       if (model) args.push('--model', model);
     }
-    const child = spawn(agent, args, { cwd: wd, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'] });
-    let out = '', err = '', sessionId: string | undefined;
+    const grouped = process.platform !== 'win32';
+    const child = spawn(agent, args, { cwd: wd, env: childEnv, stdio: ['ignore', 'pipe', 'pipe'], detached: grouped });
+    let out = '', err = '', sessionId: string | undefined, spawnError: string | undefined, timedOut = false;
+    child.on('error', e => { spawnError = (e as NodeJS.ErrnoException).code === 'ENOENT' ? `${agent} is not installed or is not on PATH` : `${agent} could not start: ${e.message}`; });
     child.stdout.on('data', d => { const s = String(d); out += s; onOut(s); const m = s.match(/"session_id"\s*:\s*"([^"]+)"/); if (m) sessionId = m[1]; });
     child.stderr.on('data', d => { err += d; });
-    const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
-    child.on('close', code => {
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try { if (grouped && child.pid) process.kill(-child.pid, 'SIGKILL'); else child.kill('SIGKILL'); } catch {}
+    }, timeoutMs);
+    child.on('close', (code, signal) => {
       clearTimeout(timer);
       const cost: Cost = { model };
       try {
@@ -78,10 +85,15 @@ function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.Proces
           if (last?.session_id) sessionId = last.session_id;
         } else {
           const m = JSON.parse(readFileSync(join(wd, '.headstart', 'devin-export.json'), 'utf8')).final_metrics ?? {};
-          cost.cached_input_tokens = m.total_cached_tokens ?? 0; cost.input_tokens = (m.total_prompt_tokens ?? 0) - (m.total_cached_tokens ?? 0); cost.output_tokens = m.total_completion_tokens ?? 0;
+          // Missing export fields mean unknown, not a zero-token run.
+          const count = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+          if (count(m.total_cached_tokens)) cost.cached_input_tokens = m.total_cached_tokens;
+          if (count(m.total_prompt_tokens) && count(m.total_cached_tokens) && m.total_prompt_tokens >= m.total_cached_tokens) cost.input_tokens = m.total_prompt_tokens - m.total_cached_tokens;
+          if (count(m.total_completion_tokens)) cost.output_tokens = m.total_completion_tokens;
         }
       } catch {}
-      res({ code, sessionId, err: err.slice(0, 300), cost });
+      const failure = spawnError ?? (timedOut ? `timed out after ${timeoutMs}ms` : signal ? `terminated by ${signal}` : code !== 0 ? `exit ${code}: ${err.slice(0, 300)}` : undefined);
+      res({ code, sessionId, err: err.slice(0, 300), cost, failure });
     });
   });
 }
@@ -112,6 +124,7 @@ export function laneOutcome(wd: string): Pick<RunResult, 'sessionId' | 'calls' |
 }
 
 export async function runOne(spec: RunSpec, opts: { live: string; store: string; repo: string; tasks: Task[]; model?: string; onOut?: (lane: string, s: string) => void }): Promise<RunResult> {
+  if (!['claude', 'devin'].includes(spec.agent)) throw new Error('agent must be claude or devin');
   const { id, prompt } = resolveTask(spec, opts.tasks);
   const wd = prepareLane(opts.live, spec.lane, spec.repo ?? opts.repo);
   const env: NodeJS.ProcessEnv = {
@@ -121,6 +134,32 @@ export async function runOne(spec: RunSpec, opts: { live: string; store: string;
   };
   const t0 = Date.now();
   const r = await spawnAgent(spec.agent, prompt, wd, env, spec.model ?? opts.model, (spec.timeoutMin ?? 12) * 60_000, s => opts.onOut?.(spec.lane, s));
+  const durationS = Math.round((Date.now() - t0) / 1000);
+  const task = opts.tasks.find(t => t.id === id);
+  let verification: RunResult['verification'] = { status: 'not_run', reason: r.failure ? 'agent did not complete' : 'no independent check defined for this task' };
+  if (!r.failure && task?.hidden_test) {
+    const source = resolve(task.hidden_test);
+    if (existsSync(source)) {
+      const target = join(wd, 'test', `hidden-${basename(source)}`);
+      mkdirSync(join(wd, 'test'), { recursive: true });
+      cpSync(source, target);
+      // Also run the task's original failing check from the untouched
+      // fixture rather than trusting agent edits to verification code.
+      const checks = [target];
+      if (task.visible_failing_test) {
+        const visibleSource = resolve(spec.repo ?? opts.repo, task.visible_failing_test);
+        if (existsSync(visibleSource)) {
+          const visibleTarget = join(wd, 'test', `verification-${basename(visibleSource)}`);
+          cpSync(visibleSource, visibleTarget); checks.push(visibleTarget);
+        }
+      }
+      const checkEnv: NodeJS.ProcessEnv = { ...process.env, APP_ENV: 'test', APP_SEED: 'fixture' };
+      delete checkEnv.NODE_TEST_CONTEXT;
+      const checked = spawnSync(process.execPath, ['--test', ...checks], { cwd: wd, env: checkEnv, encoding: 'utf8', timeout: 120_000 });
+      verification = { status: checked.status === 0 ? 'passed' : 'failed', reason: checked.status === 0 ? undefined : 'independent fixture check failed or timed out' };
+      writeFileSync(join(wd, '.headstart', 'verification.log'), `${checked.stdout ?? ''}${checked.stderr ?? ''}`);
+    } else verification = { status: 'not_run', reason: 'independent check file unavailable' };
+  }
   const o = laneOutcome(wd);
   let pushed: string | undefined, pushError: string | undefined;
   const a = api();
@@ -133,13 +172,16 @@ export async function runOne(spec: RunSpec, opts: { live: string; store: string;
       if (pr.ok) pushed = pr.admitted ? pr.workflow_id : `${pr.workflow_id} (not admitted)`; else pushError = pr.error;
     } catch (e) { pushError = String((e as Error).message); }
   }
-  return { lane: spec.lane, agent: spec.agent, taskId: id, ...o, sessionId: o.sessionId ?? r.sessionId, durationS: Math.round((Date.now() - t0) / 1000), pushed, error: r.code ? `exit ${r.code}: ${r.err}` : pushError ? `push: ${pushError}` : undefined };
+  const result: RunResult = { lane: spec.lane, agent: spec.agent, taskId: id, ...o, sessionId: o.sessionId ?? r.sessionId, durationS, cost: r.cost, verification, pushed, error: r.failure ?? (verification.status === 'failed' ? verification.reason : pushError ? `push: ${pushError}` : undefined) };
+  mkdirSync(join(wd, '.headstart'), { recursive: true });
+  writeFileSync(join(wd, '.headstart', 'run-result.json'), JSON.stringify(result, null, 2) + '\n');
+  return result;
 }
 
 export function describe(r: RunResult): string {
   const from = r.handed ? r.handed.from.map(f => `${f.harness ?? 'unknown'} ${f.task_id ?? ''}`.trim()).slice(0, 3).join(', ') : '';
   const handed = r.handed ? `handed ${r.handed.n} (${from})` : 'cold';
-  return `${r.lane.padEnd(14)} ${r.agent.padEnd(6)} ${r.taskId.padEnd(12)} ${String(r.calls).padStart(3)} calls ${String(r.discovery).padStart(3)} before first edit  ${String(r.durationS).padStart(4)}s  ${handed}${r.stored ? '  stored' : ''}${r.pushed ? '  hosted' : ''}${r.error ? '  ' + r.error : ''}`;
+  return `${r.lane.padEnd(14)} ${r.agent.padEnd(6)} ${r.taskId.padEnd(12)} ${String(r.calls).padStart(3)} calls ${String(r.discovery).padStart(3)} before first edit  ${String(r.durationS).padStart(4)}s  ${handed}${r.stored ? '  stored' : ''}${r.pushed ? '  hosted' : ''}  check=${r.verification.status}${r.error ? '  ' + r.error : ''}`;
 }
 
 /** Waves run in order; runs inside a wave run at once. Wave two recalls what wave one stored. */

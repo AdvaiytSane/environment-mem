@@ -249,6 +249,7 @@ async function main(argv: string[]): Promise<void> {
   store   ${store}`);
       const r = await runOne(spec, { live, store, repo: resolve(flag(args, 'repo', 'fixtures/repo')!), tasks: loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(',')) });
       console.log(describe(r));
+      if (r.error) process.exitCode = 1;
       return;
     }
     case 'demo': {
@@ -268,9 +269,15 @@ async function main(argv: string[]): Promise<void> {
       console.log(`1. before: ${agent}, nothing handed  (lane ${coldLane})`);
       const cold = await runOne({ lane: coldLane, agent, task, inject: '0', record: true, model }, { live, store, repo, tasks });
       console.log('   ' + describe(cold));
+      if (cold.error) { console.error('Before run failed; no comparison was made.'); process.exitCode = 1; return; }
       console.log(`2. after: ${warmAgent}, memory on  (lane ${warmLane})`);
       const warm = await runOne({ lane: warmLane, agent: warmAgent, task, inject: 'full', record: true, model }, { live, store, repo, tasks });
       console.log('   ' + describe(warm));
+      if (warm.error) { console.error('After run failed; no comparison was made.'); process.exitCode = 1; return; }
+      if (!warm.handed || cold.verification.status !== 'passed' || warm.verification.status !== 'passed') {
+        console.log('No verified memory comparison: both runs must pass independent checks and the after run must receive a recall.');
+        return;
+      }
       const d = (a: number, b: number) => (a === b ? 'same' : a > b ? `${a - b} fewer` : `${b - a} more`);
       console.log(`\nbefore ${cold.calls} steps, ${cold.discovery} before the first edit, ${cold.durationS}s`);
       console.log(`after  ${warm.calls} steps, ${warm.discovery} before the first edit, ${warm.durationS}s  (${d(cold.calls, warm.calls)} steps, ${d(cold.discovery, warm.discovery)} before the first edit, ${d(cold.durationS, warm.durationS)} seconds)`);
@@ -287,6 +294,7 @@ async function main(argv: string[]): Promise<void> {
       plan.waves.forEach((w, i) => console.log(`  wave ${i + 1}: ${w.map(r => `${r.lane} (${r.agent}, ${r.task}, inject=${r.inject ?? 'full'})`).join('; ')}`));
       const rs = await orchestrate(plan, { tasks: loadTasks(...(plan.tasks ?? [])), onDone: r => console.log(describe(r)) });
       const handed = rs.filter(r => r.handed).length, cross = rs.filter(r => r.handed && r.handed.from.some(f => f.harness && f.harness !== r.agent)).length;
+      if (rs.some(r => r.error)) process.exitCode = 1;
       console.log(`
 ${rs.length} runs, ${handed} handed a procedure, ${cross} across agents, ${rs.filter(r => r.stored).length} stored`);
       return;
