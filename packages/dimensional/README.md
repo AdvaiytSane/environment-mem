@@ -134,6 +134,27 @@ the custom projection retains their hashes, filenames, and observed poses.
 Use this only for the provided MuJoCo experiment; physical robots require their
 own controllers, environment compatibility definitions, and outcome verifiers.
 
+The simulation blueprint tightens the pinned upstream planner's normal and
+replanning arrival thresholds to 10 cm. Upstream otherwise accepts a replan
+within 50 cm as arrival. This controller configuration is local to the demo;
+the independent 20 cm verifier is unchanged. It uses private planner fields
+from the pinned dimOS revision and must be reviewed when upgrading dimOS.
+
+Verification requires a commanded visit to A followed by a commanded return
+to B, with measured pose and advancing camera frames at both. Merely starting
+at B cannot satisfy the return requirement. The inspection tool waits for a
+new camera frame, and the report verifies the saved JPEG hashes independently.
+
+Each experiment requires a new output directory. Its encrypted local store
+key is retained in `.store-key` with owner-only permissions; keep it private.
+The output includes both runs' recalled text, actual provider request messages
+(without authorization headers), token usage, and the final report. Usage is
+collected as responses arrive, including before a later agent error. The second
+run must recall the first mission's ID, deliver its context in provider requests,
+complete the inspection, and exclude a different map version. It starts from
+the first run's actual final pose, so this pair is a connection check, not a
+controlled performance benchmark.
+
 On macOS our pinned environment required PortAudio before PyAudio, Torch,
 `unitree-webrtc-connect==2.2.0`, `langchain==1.2.3`, and Git LFS assets. The activated
 venv's `bin` must be in `PATH` for upstream to find `mjpython`. This blueprint

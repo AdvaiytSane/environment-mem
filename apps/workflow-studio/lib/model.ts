@@ -1,0 +1,10 @@
+export type Purpose='must_match'|'prefer'|'context'|'ignore';
+export type Field={key:string;label:string;value:string;type:'string'|'number'|'boolean';purpose:Purpose;exposure:'send'|'redact'|'local_only';include:boolean;maxAge:number;sourceId:string;observedAt:string};
+export type Evidence={url:string;status:number;requestId:string|null;observedAt:string};
+export type Source={transport?:'server'|'browser';id:string;kind:'github'|'sample';name:string;observedAt:string;fields:Field[];evidence:Evidence[]};
+export type Workflow={id:string;revisionId?:string;version:number;name:string;intent:string;verifier:string;sources:Source[];captureAt:string;injectAt:string;budget:number};
+export type Run={provenance?:'server_observed'|'browser_reported';id:string;createdAt:string;revisionId:string;values:Record<string,{value:string;type:string;observedAt:string}>;evidence:Evidence[];summary:string};
+export const blank=():Workflow=>({id:crypto.randomUUID(),version:0,name:'Untitled workflow',intent:'',verifier:'',sources:[],captureAt:'task_complete',injectAt:'before_task',budget:4000});
+export function fieldsOf(w:Workflow){return w.sources.flatMap(s=>s.fields)}
+export function sanitized(w:Workflow):Workflow{return {...w,sources:w.sources.map(s=>({...s,fields:s.fields.map(f=>({...f,value:f.exposure==='send'?f.value:''}))}))}}
+export function manifest(w:Workflow){return {schema_version:'memorable.environment/0.1',workflow_id:w.id,revision:w.revisionId??null,name:w.name,intent:w.intent,success_verifier:w.verifier,hooks:{capture:w.captureAt,inject:w.injectAt},context:{max_bytes:w.budget,delivery:'adapter_required'},sources:w.sources.map(s=>({id:s.id,kind:s.kind,name:s.name})),fields:fieldsOf(w).map(({value,observedAt,...f})=>f),resolver:{version:'exact-v1',scope:'authenticated_owner_and_workflow',missing_required:'exclude',stale_required:'exclude',rank:'preferred_matches_desc,observed_at_desc,run_id_asc'},replay:{enabled:false,reason:'Execution adapter and step verification required'}}}

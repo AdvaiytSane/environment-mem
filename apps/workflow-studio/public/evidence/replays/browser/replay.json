@@ -1,0 +1,647 @@
+{
+  "schema": "memorable.replay.v1",
+  "id": "browser",
+  "title": "Browser Use remembers a real pagination workflow",
+  "agent": "Browser Use 0.13.10 / OpenAI gpt-4.1-mini",
+  "recordedAt": "2026-09-20T05:33:37.586726+00:00",
+  "summary": "Two fresh agents visit a public website. The second recalls the first run through Memorable.",
+  "sourceUrl": "https://quotes.toscrape.com",
+  "limitations": [
+    "Recorded real screenshots and action events; this is a visual playback, not deterministic action replay.",
+    "Before frames are the browser state captured for the model; after frames are taken after a whole model step. A step can contain multiple actions.",
+    "No cursor position or movement is fabricated. Screenshots do not by themselves prove every action succeeded.",
+    "Independent final URL and quote-count verification proves the final task, not every unknown tool result.",
+    "Storage receipts refer to the existing encrypted local Memorable store; embeddings use its configured production service.",
+    "This demonstration establishes memory delivery, not a speedup or a causal performance benefit.",
+    "Recall and injection boundaries are assembled from the validated run report in their lifecycle order before Agent.run(); they have no exact event timestamps."
+  ],
+  "chapters": [
+    {
+      "id": "run-1",
+      "title": "First run \u00b7 learn the workflow",
+      "task": "Visit page two of the public quotes website and confirm there are ten quotes.",
+      "result": "verified",
+      "events": [
+        {
+          "id": "run-1-recall",
+          "kind": "recall",
+          "title": "Recall searched an empty store",
+          "summary": "Observed CLI recall before agent construction. Returned IDs are from this actual run.",
+          "status": "observed",
+          "durationMs": null,
+          "output": {
+            "memoryIds": [],
+            "embedding": {
+              "status": "not_needed",
+              "model": null,
+              "dimensions": 0
+            }
+          }
+        },
+        {
+          "id": "run-1-event-1",
+          "kind": "start",
+          "title": "Fresh browser session",
+          "summary": "Real initial page after bootstrap navigation, before this agent runs.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 2353,
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/",
+              "quotes": 10
+            },
+            "frameSha256": "413f5416d706bfedbbb1c5dc407534ca7469f33447a97a3595ea2f5a1572727b"
+          },
+          "frame": "run-1-frame-01.png",
+          "frameCaption": "Initial browser state \u00b7 page one"
+        },
+        {
+          "id": "run-1-event-2",
+          "kind": "tool",
+          "title": "Step 1 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 4657,
+          "tool": "click",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "click",
+                "index": 351
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/",
+              "quotes": 10
+            },
+            "frameSha256": "413f5416d706bfedbbb1c5dc407534ca7469f33447a97a3595ea2f5a1572727b"
+          },
+          "frame": "run-1-frame-02.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-1-event-3",
+          "kind": "tool",
+          "title": "Step 1 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 948,
+          "elapsedMs": 5599,
+          "tool": "click",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "click",
+                "index": 351
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": false,
+                "reportedSuccess": null,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-1-frame-03.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-1-event-4",
+          "kind": "tool",
+          "title": "Step 2 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 8034,
+          "tool": "find_elements",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "find_elements"
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-1-frame-04.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-1-event-5",
+          "kind": "tool",
+          "title": "Step 2 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 138,
+          "elapsedMs": 8166,
+          "tool": "find_elements",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "find_elements"
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": false,
+                "reportedSuccess": null,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-1-frame-05.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-1-event-6",
+          "kind": "tool",
+          "title": "Step 3 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 10586,
+          "tool": "done",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "done",
+                "reportedSuccess": true
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-1-frame-06.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-1-event-7",
+          "kind": "tool",
+          "title": "Step 3 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 136,
+          "elapsedMs": 10716,
+          "tool": "done",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "done",
+                "reportedSuccess": true
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": true,
+                "reportedSuccess": true,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-1-frame-07.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-1-verify",
+          "kind": "verify",
+          "title": "Final page checked independently",
+          "summary": "Independent DOM check: exact page-two URL and ten quote cards.",
+          "status": "verified",
+          "durationMs": null,
+          "output": {
+            "url": "https://quotes.toscrape.com/page/2/",
+            "quotes": 10
+          },
+          "frame": "run-1-frame-07.png",
+          "frameCaption": "Last real browser frame before the independent final check"
+        },
+        {
+          "id": "run-1-store",
+          "kind": "store",
+          "title": "Trace stored in Memorable",
+          "summary": "Actual receipt from the existing local procedure store.",
+          "status": "observed",
+          "durationMs": null,
+          "output": {
+            "id": "7f76e4ec-591a-4af5-bb8f-f93915026d42",
+            "procedureId": "procedures/metadata-c3ab554aa0d46f2832b3dcda16a5ae833ce03ea8",
+            "status": "stored",
+            "storage": "local",
+            "duplicate": false,
+            "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+            "embedding": {
+              "status": "ready",
+              "model": "cf:@cf/baai/bge-m3",
+              "dimensions": 1024
+            }
+          }
+        }
+      ],
+      "runId": "7f76e4ec-591a-4af5-bb8f-f93915026d42"
+    },
+    {
+      "id": "run-2",
+      "title": "Second run \u00b7 recall the workflow",
+      "task": "Move to the next page of the quote listing and check that it contains ten entries.",
+      "result": "verified",
+      "events": [
+        {
+          "id": "run-2-recall",
+          "kind": "recall",
+          "title": "Recall returned the earlier workflow",
+          "summary": "Observed CLI recall before agent construction. Returned IDs are from this actual run.",
+          "status": "observed",
+          "durationMs": null,
+          "output": {
+            "memoryIds": [
+              "7f76e4ec-591a-4af5-bb8f-f93915026d42"
+            ],
+            "embedding": {
+              "status": "ready",
+              "model": "cf:@cf/baai/bge-m3",
+              "dimensions": 1024
+            }
+          }
+        },
+        {
+          "id": "run-2-inject",
+          "kind": "inject",
+          "title": "Memory reached the next model input",
+          "summary": "The existing verifier inspected the actual model message list for the recalled reference.",
+          "status": "verified",
+          "durationMs": null,
+          "output": {
+            "referenceInActualModelMessages": true,
+            "contextBytes": 508,
+            "contextSha256": "074fa1eed205dc71fcbb167536bb5088b625a36daf038eba800b047f9dbf8b01"
+          }
+        },
+        {
+          "id": "run-2-event-1",
+          "kind": "start",
+          "title": "Fresh browser session",
+          "summary": "Real initial page after bootstrap navigation, before this agent runs.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 13382,
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/",
+              "quotes": 10
+            },
+            "frameSha256": "413f5416d706bfedbbb1c5dc407534ca7469f33447a97a3595ea2f5a1572727b"
+          },
+          "frame": "run-2-frame-01.png",
+          "frameCaption": "Initial browser state \u00b7 page one"
+        },
+        {
+          "id": "run-2-event-2",
+          "kind": "tool",
+          "title": "Step 1 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 15667,
+          "tool": "click",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "click",
+                "index": 351
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/",
+              "quotes": 10
+            },
+            "frameSha256": "413f5416d706bfedbbb1c5dc407534ca7469f33447a97a3595ea2f5a1572727b"
+          },
+          "frame": "run-2-frame-02.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-2-event-3",
+          "kind": "tool",
+          "title": "Step 1 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 957,
+          "elapsedMs": 16618,
+          "tool": "click",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "click",
+                "index": 351
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": false,
+                "reportedSuccess": null,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-03.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-2-event-4",
+          "kind": "tool",
+          "title": "Step 2 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 18729,
+          "tool": "extract",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "extract"
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-04.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-2-event-5",
+          "kind": "tool",
+          "title": "Step 2 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 4928,
+          "elapsedMs": 23651,
+          "tool": "extract",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "extract"
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": false,
+                "reportedSuccess": null,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-05.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-2-event-6",
+          "kind": "tool",
+          "title": "Step 3 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 25956,
+          "tool": "find_elements",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "find_elements"
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-06.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-2-event-7",
+          "kind": "tool",
+          "title": "Step 3 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 129,
+          "elapsedMs": 26081,
+          "tool": "find_elements",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "find_elements"
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": false,
+                "reportedSuccess": null,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-07.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-2-event-8",
+          "kind": "tool",
+          "title": "Step 4 \u00b7 before action",
+          "summary": "Real browser state supplied to the model; these actions are proposed and have not executed at this event.",
+          "status": "observed",
+          "durationMs": null,
+          "elapsedMs": 28924,
+          "tool": "done",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "done",
+                "reportedSuccess": true
+              }
+            ]
+          },
+          "output": {
+            "observedAtCallback": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-08.png",
+          "frameCaption": "Before execution \u00b7 browser screenshot from this model step",
+          "phase": "before"
+        },
+        {
+          "id": "run-2-event-9",
+          "kind": "tool",
+          "title": "Step 4 \u00b7 observed result",
+          "summary": "Screenshot after the model step finished; execution results remain separate from task verification.",
+          "status": "observed",
+          "durationMs": 162,
+          "elapsedMs": 29079,
+          "tool": "done",
+          "input": {
+            "proposedActions": [
+              {
+                "name": "done",
+                "reportedSuccess": true
+              }
+            ]
+          },
+          "output": {
+            "observation": {
+              "url": "https://quotes.toscrape.com/page/2/",
+              "quotes": 10
+            },
+            "toolResults": [
+              {
+                "isDone": true,
+                "reportedSuccess": true,
+                "hasError": false
+              }
+            ],
+            "frameSha256": "85c3d1c33116c7a4971b7b85238ecfb0a3f7d6e20cdfd5d8bfe7718a0946ffae"
+          },
+          "frame": "run-2-frame-09.png",
+          "frameCaption": "After execution \u00b7 actual page at the end of this model step",
+          "phase": "after"
+        },
+        {
+          "id": "run-2-verify",
+          "kind": "verify",
+          "title": "Final page checked independently",
+          "summary": "Independent DOM check: exact page-two URL and ten quote cards.",
+          "status": "verified",
+          "durationMs": null,
+          "output": {
+            "url": "https://quotes.toscrape.com/page/2/",
+            "quotes": 10
+          },
+          "frame": "run-2-frame-09.png",
+          "frameCaption": "Last real browser frame before the independent final check"
+        },
+        {
+          "id": "run-2-store",
+          "kind": "store",
+          "title": "Trace stored in Memorable",
+          "summary": "Actual receipt from the existing local procedure store.",
+          "status": "observed",
+          "durationMs": null,
+          "output": {
+            "id": "f9a5ea6b-c03b-41c1-b08a-7dee08bb4042",
+            "procedureId": "procedures/metadata-ac3fadcc59dac035fee8e55301adab7fd7d120d9",
+            "status": "stored",
+            "storage": "local",
+            "duplicate": false,
+            "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+            "embedding": {
+              "status": "ready",
+              "model": "cf:@cf/baai/bge-m3",
+              "dimensions": 1024
+            }
+          }
+        }
+      ],
+      "runId": "f9a5ea6b-c03b-41c1-b08a-7dee08bb4042"
+    }
+  ],
+  "complete": true,
+  "verification": {
+    "hardFilterChecks": {
+      "project": {
+        "matches": 0,
+        "eligible": 0,
+        "embedding": "not_needed"
+      },
+      "website": {
+        "matches": 0,
+        "eligible": 0,
+        "embedding": "not_needed"
+      },
+      "outcome": {
+        "matches": 0,
+        "eligible": 0,
+        "embedding": "not_needed"
+      }
+    },
+    "unrelatedQueryMatches": 0
+  }
+}

@@ -20,6 +20,8 @@ from dotenv import dotenv_values
 from dimos.agents.mcp.mcp_adapter import McpAdapter
 from langchain.agents import create_agent
 from langchain_core.tools import StructuredTool
+from langchain_core.callbacks import UsageMetadataCallbackHandler
+import httpx
 from langchain_openai import ChatOpenAI
 from memorable_dimensional import DIMENSIONAL_METADATA, MemorableMemory, MissionMemory, minimal_projection
 
@@ -29,10 +31,14 @@ async def main(args):
     if key:
         os.environ["OPENAI_API_KEY"] = key
     output = Path(args.output).resolve()
-    output.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Never silently replace the encryption key of a previous experiment.
+    output.mkdir(parents=True, exist_ok=False, mode=0o700)
     os.environ["MEMORABLE_HOME"] = str(output / "memory-home")
     os.environ["MEMORABLE_BACKEND"] = "local"
     os.environ["MEMORABLE_STORE_KEY"] = secrets.token_hex(32)
+    key_file = output / ".store-key"
+    key_file.write_text(os.environ["MEMORABLE_STORE_KEY"])
+    key_file.chmod(0o600)
     command = [args.node, str(Path(args.memorable_cli).resolve())]
     env = {k: v for k, v in os.environ.items() if k in {"PATH", "HOME", "TMPDIR", "LANG"} or k.startswith("MEMORABLE_")}
     subprocess.run([*command, "enable"], env=env, check=True, capture_output=True, timeout=15)
@@ -71,8 +77,21 @@ async def main(args):
             project="dimos-office-demo", site="mujoco-office1", map_version="mujoco-4232d61e",
             robot_capabilities="go1-simulation:camera:nav", tool_schema_version="dimos-c1c3cdc9-inspection-v1")
         recalled = await mission.prepare()
+        (output / f"run-{number + 1}-context.txt").write_text(recalled)
         wrapped = mission.wrap_mcp(client)
         moves = 0
+        requests = []
+        usage_tracker = UsageMetadataCallbackHandler()
+
+        async def record_request(request):
+            # Record the actual provider payload, never authorization headers.
+            payload = json.loads(request.content)
+            messages = payload.get("messages", [])
+            requests.append({"model": payload.get("model"), "messages": messages,
+                             "context_present": bool(recalled) and any(
+                                 recalled in str(m.get("content", "")) for m in messages
+                                 if m.get("role") in {"system", "developer"})})
+            (output / f"run-{number + 1}-requests.json").write_text(json.dumps(requests, indent=2) + "\n")
 
         def move_to(x: float, y: float) -> str:
             nonlocal moves
@@ -97,7 +116,9 @@ async def main(args):
                            args_schema={"type": "object", "properties": {}, "additionalProperties": False},
                            func=inspect_pose),
         ]
-        agent = create_agent(ChatOpenAI(model=args.model, temperature=0), tools=tools,
+        http_client = httpx.AsyncClient(event_hooks={"request": [record_request]})
+        agent = create_agent(ChatOpenAI(model=args.model, temperature=0, max_retries=0,
+                                       http_async_client=http_client), tools=tools,
                              system_prompt="You inspect the two specified coordinates in a local MuJoCo simulation. "
                              "Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. "
                              "Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. "
@@ -108,32 +129,51 @@ async def main(args):
         state = {"messages": []}
         try:
             state = await agent.ainvoke({"messages": [{"role": "user", "content": f"Complete the checkpoint inspection. Coordinates: {json.dumps(checkpoints)}"}]},
-                                       config={"recursion_limit": 18})
+                                       config={"recursion_limit": 32, "callbacks": [usage_tracker]})
         except Exception as exc:
             agent_error = type(exc).__name__
+        finally:
+            await http_client.aclose()
         final = json.loads(client.call_tool_text("inspect_pose"))
-        visits = {name: any(math.dist(p, o["position"][:2]) <= 0.20 for o in observed) for name, p in checkpoints.items()}
+        # Require commanded A, observed A, commanded B, observed B, in that order.
+        # The starting position at B cannot count as the return leg.
+        visits = {"A": False, "B": False}
+        phase_frames = []
+        target = None
+        for event in sorted(mission.events, key=lambda e: e["sequence"]):
+            if event["tool"] == "move_to":
+                point = [event["input"]["x"], event["input"]["y"]]
+                target = next((name for name, p in checkpoints.items() if math.dist(point, p) < 0.01), None)
+            observation = event.get("observation", {})
+            if target and observation.get("ok") and math.dist(checkpoints[target], observation["position"][:2]) <= 0.20:
+                if (target == "A" or visits["A"]) and not visits[target]:
+                    visits[target] = True
+                    phase_frames.append(observation["image_sequence"])
         final_at_b = final.get("ok") is True and math.dist(checkpoints["B"], final["position"][:2]) <= 0.20
         frame_checks = []
-        for observation in observed:
+        for observation in [*observed, final] if final.get("ok") else observed:
             source = Path(args.frames) / observation["image_file"]
             valid = source.is_file() and hashlib.sha256(source.read_bytes()).hexdigest() == observation["image_sha256"]
             frame_checks.append(valid)
             if valid:
                 (output / source.name).write_bytes(source.read_bytes())
         sequences = [o["image_sequence"] for o in observed]
-        camera_advanced = len(sequences) >= 3 and all(b > a for a, b in zip(sequences, sequences[1:]))
+        camera_advanced = len(phase_frames) == 2 and phase_frames[1] > phase_frames[0] > first["image_sequence"]
         verified = not agent_error and all(visits.values()) and final_at_b and camera_advanced and bool(frame_checks) and all(frame_checks)
         verification = {"ok": verified, "checkpoints": visits, "returned_to_b": final_at_b,
                         "camera_sequence_advanced": camera_advanced,
                         "camera_hashes_verified": bool(frame_checks) and all(frame_checks), "measured_final_pose": final.get("position"),
                         "agent_error": agent_error}
         await mission.finish(verification=verification)
-        usages = [m.usage_metadata for m in state["messages"] if getattr(m, "usage_metadata", None)]
+        usages = list(usage_tracker.usage_metadata.values())
         report["runs"].append({"number": number + 1, "mission_id": mission.id,
-            "context_delivered": bool(recalled), "context_chars": len(recalled), "verification": verification,
+            "context_delivered": bool(requests) and all(r["context_present"] for r in requests),
+            "context_chars": len(recalled), "recall_ids": [m.get("id") for m in (mission.recall_result or {}).get("matches", [])],
+            "verification": verification, "final_observation": final, "checkpoint_image_sequences": phase_frames,
             "elapsed_ms": round((time.monotonic() - started) * 1000, 2),
-            "usage": {k: sum(m.get(k, 0) for m in usages) for k in ("input_tokens", "output_tokens", "total_tokens")} if not agent_error else None,
+            "usage": {k: sum(m.get(k, 0) for m in usages) for k in ("input_tokens", "output_tokens", "total_tokens")},
+            "usage_by_model": usage_tracker.usage_metadata,
+            "provider_request_count": len(requests),
             "actions": mission.events, "receipt": mission.store_result, "diagnostics": mission.diagnostics})
         (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
         if not verified:
@@ -141,7 +181,12 @@ async def main(args):
                 "metadata": {**mission.filters, "outcome": "verified"}, "limit": 3})
             report["unverified_excluded_from_recall"] = not bool(post_store_recall["matches"])
             break
-    report["complete"] = len(report["runs"]) == 2 and all(x["verification"]["ok"] for x in report["runs"]) and report["runs"][1]["context_delivered"]
+        mismatch = await memory.recall({"query": mission.task,
+            "metadata": {**mission.filters, "map_version": "different-map", "outcome": "verified"}, "limit": 3})
+        report["different_map_excluded"] = not bool(mismatch["matches"])
+    report["complete"] = (len(report["runs"]) == 2 and all(x["verification"]["ok"] and x["receipt"] for x in report["runs"])
+        and report["runs"][1]["context_delivered"] and report.get("different_map_excluded")
+        and report["runs"][0]["mission_id"] in report["runs"][1]["recall_ids"])
     (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({"complete": report["complete"], "runs": len(report["runs"]), "report": str(output / "report.json")}))
     if not report["complete"]:

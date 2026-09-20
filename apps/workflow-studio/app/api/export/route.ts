@@ -1,0 +1,3 @@
+import {db,owner,failure} from '@/lib/server';
+import {manifest} from '@/lib/model';
+export async function GET(r:Request){try{const user=await owner();const revision=new URL(r.url).searchParams.get('revision');if(!revision)throw new Error('Select a saved revision');const row=await db().prepare('SELECT data FROM workflow_revisions WHERE owner=? AND id=?').bind(user,revision).first<{data:string}>();if(!row)throw new Error('Saved revision not found');return new Response(JSON.stringify(manifest(JSON.parse(row.data)),null,2),{headers:{'content-type':'application/json; charset=utf-8','content-disposition':'attachment; filename="memorable.environment.json"','cache-control':'private, no-store'}})}catch(e){return failure(e)}}
