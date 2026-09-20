@@ -36,6 +36,8 @@ const HELP = `headstart  the second session starts where the first one finished
                        --agent claude|devin --lane <name> --task <id or text> [--inject full|facts|0] [--record 0|1]
                        [--repo fixtures/repo] [--live results/live] [--store results/live/store.jsonl] [--model sonnet]
   push <file>          post one stored session to the hosted store (HEADSTART_API_URL, HEADSTART_API_KEY)
+  demo                 before and after, one command: the same task cold, then with memory on, two lanes
+                       --agent devin|claude --task <id or text> [--warm-agent devin|claude] [--model sonnet]
   orchestrate          waves of runs from a plan; a wave runs at once, the next wave recalls what it stored
                        [--plan fixtures/orchestrate-demo.json] [--fresh] [--agent claude|devin] [--live <dir>] [--repo <dir>] [--model <id>]
 
@@ -168,6 +170,32 @@ async function main(argv: string[]): Promise<void> {
   store   ${store}`);
       const r = await runOne(spec, { live, store, repo: resolve(flag(args, 'repo', 'fixtures/repo')!), tasks: loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(',')) });
       console.log(describe(r));
+      return;
+    }
+    case 'demo': {
+      // demo --agent devin --task bugfix-1: cold run, then the same task with memory on.
+      const agent = (flag(args, 'agent', 'devin') as RunSpec['agent']);
+      const warmAgent = (flag(args, 'warm-agent', agent) as RunSpec['agent']);
+      const task = flag(args, 'task', 'bugfix-1')!;
+      const live = resolve(flag(args, 'live', 'results/live')!);
+      const store = resolve(flag(args, 'store', join(live, 'store.jsonl'))!);
+      const model = flag(args, 'model', 'sonnet');
+      const tasks = loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(','));
+      const repo = resolve(flag(args, 'repo', 'fixtures/repo')!);
+      mkdirSync(live, { recursive: true });
+      const stamp = Date.now().toString(36).slice(-4);
+      const coldLane = `${agent}-before-${stamp}`, warmLane = `${warmAgent}-after-${stamp}`;
+      console.log(`task: ${task}\nconsole: http://localhost:4177 (run \`headstart console --live\` in another terminal)\n`);
+      console.log(`1. before: ${agent}, nothing handed  (lane ${coldLane})`);
+      const cold = await runOne({ lane: coldLane, agent, task, inject: '0', record: true, model }, { live, store, repo, tasks });
+      console.log('   ' + describe(cold));
+      console.log(`2. after: ${warmAgent}, memory on  (lane ${warmLane})`);
+      const warm = await runOne({ lane: warmLane, agent: warmAgent, task, inject: 'full', record: true, model }, { live, store, repo, tasks });
+      console.log('   ' + describe(warm));
+      const d = (a: number, b: number) => (a === b ? 'same' : a > b ? `${a - b} fewer` : `${b - a} more`);
+      console.log(`\nbefore ${cold.calls} steps, ${cold.discovery} before the first edit, ${cold.durationS}s`);
+      console.log(`after  ${warm.calls} steps, ${warm.discovery} before the first edit, ${warm.durationS}s  (${d(cold.calls, warm.calls)} steps, ${d(cold.discovery, warm.discovery)} before the first edit, ${d(cold.durationS, warm.durationS)} seconds)`);
+      if (warm.handed) console.log(`handed: ${warm.handed.from.map(f => `${f.harness ?? 'a procedure'} ${f.task_id ?? ''}`.trim()).join(', ')}`);
       return;
     }
     case 'orchestrate': {

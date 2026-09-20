@@ -74,9 +74,18 @@ export function extractPayload(events: TraceEvent[], repo?: string): ExtractPayl
   const first = events[0]; if (!first) return null;
   const prompt = events.find(e => e.event === 'prompt')?.prompt ?? '';
   const tools = events.filter(e => e.event === 'tool' && e.tool_name);
+  // Paths inside the session's own checkout are stored as the repo saw them.
+  const roots = [...new Set(events.map(e => e.cwd).filter(Boolean))].sort((a, b) => b.length - a.length);
+  const rel = (v: unknown): unknown => {
+    if (typeof v !== 'string') return v;
+    let out = v;
+    for (const r of roots) out = out.split(r + '/').join('').split(r).join('.');
+    return out;
+  };
   const tool_calls = tools.map(e => {
     const cls = classify(e.tool_name!);
-    const input = typeof e.tool_input === 'string' ? (() => { try { return JSON.parse(e.tool_input as unknown as string); } catch { return { raw: e.tool_input }; } })() : (e.tool_input ?? {});
+    const raw = typeof e.tool_input === 'string' ? (() => { try { return JSON.parse(e.tool_input as unknown as string); } catch { return { raw: e.tool_input }; } })() : (e.tool_input ?? {});
+    const input = Object.fromEntries(Object.entries(raw as Record<string, unknown>).map(([k, v]) => [k, rel(v)]));
     // A command's exit code is what the extractor reads a postcondition from.
     // Harnesses that report none get the same rule the local extractor uses.
     const ok = succeeded(e);
