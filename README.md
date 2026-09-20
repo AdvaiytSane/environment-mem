@@ -1,29 +1,117 @@
-# Memorable connections and DejaDo
+# DejaDo
 
-`headstart` is the CLI; `dejado` is its alias.
+**Your agent did this yesterday.** DejaDo records how an agent did a task, boils the session down to a short procedure, and hands that procedure to the next agent that gets the same kind of task. Devin, Claude Code, Codex, a browser agent and a robot all write into one memory and read from it.
 
-Connect an agent to Memorable through two operations: **`store` and `recall`**. Developers choose where to capture work and where to use recalled context. Memorable performs its existing extraction and retrieval.
+Live console, no login: **https://headstart-demo.vercel.app/dash/enterprise**. Every number on it is a recorded session, not an estimate. Built at HackMIT 2026 for the Devin track.
 
-Use `headstart connect --repo /path/to/app --target application` for read-only
-integration discovery. Add `--write` to create a versioned manifest and a handoff
-skill for your coding assistant; it does not automatically wire application hooks.
-Choose `--target coding-agent --agent claude|devin` for the assistant working on
-the repo. [Connect setup and evidence stages](docs/CONNECT.md).
+`headstart` is the CLI, `dejado` is its alias.
 
-This repository's package and executable remain named **`headstart`**. The connection layer is available from **`headstart/memorable`** on this branch; it wraps the existing Memorable CLI. This is not a newly published npm release or a deployed HTTP SDK.
+![Overview](docs/screens/overview.png)
 
-## Metadata-driven Browser Use integration
+## The problem
 
-The new [metadata SDK](docs/METADATA-MEMORY.md) lets developers declare `filter`,
-`semantic`, `context`, and `private` fields once, then use `store({id, trace,
-metadata})` and `recall({query, metadata})`. The optional [Browser Use package](packages/browser-use/README.md)
-captures actions and returns recalled references through the same Memorable CLI.
+Every agent session starts from zero. Devin reads the same twelve files, runs the same `find`, greps the same names, then makes the same three edits someone else's Devin made last week. We watched it do that across 200 recorded sessions. Roughly the first half of every session is rediscovery.
 
-This path uses the existing encrypted local procedure store, production embedding
-service and ranker. A real second Browser Use Agent recalled the first run using
-a paraphrased task and received its reference in model messages. See the
-[live evidence](docs/verification/2026-09-19-metadata-browser.md).
-**Requires the companion private CLI patch; not yet published on npm.**
+## What DejaDo does
+
+1. Hooks inside the agent write down every tool call as it happens: what it ran, what it read, what it edited, whether it worked.
+2. When the session ends, the trace is boiled down to a procedure: the steps that mattered, the files they touched, the check at the end. No model in that loop.
+3. Before the next session on a similar task, the agent is handed the closest procedure. It skips the search and starts on the right files.
+
+## The console
+
+### Pick the agent
+
+The console is set up for one use case at a time. The picker under the wordmark switches between Devin, Claude Code, Codex, Browser Use, Dimensional (a robot on dimOS) and a custom agent. Every page then shows only that agent's sessions.
+
+![Use case picker](docs/screens/picker.png)
+
+### Evals: the same task, twice
+
+One session that had nothing, next to one that was handed the procedure. Same task, same model. Hit Enter and both traces play in from their recorded timestamps: steps, tokens and seconds count up on each side, and the DejaDo side finishes first.
+
+The pair shown: add a `DELETE /orders/:id` endpoint. Without memory Devin spends its first nine steps on `find`, `grep` and reads. With memory it opens the right files and edits by step seven. 20 steps to 16, 705k tokens to 315k, 67 s to 43 s.
+
+![Evals, side by side](docs/screens/evals.png)
+
+Across all 30 recorded Devin pairs: 10 out of 100 fewer steps, 114k fewer tokens, 9 s less per session. Claude Code, 38 pairs: 245k fewer tokens, 14 s less.
+
+### Procedures
+
+Every stored procedure, who wrote it, how many times it was used, how many of those sessions went well. Open one to see its steps, what had to be true first, and what was checked at the end.
+
+![Procedures](docs/screens/procedures.png)
+
+### Map
+
+Every step agents share, as one map. A procedure is a path left to right. Where two procedures ran the same step, the paths meet. Search a procedure and its whole path lights up; click a step to see who passes through it.
+
+![Map](docs/screens/map.png)
+
+### Environments and replays
+
+Each use case lists its recorded environments. Two of them ship a replay of what actually happened, frame by frame.
+
+**Browser Use.** Two fresh agents visit a public site. The second one is handed the first one's procedure before it starts. Real screenshots, real tool events, verified final page.
+
+![Browser Use replay](docs/screens/replay-browser.png)
+
+**Dimensional (robot).** A model drives a MuJoCo robot through MCP. The mission is stored; the next mission is handed it. Captured camera frames and measured poses. The first attempt failed its arrival check and the recording says so.
+
+![Robot replay](docs/screens/replay-robot.png)
+
+![Environments](docs/screens/environments.png)
+
+Add environment defines a new one: name, use case, repository, when to store, when to recall, which metadata fields are filters and which are searched. It gives back the setup and the connect command.
+
+### How it runs
+
+Every way an agent can connect: hooks in Claude Code, Devin CLI and Codex; `headstart connect` to inspect a repository's seams; the SDK's `store()` and `recall()`; the metadata SDK; the Browser Use package; the Dimensional adapter; MCP; HTTP `POST /v1/extract` and `/v1/recall`; `headstart push` and `backfill`; skill files.
+
+![How it runs](docs/screens/how-it-runs.png)
+
+### Agents
+
+Which agents have written into the memory, and how often one agent's procedure was used by another. 50 times so far, Claude Code to Devin and back.
+
+![Agents](docs/screens/agents.png)
+
+## The numbers
+
+| Use case | Sessions | Pairs | Per session, with a procedure |
+|---|---:|---:|---|
+| Devin | 83 | 30 | 2 fewer steps, 114k fewer tokens, 9 s less |
+| Claude Code | 106 | 38 | 2 fewer steps, 245k fewer tokens, 14 s less |
+| Browser Use | 6 | 2 | ten-page audit: 1.0M to 853k tokens, 296 s to 240 s, 73 to 59 actions |
+| Dimensional | 5 | 2 | inspection mission: 8 to 6 tool calls, 7,265 to 5,217 tokens |
+| Codex | 3 | 0 | recorded, not yet paired |
+
+A pair is one session that used a procedure next to the same agent's earlier session on the same task that had nothing. Spread is wide on a single pair; the console shows the 95 out of 100 range next to every mean.
+
+## Run it yourself
+
+```sh
+npm install
+headstart install                                  # hooks for Claude Code, Devin CLI, Codex on this machine
+headstart demo --agent devin --task bugfix-1       # the same task cold, then with memory, two lanes
+headstart console --live                           # the local console: lanes, the Race tab (Enter runs both at once)
+headstart orchestrate --plan fixtures/orchestrate-demo.json   # waves of agents; wave two recalls what wave one stored
+```
+
+Browser and robot demos: `pip install -e packages/browser-use` then `python packages/browser-use/examples/live_browser.py`; `pip install -e packages/dimensional` then `python packages/dimensional/examples/inspection.py`.
+
+## What is real and what is not
+
+- Every session on the console was recorded by hooks or an adapter and pushed to the store. Nothing is simulated.
+- The browser and robot sessions were pushed from the recordings in this repository (`scripts/evidence-sessions.mjs`). For the ten-page browser audit the original step history was not kept, so the order of its actions is rebuilt from the recorded action counts; tokens, time, counts and verdicts are the recorded ones.
+- The procedure that helped on one pair did not help on every pair. The Devin eval rounds are in `results/` unedited, negative pairs included.
+- Devin Cloud sessions from the console are not built. Pin and Retire need a migration that is not applied on the demo database.
+
+## Team
+
+Nikhil Krishnaswamy and Advaiyt Sane. HackMIT 2026.
+
+---
 
 ## Demos on this branch
 
