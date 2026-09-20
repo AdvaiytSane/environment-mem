@@ -7,7 +7,7 @@ import {environmentDefinition,frameworks,newEnvironment,roles,type Environment} 
 import {setupPrompt} from '@/lib/connect/data';
 import './connect.css';
 import './environments.css';
-const DEVIN_CONSOLE_URL='http://127.0.0.1:4177/';
+const DEVIN_CONSOLE_URL='https://headstart-demo.vercel.app/dash/enterprise';
 const examples=[{id:'browser',name:'Browser Use',scope:'quotes.toscrape.com',icon:Globe2,n:'2 runs',result:'Store → recall → context verified',detail:'Web task · production embeddings'}, {id:'devin',name:'Devin',scope:'Coding benchmark',icon:Code2,n:'54 runs',result:'18 pairs + static-doc control',detail:'Coding tasks · recorded comparisons'}, {id:'dimensional',name:'Dimensional',scope:'dimOS MCP coordinator',icon:Layers3,n:'2 runs',result:'MCP agent memory verified',detail:'Robotics tools · no motion claimed'}] as const;
 export default function Environments(){
  const [items,setItems]=useState<Environment[]>([]),[selected,setSelected]=useState('replay'),[query,setQuery]=useState(''),[loading,setLoading]=useState(true),[error,setError]=useState(''),[notice,setNotice]=useState('');

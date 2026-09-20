@@ -4,14 +4,9 @@ The centralized environment dashboard and recorded agent replay player.
 
 [Open the hosted demo](https://memorable-workflow-studio.ahsane692499.chatgpt.site/?environment=replay).
 
-The **Devin** sidebar button opens Nikhil’s existing CLI console directly at
-`http://127.0.0.1:4177/`. It requires the console to be running on the viewer’s
-machine; the hosted dashboard does not run or duplicate that program.
-From the repository root, start it with Node 24 or newer:
-
-```sh
-node src/cli.ts console --live --results results/devin-sonnet-r1 --stores results/devin-sonnet-r1/store.jsonl --lanes results/devin-live --port 4177
-```
+The **Devin** sidebar button opens Nikhil’s existing hosted console directly at
+[DejaDo for Devin](https://headstart-demo.vercel.app/dash/enterprise), as documented
+in `enterprise/README.md`. No copied UI or local console is required.
 
 
 This directory mirrors the deployed Site source at commit
