@@ -1,16 +1,22 @@
 {
   "name": "headstart",
   "version": "0.1.0",
-  "description": "Warm-start coding-agent sessions from what the last session did, and measure the saving.",
+  "description": "Coding-agent capture and a two-operation connection to Memorable's existing CLI.",
   "type": "module",
-  "bin": {
-    "dejado": "src/cli.ts",
-    "headstart": "src/cli.ts"
+  "bin": { "headstart": "./bin/headstart", "dejado": "./bin/headstart" },
+  "types": "./src/sdk/index.ts",
+  "exports": {
+    ".": { "types": "./src/sdk/index.ts", "default": "./dist/sdk/index.js" },
+    "./memorable": { "types": "./src/sdk/index.ts", "default": "./dist/sdk/index.js" },
+    "./adapters": { "types": "./src/sdk/adapters.ts", "default": "./dist/sdk/adapters.js" },
+    "./package.json": "./package.json"
   },
-  "engines": {
-    "node": ">=24"
-  },
+  "files": ["bin/", "dist/", "src/", "scripts/build.mjs", "docs/*.md", "skills/"],
+  "engines": { "node": ">=24" },
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepare": "node scripts/build.mjs",
+    "pretest": "node scripts/build.mjs",
     "test": "node --test test/*.test.js",
     "eval": "node src/cli.ts eval",
     "report": "node src/cli.ts report"

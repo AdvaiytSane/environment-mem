@@ -1,0 +1,135 @@
+{
+  "mode": "llm_agent",
+  "agent_evidence": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "model_output_steps": 3,
+    "model_proposed_actions": [
+      "click",
+      "extract",
+      "done"
+    ],
+    "agent_reported_success": true,
+    "agent_error_count": 0,
+    "reported_total_tokens": 51308
+  },
+  "browser_use_version": "0.13.10",
+  "remote_enabled": false,
+  "run_id": "d2a597c4-905f-41bf-ad1a-bffbc9a159ff",
+  "events_retained": 3,
+  "verification": {
+    "ok": true,
+    "check": "current_page_url_and_dom_card_count"
+  },
+  "observation": {
+    "url": "https://quotes.toscrape.com/page/2/",
+    "title": "Quotes to Scrape",
+    "quotes": 10
+  },
+  "custom_tool_observed_counts": [],
+  "recall_result": null,
+  "store_result": null,
+  "diagnostics": [
+    {
+      "stage": "recall",
+      "error": "offline"
+    },
+    {
+      "stage": "store",
+      "error": "offline"
+    }
+  ],
+  "wire_diagnostics": [
+    {
+      "stage": "wire",
+      "dropped": 1,
+      "reasons": {
+        "outcome_unknown": 1
+      }
+    }
+  ],
+  "pending_outbox_exists": true,
+  "typed_value_absent_from_journal": true,
+  "journal_sha256": "81294165e826bc383f7840d86b2c0e441972370aa99281cd02c0109d3936da07",
+  "failure": null,
+  "local_contract_validation": {
+    "run_id": "d2a597c4-905f-41bf-ad1a-bffbc9a159ff",
+    "checked_at": "2026-09-19T22:33:35.984Z",
+    "verification_kind": "local_validation_of_actual_agent_outbox_with_upstream_server_validator",
+    "upstream_commit": "101666176b842f1d1053c2c132dcdd2a0640838a",
+    "validator": "services/extraction-api/src/browser-event.ts",
+    "no_network_requests": true,
+    "production_ingestion_verified": false,
+    "journal_sha256": "81294165e826bc383f7840d86b2c0e441972370aa99281cd02c0109d3936da07",
+    "outbox_sha256": "33f98d663550439c6fec106e01adb78f3c000125faa146f7603ee1919644ebeb",
+    "capture_completed_rows": 3,
+    "completed_rows": [
+      {
+        "sequence": 1,
+        "phase": "finished",
+        "status": "returned",
+        "verb": "click",
+        "dropped_reason": null,
+        "needs_run_verification": false
+      },
+      {
+        "sequence": 2,
+        "phase": "finished",
+        "status": "returned",
+        "verb": null,
+        "dropped_reason": "outcome_unknown",
+        "needs_run_verification": null
+      },
+      {
+        "sequence": 3,
+        "phase": "finished",
+        "status": "returned",
+        "verb": "end",
+        "dropped_reason": null,
+        "needs_run_verification": true
+      }
+    ],
+    "upload_events": [
+      {
+        "seq": 1,
+        "verb": "click",
+        "result_status": "ok",
+        "run_id_matches": true,
+        "event_ok": true,
+        "fingerprints": [
+          {
+            "field": "before",
+            "ok": true
+          },
+          {
+            "field": "after",
+            "ok": true
+          }
+        ]
+      },
+      {
+        "seq": 3,
+        "verb": "end",
+        "result_status": "ok",
+        "run_id_matches": true,
+        "event_ok": true,
+        "fingerprints": [
+          {
+            "field": "before",
+            "ok": true
+          },
+          {
+            "field": "after",
+            "ok": true
+          }
+        ]
+      }
+    ],
+    "dropped": {
+      "count": 1,
+      "since": "2026-09-19T22:32:14.661Z",
+      "reason": "policy_filtered"
+    },
+    "all_upload_events_valid": true
+  }
+}

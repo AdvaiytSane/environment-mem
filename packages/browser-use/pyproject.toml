@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memorable-browser-use"
+version = "0.1.0"
+description = "Optional Browser Use capture adapter for the Memorable CLI extension protocol"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = []
+
+[project.optional-dependencies]
+browser = ["browser-use==0.13.10"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["memorable_browser_use*"]
+
+[tool.setuptools.package-data]
+memorable_browser_use = ["*.mjs"]

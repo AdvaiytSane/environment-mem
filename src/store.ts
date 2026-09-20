@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import type { Procedure } from './types.ts';
 import { stateDir, storePath } from './paths.ts';
 import { join } from 'node:path';
@@ -9,15 +9,16 @@ export function readAll(cwd: string): Procedure[] {
   const byId = new Map<string, Procedure>();
   for (const line of readFileSync(p, 'utf8').split('\n')) {
     if (!line.trim()) continue;
-    try { const pr = JSON.parse(line) as Procedure; byId.set(pr.session_id, pr); } catch {}
+    try { const pr = JSON.parse(line) as Procedure; byId.set(pr.run_id ? `${pr.session_id}\0${pr.run_id}` : pr.id ?? pr.session_id, pr); } catch {}
   }
   return [...byId.values()];
 }
 
 export function upsert(cwd: string, pr: Procedure): void {
   const p = storePath(cwd);
-  const rest = readAll(cwd).filter(x => x.session_id !== pr.session_id);
-  writeFileSync(p, rest.concat(pr).map(x => JSON.stringify(x)).join('\n') + '\n');
+  // Append revisions rather than rewriting every other run's record. Readers
+  // select the most recent revision, including old session-only procedures.
+  appendFileSync(p, JSON.stringify(pr) + '\n');
 }
 
 export function appendLog(cwd: string, line: string): void {

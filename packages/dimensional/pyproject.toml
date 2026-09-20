@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memorable-dimensional"
+version = "0.1.0"
+description = "Optional dimOS mission capture and advisory recall through the Memorable CLI"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.entry-points."dimos.blueprints"]
+inspection = "memorable_dimensional.simulation:inspection"
+
+[tool.setuptools.packages.find]
+include = ["memorable_dimensional*"]

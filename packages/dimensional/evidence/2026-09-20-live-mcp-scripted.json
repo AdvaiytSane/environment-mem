@@ -1,0 +1,152 @@
+{
+  "schema": "memorable.dimensional.evidence.v1",
+  "mode": "live_local_mcp_readiness",
+  "robot_simulation": false,
+  "autonomous_agent": false,
+  "embedding": "off",
+  "tool_names": [
+    "agent_send",
+    "list_modules",
+    "server_status"
+  ],
+  "runs": [
+    {
+      "case": "first",
+      "mission_id": "2ce7d294-d1a5-4cad-8ae8-439c4fe83d73",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 2,
+      "stored": true,
+      "receipt": {
+        "id": "2ce7d294-d1a5-4cad-8ae8-439c4fe83d73",
+        "procedureId": "procedures/metadata-0db065196f692bb3478b45e85198cb266f4bcb22",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "989d8341ed1faa7b47cc08674bff0f99b9c3ee8f42e8952ce85e5dc62de6dbd5",
+        "embedding": {
+          "status": "off",
+          "model": null,
+          "dimensions": 0
+        }
+      },
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "recall",
+      "mission_id": "7d0f6ea3-4671-4d55-ba93-f3a40b4c059d",
+      "verified": true,
+      "context_received_by_runner": true,
+      "context_chars": 325,
+      "captured_calls": 2,
+      "stored": true,
+      "receipt": {
+        "id": "7d0f6ea3-4671-4d55-ba93-f3a40b4c059d",
+        "procedureId": "procedures/metadata-8c1c7a5d5284c02d9ef5ad58c784fc5892115f2d",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "989d8341ed1faa7b47cc08674bff0f99b9c3ee8f42e8952ce85e5dc62de6dbd5",
+        "embedding": {
+          "status": "off",
+          "model": null,
+          "dimensions": 0
+        }
+      },
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": [
+        "2ce7d294-d1a5-4cad-8ae8-439c4fe83d73"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "case": "disabled",
+      "mission_id": "565bb336-19fb-4826-883f-fbde1a4cb03a",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 0,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "kill_switch",
+      "mission_id": "ae07c31d-49db-44d3-9fa6-80259368186a",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 0,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    },
+    {
+      "case": "missing_cli",
+      "mission_id": "e308355d-f4eb-4ece-afe6-d07770c59ad1",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "cli_unavailable"
+        },
+        {
+          "stage": "store",
+          "error": "cli_unavailable"
+        }
+      ],
+      "pending_store_retained": true,
+      "matched_ids": []
+    },
+    {
+      "case": "no_consent",
+      "mission_id": "eb697fc1-bf86-483a-9066-e019dd73712a",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "consent_required"
+        },
+        {
+          "stage": "store",
+          "error": "consent_required"
+        }
+      ],
+      "pending_store_retained": true,
+      "matched_ids": []
+    },
+    {
+      "case": "wrong_map",
+      "mission_id": "830b5df1-0457-45dc-b3b3-25eab01de9b0",
+      "verified": true,
+      "context_received_by_runner": false,
+      "context_chars": 0,
+      "captured_calls": 2,
+      "stored": false,
+      "receipt": null,
+      "diagnostics": [],
+      "pending_store_retained": false,
+      "matched_ids": []
+    }
+  ],
+  "complete": true
+}

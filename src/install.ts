@@ -1,12 +1,26 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type HookMap = Record<string, { matcher?: string; hooks: { type: 'command'; command: string }[] }[]>;
 
+const shellQuote = (value: string): string => `'${value.replace(/'/g, `'"'"'`)}'`;
+
+function defaultBinCommand(): string {
+  // Pin the runtime that is running this Node 24+ CLI and this checkout. A
+  // native hook does not necessarily inherit an interactive shell's PATH.
+  return `${shellQuote(process.execPath)} ${shellQuote(fileURLToPath(new URL('./cli.ts', import.meta.url)))}`;
+}
+
 export function binCommand(): string {
-  return process.env.HEADSTART_BIN ?? 'headstart';
+  const override = process.env.HEADSTART_BIN;
+  if (override !== undefined) {
+    if (!override.trim() || override.includes('\0')) throw new Error('HEADSTART_BIN must be a nonempty command without NUL bytes');
+    return override;
+  }
+  return defaultBinCommand();
 }
 
 export function claudeFormatHooks(bin: string): HookMap {
@@ -15,19 +29,51 @@ export function claudeFormatHooks(bin: string): HookMap {
     SessionStart: one('SessionStart'),
     UserPromptSubmit: one('UserPromptSubmit'),
     PostToolUse: one('PostToolUse'),
+    PostToolUseFailure: one('PostToolUseFailure'),
     Stop: one('Stop'),
   };
 }
 
-function mergeJson(path: string, patch: (j: any) => any): void {
+function readSettings(path: string): any {
   let j: any = {};
-  if (existsSync(path)) { try { j = JSON.parse(readFileSync(path, 'utf8')); } catch { j = {}; } }
-  mkdirSync(join(path, '..'), { recursive: true });
-  writeFileSync(path, JSON.stringify(patch(j), null, 2) + '\n');
+  if (existsSync(path)) {
+    const text = readFileSync(path, 'utf8');
+    try { j = JSON.parse(text); }
+    catch { throw new Error(`Refusing to change ${path}: settings contain invalid JSON`); }
+  }
+  const object = (v: unknown) => v !== null && typeof v === 'object' && !Array.isArray(v);
+  const invalid = () => { throw new Error(`Refusing to change ${path}: settings contain an invalid hooks structure`); };
+  if (!object(j)) invalid();
+  if (j.hooks !== undefined) {
+    if (!object(j.hooks)) invalid();
+    for (const groups of Object.values(j.hooks)) {
+      if (!Array.isArray(groups)) invalid();
+      for (const group of groups as any[]) {
+        if (!object(group) || !Array.isArray(group.hooks) || !group.hooks.every(object)) invalid();
+      }
+    }
+  }
+  return j;
+}
+
+function writeSettings(path: string, settings: any): void {
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, JSON.stringify(settings, null, 2) + '\n');
 }
 
 function stripOurs(list: any[] | undefined, bin: string): any[] {
-  return (list ?? []).filter(g => !(g.hooks ?? []).some((h: any) => String(h.command ?? '').startsWith(`${bin} hook`)));
+  // Recognize the original PATH-based installation as well as this checkout's
+  // default and the explicit override. Never remove a whole mixed hook group.
+  const commands = new Set([bin, defaultBinCommand(), 'headstart']);
+  const ours = (hook: any) => typeof hook.command === 'string' && [...commands].some(command => {
+    const prefix = `${command} hook `;
+    return hook.command.startsWith(prefix) && /^[A-Za-z][A-Za-z0-9]*\s*$/.test(hook.command.slice(prefix.length));
+  });
+  return (list ?? []).flatMap(group => {
+    const hooks = group.hooks.filter((hook: any) => !ours(hook));
+    if (hooks.length === group.hooks.length) return [group];
+    return hooks.length ? [{ ...group, hooks }] : [];
+  });
 }
 
 export interface Target { name: string; path: string; present: boolean }
@@ -49,30 +95,36 @@ export function detect(cwd: string): Target[] {
 export function install(cwd: string, opts: { targets?: string[]; force?: boolean } = {}): string[] {
   const bin = binCommand();
   const hooks = claudeFormatHooks(bin);
-  const written: string[] = [];
+  const updates: Array<{ path: string; settings: any }> = [];
   for (const t of detect(cwd)) {
     if (opts.targets && !opts.targets.includes(t.name)) continue;
     if (!opts.targets && t.name !== 'claude') continue;
-    mergeJson(t.path, j => {
-      j.hooks = j.hooks ?? {};
-      for (const [ev, groups] of Object.entries(hooks)) j.hooks[ev] = [...stripOurs(j.hooks[ev], bin), ...groups];
-      return j;
-    });
-    written.push(t.path);
+    const settings = readSettings(t.path);
+    settings.hooks = settings.hooks ?? {};
+    for (const [ev, groups] of Object.entries(hooks)) {
+      // Failure-event registration is documented for Claude. Do not assume
+      // other harnesses accept the same event just because the payloads overlap.
+      if (ev === 'PostToolUseFailure' && t.name !== 'claude') continue;
+      settings.hooks[ev] = [...stripOurs(settings.hooks[ev], bin), ...groups];
+    }
+    updates.push({ path: t.path, settings });
   }
-  return written;
+  // Preflight every target before the first write, so malformed settings in
+  // another target cannot leave a partially installed set of hooks.
+  for (const update of updates) writeSettings(update.path, update.settings);
+  return updates.map(update => update.path);
 }
 
 export function uninstall(cwd: string): string[] {
   const bin = binCommand();
-  const removed: string[] = [];
+  const updates: Array<{ path: string; settings: any }> = [];
   for (const t of detect(cwd)) {
     if (!existsSync(t.path)) continue;
-    mergeJson(t.path, j => {
-      for (const ev of Object.keys(j.hooks ?? {})) j.hooks[ev] = stripOurs(j.hooks[ev], bin);
-      return j;
-    });
-    removed.push(t.path);
+    const settings = readSettings(t.path);
+    const before = JSON.stringify(settings);
+    for (const ev of Object.keys(settings.hooks ?? {})) settings.hooks[ev] = stripOurs(settings.hooks[ev], bin);
+    if (JSON.stringify(settings) !== before) updates.push({ path: t.path, settings });
   }
-  return removed;
+  for (const update of updates) writeSettings(update.path, update.settings);
+  return updates.map(update => update.path);
 }

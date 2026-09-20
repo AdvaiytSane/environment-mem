@@ -1,0 +1,112 @@
+{
+  "storage": "existing Memorable local procedure store",
+  "embedding_mode": "required",
+  "browser_use": "0.13.10",
+  "runs": [
+    {
+      "run": 1,
+      "id": "cbdbead6-1a68-4e2b-9ad0-c36802002ea8",
+      "observation": {
+        "url": "https://quotes.toscrape.com/page/2/",
+        "quotes": 10
+      },
+      "independently_verified": true,
+      "agent_actions": [
+        "click",
+        "extract",
+        "done"
+      ],
+      "agent_errors": 0,
+      "model_steps": 3,
+      "captured_actions": 3,
+      "receipt": {
+        "id": "cbdbead6-1a68-4e2b-9ad0-c36802002ea8",
+        "procedureId": "procedures/metadata-51b422f74a6f99ab23a6ed18ad36fd9f40333351",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+        "embedding": {
+          "status": "ready",
+          "model": "cf:@cf/baai/bge-m3",
+          "dimensions": 1024
+        }
+      },
+      "recall_ids": [],
+      "recall_embedding": {
+        "status": "not_needed",
+        "model": null,
+        "dimensions": 0
+      },
+      "context_bytes": 0,
+      "context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "reference_in_actual_model_messages": false,
+      "private_marker_absent_from_recall": true,
+      "private_marker_absent_from_model": true,
+      "diagnostics": []
+    },
+    {
+      "run": 2,
+      "id": "2a06266d-370c-4579-830c-e2d36a63d23a",
+      "observation": {
+        "url": "https://quotes.toscrape.com/page/2/",
+        "quotes": 10
+      },
+      "independently_verified": true,
+      "agent_actions": [
+        "click",
+        "extract",
+        "done"
+      ],
+      "agent_errors": 0,
+      "model_steps": 3,
+      "captured_actions": 3,
+      "receipt": {
+        "id": "2a06266d-370c-4579-830c-e2d36a63d23a",
+        "procedureId": "procedures/metadata-e8de9867ce11aa7d93fa9013312f1d785ce91532",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "6f77adea88c9d045aeb114679a7ca8da9f783c959aea00d7bbcb0d39a385c82d",
+        "embedding": {
+          "status": "ready",
+          "model": "cf:@cf/baai/bge-m3",
+          "dimensions": 1024
+        }
+      },
+      "recall_ids": [
+        "cbdbead6-1a68-4e2b-9ad0-c36802002ea8"
+      ],
+      "recall_embedding": {
+        "status": "ready",
+        "model": "cf:@cf/baai/bge-m3",
+        "dimensions": 1024
+      },
+      "context_bytes": 500,
+      "context_sha256": "5559135ddbff05bd193bf7342f262ba3981a0b506a7ce4f226fc69014660d196",
+      "reference_in_actual_model_messages": true,
+      "private_marker_absent_from_recall": true,
+      "private_marker_absent_from_model": true,
+      "diagnostics": []
+    }
+  ],
+  "complete": true,
+  "hard_filter_checks": {
+    "project": {
+      "matches": 0,
+      "eligible": 0,
+      "embedding": "not_needed"
+    },
+    "website": {
+      "matches": 0,
+      "eligible": 0,
+      "embedding": "not_needed"
+    },
+    "outcome": {
+      "matches": 0,
+      "eligible": 0,
+      "embedding": "not_needed"
+    }
+  },
+  "unrelated_query_matches": 0
+}

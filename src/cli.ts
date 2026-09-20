@@ -9,6 +9,9 @@ import { writeSkills } from './skills.ts';
 import { ARMS, runEval, type Arm } from './eval.ts';
 import { report } from './report.ts';
 import { writeConsole } from './console.ts';
+import { backendFor, memorableConnection, pendingMemorable, syncMemorable } from './memorable.ts';
+import { adapterCommand } from './sdk/adapters.ts';
+import { connectCommand } from './connect.ts';
 import { serveLive } from './live.ts';
 import { buildGraph, readStores } from './graph.ts';
 import { writeVault } from './obsidian.ts';
@@ -19,10 +22,17 @@ import { stateDir, storePath } from './paths.ts';
 const HELP = `headstart  the second session starts where the first one finished
 
   init                 write .headstart/config.json
+  connect              inspect integration seams without executing the repo or reading credentials
+                       --repo <path> --target coding-agent|application [--agent claude|devin|codex]
+                       [--json|--prompt] [--write] [--install-hooks --agent claude|devin] [--backend memorable|local]
   install [--all]      write hook files for Claude Code, Devin CLI, Codex found on this machine
   uninstall            remove headstart hooks from those files
   hook <Event>         stdin: one hook event (SessionStart | UserPromptSubmit | PostToolUse | Stop)
   recall "<task>"      print the best procedure for a task, --json for raw
+  recall --procedure <slug>  read a Memorable procedure through the active connection
+  connection           show selected backend and pending Memorable submissions
+  sync                 retry pending Memorable submissions (same workflow IDs)
+  memory <recall|store> --adapter <file>  JSON bridge to an optional SDK adapter
   facts                print what headstart knows about this repo
   doc [--write]        a repository doc generated from recorded sessions; --write puts it in AGENTS.md and CLAUDE.md
   list                 list stored procedures
@@ -66,20 +76,24 @@ function loadDotEnv(): void {
   const f = resolve(new URL('../.env', import.meta.url).pathname);
   if (!existsSync(f)) return;
   for (const line of readFileSync(f, 'utf8').split('\n')) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (!m || process.env[m[1]] !== undefined) continue;
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (!m || !['HEADSTART_API_URL', 'HEADSTART_API_KEY'].includes(m[1]) || process.env[m[1]] !== undefined) continue;
     process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
   }
 }
 
 async function main(argv: string[]): Promise<void> {
-  loadDotEnv();
   const [cmd, ...args] = argv;
+  // Inspection must not read credentials, including this checkout's .env.
+  if (cmd !== 'connect') loadDotEnv();
   const cwd = process.cwd();
   switch (cmd) {
+    case 'connect': return connectCommand(args, cwd);
+    case 'memory': return adapterCommand(args);
     case 'hook': return runHook(args[0]);
     case 'init': {
       const dir = stateDir(cwd);
-      const backend = 'local';
+      const backend = flag(args, 'backend', process.env.HEADSTART_BACKEND ?? 'local');
+      if (backend !== 'local' && backend !== 'memorable') throw new Error('backend must be local or memorable');
       const cfg = { backend, created_at: new Date().toISOString() };
       writeFileSync(join(dir, 'config.json'), JSON.stringify(cfg, null, 2) + '\n');
       console.log(`wrote ${join(dir, 'config.json')} (backend ${backend})`);
@@ -95,11 +109,33 @@ async function main(argv: string[]): Promise<void> {
     }
     case 'uninstall': { for (const p of uninstall(cwd)) console.log(`cleaned ${p}`); return; }
     case 'recall': {
-      const q = args.filter(a => !a.startsWith('--')).join(' ');
+      const words = args.filter((a, i) => !a.startsWith('--') && !['--limit', '--procedure'].includes(args[i - 1]));
+      const q = words.join(' ');
+      if (backendFor(cwd) === 'memorable') {
+        if (args.includes('--json')) throw new Error('The published Memorable CLI returns text; --json is unavailable for this connection.');
+        const procedureId = flag(args, 'procedure');
+        const result = await memorableConnection(cwd).recall(procedureId
+          ? { procedureId } : { query: q, mode: args.includes('--chain') ? 'chain' : args.includes('--single') ? 'single' : 'auto' });
+        process.stdout.write(result.stdout);
+        process.stderr.write(result.stderr);
+        return;
+      }
+      if (args.includes('--procedure')) throw new Error('--procedure requires the memorable backend');
       const hits = recall(cwd, q, { k: Number(flag(args, 'limit', '3')), minScore: 0 });
       if (args.includes('--json')) return console.log(JSON.stringify(hits, null, 2));
       if (!hits.length) return console.log('no matching procedures');
       for (const h of hits) console.log(renderProcedure(h), '\n');
+      return;
+    }
+    case 'connection': {
+      return console.log(JSON.stringify({ backend: backendFor(cwd), transport: backendFor(cwd) === 'memorable' ? 'cli' : 'local',
+        pendingSubmissions: pendingMemorable(cwd).length, durableRemoteStorage: 'unverified' }, null, 2));
+    }
+    case 'sync': {
+      for (const result of await syncMemorable(cwd)) {
+        process.stdout.write(result.stdout);
+        process.stderr.write(result.stderr);
+      }
       return;
     }
     case 'doc': {
@@ -213,6 +249,7 @@ async function main(argv: string[]): Promise<void> {
   store   ${store}`);
       const r = await runOne(spec, { live, store, repo: resolve(flag(args, 'repo', 'fixtures/repo')!), tasks: loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(',')) });
       console.log(describe(r));
+      if (r.error) process.exitCode = 1;
       return;
     }
     case 'demo': {
@@ -232,9 +269,15 @@ async function main(argv: string[]): Promise<void> {
       console.log(`1. before: ${agent}, nothing handed  (lane ${coldLane})`);
       const cold = await runOne({ lane: coldLane, agent, task, inject: '0', record: true, model }, { live, store, repo, tasks });
       console.log('   ' + describe(cold));
+      if (cold.error) { console.error('Before run failed; no comparison was made.'); process.exitCode = 1; return; }
       console.log(`2. after: ${warmAgent}, memory on  (lane ${warmLane})`);
       const warm = await runOne({ lane: warmLane, agent: warmAgent, task, inject: 'full', record: true, model }, { live, store, repo, tasks });
       console.log('   ' + describe(warm));
+      if (warm.error) { console.error('After run failed; no comparison was made.'); process.exitCode = 1; return; }
+      if (!warm.handed || cold.verification.status !== 'passed' || warm.verification.status !== 'passed') {
+        console.log('No verified memory comparison: both runs must pass independent checks and the after run must receive a recall.');
+        return;
+      }
       const d = (a: number, b: number) => (a === b ? 'same' : a > b ? `${a - b} fewer` : `${b - a} more`);
       console.log(`\nbefore ${cold.calls} steps, ${cold.discovery} before the first edit, ${cold.durationS}s`);
       console.log(`after  ${warm.calls} steps, ${warm.discovery} before the first edit, ${warm.durationS}s  (${d(cold.calls, warm.calls)} steps, ${d(cold.discovery, warm.discovery)} before the first edit, ${d(cold.durationS, warm.durationS)} seconds)`);
@@ -251,6 +294,7 @@ async function main(argv: string[]): Promise<void> {
       plan.waves.forEach((w, i) => console.log(`  wave ${i + 1}: ${w.map(r => `${r.lane} (${r.agent}, ${r.task}, inject=${r.inject ?? 'full'})`).join('; ')}`));
       const rs = await orchestrate(plan, { tasks: loadTasks(...(plan.tasks ?? [])), onDone: r => console.log(describe(r)) });
       const handed = rs.filter(r => r.handed).length, cross = rs.filter(r => r.handed && r.handed.from.some(f => f.harness && f.harness !== r.agent)).length;
+      if (rs.some(r => r.error)) process.exitCode = 1;
       console.log(`
 ${rs.length} runs, ${handed} handed a procedure, ${cross} across agents, ${rs.filter(r => r.stored).length} stored`);
       return;
@@ -282,4 +326,11 @@ ${rs.length} runs, ${handed} handed a procedure, ${cross} across agents, ${rs.fi
   }
 }
 
-main(process.argv.slice(2)).catch(e => { console.error(e?.stack ?? String(e)); process.exit(1); });
+main(process.argv.slice(2)).catch(e => {
+  if (process.argv[2] === 'memory') {
+    process.stdout.write(JSON.stringify({ schema: 'memorable.adapter.v1', operation: process.argv[3],
+      error: { code: typeof e?.code === 'string' && /^[a-z_]{1,80}$/.test(e.code) ? e.code : 'adapter_error',
+        message: e instanceof Error ? e.message.slice(0, 4096) : 'adapter failed' } }) + '\n');
+  } else console.error(e?.stack ?? String(e));
+  process.exit(1);
+});

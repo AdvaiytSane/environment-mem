@@ -1,0 +1,30 @@
+{
+  "fresh_agent_execution": false,
+  "status": "blocked_missing_cli",
+  "exit_code": 1,
+  "elapsed_seconds": 0.518,
+  "controlled_error": true,
+  "unhandled_exception": false,
+  "run_receipts": 1,
+  "comparison_skipped": true,
+  "source_branch": "codex/devin-runtime-verify",
+  "node_version": "v24.7.0",
+  "run": {
+    "lane": "devin-before-qns8",
+    "agent": "devin",
+    "taskId": "bugfix-1",
+    "calls": 0,
+    "discovery": 0,
+    "handed": null,
+    "stored": false,
+    "durationS": 0,
+    "cost": {
+      "model": "sonnet"
+    },
+    "verification": {
+      "status": "not_run",
+      "reason": "agent did not complete"
+    },
+    "error": "devin is not installed or is not on PATH"
+  }
+}
