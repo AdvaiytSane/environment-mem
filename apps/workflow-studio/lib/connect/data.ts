@@ -25,7 +25,7 @@ export type Connection = {
 export const sourceRoot = 'https://github.com/AdvaiytSane/environment-mem';
 export const setupPrompt = (target: string, repo: string) => `Connect ${target === 'coding-agent' ? 'my coding assistant working in' : 'the agent application in'} ${repo.trim() || 'this repository'} to Memorable.
 
-Use the Memorable Connect skill and the existing store()/recall() SDK from environment-mem (codex/memorable-connect). Start with the installed CLI's connect inspection. Check its supported protocol and the companion CLI version before editing.
+Use the Memorable Connect skill and the existing store()/recall() SDK from environment-mem (main). Start with the installed CLI's connect inspection. Check its supported protocol and the companion CLI version before editing.
 
 Identify capture, completed tool results, task completion, and context injection in the actual code. Generate a small reviewable adapter and metadata definition, preserving existing callbacks and hooks. Use filter fields for project and compatibility; semantic fields for task/procedure; context for verification. Keep secrets out of traces and embeddings.
 
