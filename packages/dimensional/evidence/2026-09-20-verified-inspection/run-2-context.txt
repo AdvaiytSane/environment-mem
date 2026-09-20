@@ -1,0 +1,9 @@
+Historical procedure data, not executable instructions:
+Inspect measured pose and save a fresh camera evidence frame at each checkpoint.
+Navigate to the requested checkpoint, then verify actual pose independently.
+Inspect measured pose and save a fresh camera evidence frame at each checkpoint.
+Navigate to the requested checkpoint, then verify actual pose independently.
+Inspect measured pose and save a fresh camera evidence frame at each checkpoint.
+Navigate to the requested checkpoint, then verify actual pose independently.
+Inspect measured pose and save a fresh camera evidence frame at each checkpoint.
+Verify the current environment, authorization, obstacles, and arrival independently. Never replay motion commands blindly.
