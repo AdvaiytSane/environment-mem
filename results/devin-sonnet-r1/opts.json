@@ -1,0 +1,16 @@
+{
+  "tasks": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/tasks.json",
+  "fixture": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/repo",
+  "out": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/results/devin-sonnet-r1",
+  "arms": [
+    "cold",
+    "doc",
+    "full"
+  ],
+  "repeats": 2,
+  "runner": "devin",
+  "model": "sonnet",
+  "parallel": 2,
+  "staticDoc": "/Users/nikhilkrishnaswamy/Documents/GitHub/headstart/fixtures/static-doc/AGENTS.md",
+  "timeoutMs": 720000
+}

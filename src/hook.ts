@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import type { TraceEvent } from './types.ts';
 import { sessionPath } from './paths.ts';
 import { extract } from './extract.ts';
-import { appendLog, upsert } from './store.ts';
+import { appendLog, readAll, upsert } from './store.ts';
 import { similar, repoFacts } from './recall.ts';
 import { renderFacts, renderSimilar } from './inject.ts';
 
@@ -63,7 +63,7 @@ export function runHook(argvEvent?: string): void {
       const facts = repoFacts(cwd, excludeTask);
       if (!facts) return;
       const ctx = renderFacts(facts, cwd);
-      appendLog(cwd, `inject start ${sessionId} chars=${ctx.length}`);
+      appendLog(cwd, `inject start ${sessionId} chars=${ctx.length} sessions=${facts.sessions}`);
       process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: ctx } }));
       return;
     }
@@ -74,7 +74,13 @@ export function runHook(argvEvent?: string): void {
       const sim = similar(cwd, prompt, { k: 3, excludeTask });
       if (!sim) { appendLog(cwd, `recall miss ${sessionId}`); return; }
       const ctx = renderSimilar(sim);
-      appendLog(cwd, `inject prompt ${sessionId} score=${sim.closest.score.toFixed(2)} chars=${ctx.length} from=${sim.closest.procedure.id} matches=${sim.n}`);
+      appendLog(cwd, `inject prompt ${sessionId} score=${sim.closest.score.toFixed(2)} chars=${ctx.length} from=${sim.closest.procedure.id} matches=${sim.n} ids=${sim.ids.join(',')} harnesses=${sim.harnesses.map(h => `${h.name}:${h.n}`).join(',')} recorded=${sim.closest.procedure.created_at}`);
+      // The hand-off record: written by the sender, so the page never has to
+      // search for a source. One JSON line, read by the live server.
+      const all = readAll(cwd);
+      const from = sim.ids.map(id => all.find(p => p.id === id)).filter(Boolean).map(p => ({ id: p!.id, harness: p!.harness ?? 'unknown', task_id: p!.task_id, created_at: p!.created_at, title: p!.title.slice(0, 80) }));
+      const agree = sim.changed.filter(c => c.n >= Math.max(2, Math.ceil(sim.n / 2))).map(c => ({ file: c.name, n: c.n }));
+      appendLog(cwd, JSON.stringify({ handoff: 1, session: sessionId, at: new Date().toISOString(), prompt: prompt.slice(0, 200), from, n: sim.n, agree, verify: sim.verify[0]?.name ?? null, discovery: sim.discovery, score: Number(sim.closest.score.toFixed(2)) }));
       process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: ctx } }));
       return;
     }

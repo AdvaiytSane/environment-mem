@@ -3,3 +3,4 @@ node_modules/
 results/*/work/
 !results/.keep
 *.log
+results/vault/.obsidian/workspace*.json

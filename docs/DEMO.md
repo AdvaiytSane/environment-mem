@@ -1,6 +1,12 @@
 # Demo, 6 minutes
 
-Two terminals side by side, console.html on the second screen.
+Second screen: `node src/cli.ts console --live --watch /tmp/demo-cold,/tmp/demo-hs` and http://localhost:4177. It shows the two lanes ticking, sessions over time, the similarity graph over every recorded session, and the clean table.
+
+Set up the two lanes once (copies of the fixture with hooks installed):
+
+    for d in demo-cold demo-hs; do rm -rf /tmp/$d && cp -R fixtures/repo /tmp/$d && (cd /tmp/$d && node ~/Documents/GitHub/environment-mem/src/cli.ts install && git init -q && git add -A && git commit -qm f); done
+
+Run the cold lane with HEADSTART_INJECT=0 HEADSTART_RECORD=0 and the headstart lane with HEADSTART_INJECT=full, both with HEADSTART_STORE pointing at results/claude-sonnet-r4-clean/store.jsonl.
 
 ## 0:00 One sentence
 
@@ -47,7 +53,7 @@ Mean delta times 9,000 sessions, with the 95% interval next to it. Say the inter
 
 ## 5:30 What is prior work
 
-New repo, written this weekend. Devin CLI, Claude Code, Codex are the harnesses under test. memorable-cli is an optional backend, off by default, pre-existing, disclosed.
+New repo, written this weekend. Devin CLI, Claude Code, Codex are the harnesses under test.
 
 ## Backup
 

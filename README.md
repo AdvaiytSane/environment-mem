@@ -1,4 +1,4 @@
-# headstart (environment-mem)
+# headstart
 
 The second coding-agent session on a repo starts where the first one finished.
 
@@ -42,9 +42,7 @@ echo '{"session_id":"s1","cwd":"'$PWD'"}' | headstart hook Stop
 
 ## Backend
 
-`HEADSTART_BACKEND=local` (default) keeps procedures in `.headstart/procedures.jsonl`.
-
-`HEADSTART_BACKEND=memorable` also sends each procedure to [memorable-cli](https://www.npmjs.com/package/memorable-cli) (`memorable ingest`) so it shows up in that dashboard. memorable-cli is a separate, pre-existing package; headstart does not need it.
+Procedures live in `.headstart/procedures.jsonl`.
 
 ## Eval
 

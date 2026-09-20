@@ -1,0 +1,74 @@
+<title>Headstart Results</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{--bg:#f6f5f1;--ink:#1c1b18;--mute:#6b6862;--line:#d9d6cd;--panel:#fff;--accent:#8a4b1f;--ok:#2f6b3a;--warn:#9a5a00;--bad:#9c2b2b;--serif:"Source Serif 4",Georgia,serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--warn:#e0a94c;--bad:#e07b7b}}
+:root[data-theme="dark"]{--bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--warn:#e0a94c;--bad:#e07b7b}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55;margin:0;padding:0 20px}
+main{max-width:680px;margin:0 auto;padding-block:48px 96px}
+h1{font-size:32px;line-height:1.15;margin:0 0 6px;font-weight:600}
+.sub{color:var(--mute);margin:0 0 36px;font-size:16px}
+h2{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:40px 0 12px;font-family:var(--mono);font-weight:500}
+p,li{max-width:62ch}p{margin:0 0 14px}ul{margin:0 0 14px;padding-left:22px}li{margin:0 0 6px}
+code{font-family:var(--mono);font-size:13.5px;background:var(--panel);border:1px solid var(--line);padding:1px 5px}
+table{border-collapse:collapse;width:100%;margin:0 0 14px;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);font-weight:500}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.big{font-family:var(--mono);font-size:30px;font-weight:500;color:var(--accent);margin:0 0 4px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+</style>
+<main>
+<h1>Headstart Results</h1>
+<p class="sub">What was run on 19 September 2026, what came out, and whether it is good.</p>
+
+<h2>What headstart is</h2>
+<p>A coding agent (Claude Code, Devin) spends the first part of every job finding out how the repo works: how to run tests, where routes get registered, which table a flag goes in. Headstart records what one session did, boils it down to a short list (files it changed, what verified it), and hands that list to the next session before it starts. The next session should need fewer steps.</p>
+
+<h2>What was run</h2>
+<ul>
+<li>One test repo: a 125-file Node service we built, with a test suite and three planted bugs.</li>
+<li>Nine tasks on it: add 3 CLI flags, add 3 endpoints, fix 3 bugs. Each task has a hidden test that says pass or fail.</li>
+<li>Each task run 2 times under each of three conditions, in a fresh copy of the repo:
+  <ul>
+  <li><b>cold</b>: the agent gets nothing.</li>
+  <li><b>headstart</b>: the agent gets what earlier sessions on other tasks recorded. Never its own task.</li>
+  <li><b>hand-written doc</b>: a person wrote a 28-line file explaining the repo. This is the thing headstart is competing with.</li>
+  </ul></li>
+<li>Two agents: Claude Code and Devin CLI, both on the Sonnet model. 54 runs each, 108 in the clean set. About 200 more runs earlier in the day while the harness was being fixed, not counted.</li>
+<li>Measured per run: tokens read, tool calls, seconds, dollars, test pass or fail.</li>
+</ul>
+
+<h2>Results</h2>
+<p class="big">-18% tool calls, -13% cost</p>
+<p>Claude Code with a head start, against cold. All tests pass in every condition.</p>
+<table>
+<tr><th></th><th class="n">cold</th><th class="n">headstart</th><th class="n">hand-written doc</th></tr>
+<tr><td>Claude Code, tool calls</td><td class="n">18.2</td><td class="n">14.8 (-18%)</td><td class="n">12.6 (-31%)</td></tr>
+<tr><td>Claude Code, context tokens</td><td class="n">1,009,927</td><td class="n">-25%</td><td class="n">-30%</td></tr>
+<tr><td>Claude Code, cost per run</td><td class="n">$0.42</td><td class="n">$0.37 (-13%)</td><td class="n">$0.34 (-20%)</td></tr>
+<tr><td>Devin CLI, tool calls</td><td class="n">17.7</td><td class="n">16.5 (-7%)</td><td class="n">14.6 (-17%)</td></tr>
+<tr><td>Devin CLI, context tokens</td><td class="n">593,882</td><td class="n">-22%</td><td class="n">-22%</td></tr>
+<tr><td>Devin CLI, seconds</td><td class="n">64</td><td class="n">54 (-16%)</td><td class="n">52 (-20%)</td></tr>
+<tr><td>tests pass</td><td class="n">100%</td><td class="n">100%</td><td class="n">100%</td></tr>
+</table>
+<p>18 runs per cell. The spread between runs is wide, about the size of the effect, so read "-13% cost" as "somewhere between a little and a quarter".</p>
+
+<h2>Good or bad</h2>
+<p><span class="ok">Good:</span> it works, on two different agents, with nothing written by a person, and it never broke a task. A quarter fewer tokens read is a real saving at fleet scale.</p>
+<p><span class="warn">Not as good as a person:</span> a human's 28-line doc beats it on every number. The doc says <i>why</i> ("a route only takes effect once it is in ROUTES"). The recording only says <i>what</i> ("src/registry.js changed in 6 of 6 endpoint tasks"). The agent still reads to find the why.</p>
+<p><span class="bad">One thing that got worse:</span> calls before the first edit. Agents given a head start check the claims before acting, so they read a bit more up front, then save on everything after.</p>
+<p>One confound found and fixed mid-day: another memory hook on this laptop was quietly helping the cold runs. With it off, the effect roughly doubled. The numbers above are the clean ones.</p>
+
+<h2>Ideas for improvement</h2>
+<ul>
+<li>Turn "what changed together" into a sentence with a reason. The gap to the human doc is the why. A one-line explanation per rule, generated from the verify command's output, is the next experiment.</li>
+<li>Only name a file when most matches agree. Done after the audit; one task had lost 10 calls chasing a file that one of three matches touched.</li>
+<li>More repeats. 18 per cell gives a wide interval. 3 repeats on the two arms that count would halve it for about $25.</li>
+<li>Bigger repo. Discovery cost grows with repo size; the fixture is 125 files. A 2,000-file repo would show a bigger gap between cold and headstart.</li>
+<li>Learn from warm runs too. Only cold runs write memory today, so memory only ever comes from the worst sessions.</li>
+</ul>
+
+<h2>Where the files are</h2>
+<p><code>results/claude-sonnet-r4-clean/report.md</code> and <code>results/devin-sonnet-r1/report.md</code> in <code>environment-mem</code> have every run with standard deviations and the fleet projection.</p>
+</main>

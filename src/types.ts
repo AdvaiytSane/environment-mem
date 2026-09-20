@@ -26,6 +26,7 @@ export interface Procedure {
   session_id: string;
   task_id?: string;
   repo: string;
+  harness?: string;
   created_at: string;
   title: string;
   prompt: string;

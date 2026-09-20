@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import type { Procedure, Step, TraceEvent } from './types.ts';
 import { repoName } from './paths.ts';
 import { succeeded, toSteps } from './trace.ts';
+import { harnessOf } from './harness.ts';
 
 const MAX_STEPS = 40;
 
@@ -62,11 +63,13 @@ export function extract(events: TraceEvent[], cwd: string): Procedure | null {
     ? [...steps.slice(0, 10), ...steps.slice(firstWrite < 0 ? 10 : Math.max(10, firstWrite - 3)).slice(0, MAX_STEPS - 10)]
     : steps;
 
+  const harness = harnessOf(toolEvents.map(e => e.tool_name!));
   return {
     id: createHash('sha1').update(sessionId + title).digest('hex').slice(0, 12),
     session_id: sessionId,
     task_id: process.env.HEADSTART_TASK_ID,
     repo: repoName(cwd),
+    harness,
     created_at: new Date().toISOString(),
     title,
     prompt: prompt.slice(0, 500),

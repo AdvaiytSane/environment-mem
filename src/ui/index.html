@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>headstart</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/ui/tokens.css"><link rel="stylesheet" href="/ui/app.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+</head><body>
+<div class="app">
+  <div class="top">
+    <img src="/mark.svg" alt="" onerror="this.style.display='none'"><h1>headstart</h1>
+    <nav class="tabs" role="tablist">
+      <button class="tab on" role="tab" data-view="graph">Graph</button>
+      <button class="tab" role="tab" data-view="handed">Handed</button>
+      <button class="tab" role="tab" data-view="sessions">Sessions</button>
+      <button class="tab" role="tab" data-view="matrix">Distances</button>
+      <button class="tab" role="tab" data-view="measured">Measured</button>
+    </nav>
+    <div class="status"><span id="status-sessions"></span><span id="status-live" class="live off"><i></i>offline</span></div>
+  </div>
+
+  <aside class="rail">
+    <div class="block">
+      <div class="label">Search</div>
+      <input class="search" id="search" placeholder="task, file, session" autocomplete="off" aria-label="search sessions and files">
+      <div class="results" id="results"></div>
+    </div>
+    <div class="block legend" id="legend"><div class="label">Shapes</div></div>
+    <div class="block inspector" id="inspector"><div class="label">Selected</div><div class="empty">Click a node.</div></div>
+  </aside>
+
+  <main class="stage">
+    <section class="view on" id="view-graph" data-view="graph"><svg id="graph"></svg>
+      <div class="caption" id="caption"></div>
+      <div class="key" id="gkey"></div>
+      <div class="steps" id="steps"></div>
+    </section>
+    <section class="view page" id="view-handed" data-view="handed"><div id="handed"></div></section>
+    <section class="view" id="view-sessions" data-view="sessions"><canvas id="timeline"></canvas><div class="chips" id="tchips"></div><div class="strip right" id="tstats"></div></section>
+    <section class="view" id="view-matrix" data-view="matrix"><canvas id="matrix"></canvas><div class="strip" id="mstats"></div></section>
+    <section class="view page" id="view-measured" data-view="measured"><div id="measured"></div></section>
+  </main>
+
+  <div class="drawer" id="drawer">
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+<div class="hover" id="hover"></div>
+<script type="module" src="/ui/app.js"></script>
+</body></html>
