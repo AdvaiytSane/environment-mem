@@ -28,6 +28,19 @@ node ~/headstart/src/cli.ts skills          # write .agents/skills/*/SKILL.md an
 
 Alias it: `alias headstart='node ~/headstart/src/cli.ts'`.
 
+## See it run
+
+From this repo, three terminals. Every line is a real agent session in a fresh copy of `fixtures/repo` with the hooks on.
+
+```
+headstart console --live                                             # http://localhost:4177, one lane per run
+headstart run --agent devin  --lane devin-cold  --task bugfix-1 --inject 0   # cold: nothing handed
+headstart run --agent claude --lane claude-warm --task bugfix-1              # warm: handed what the cold run stored
+headstart orchestrate --fresh                                        # six agents in three waves, hand-offs across Devin and Claude
+```
+
+`docs/DEMO.md` has the script and the measured numbers. `docs/ARCHITECTURE.png` is the picture.
+
 ## Any other agent loop
 
 Pipe hook events as JSON on stdin. Four events, all optional except `PostToolUse` and `Stop`:
@@ -42,7 +55,7 @@ echo '{"session_id":"s1","cwd":"'$PWD'"}' | headstart hook Stop
 
 ## Backend
 
-Procedures live in `.headstart/procedures.jsonl`.
+Procedures live in `.headstart/procedures.jsonl`. With `HEADSTART_API_URL` and `HEADSTART_API_KEY` set, every finished session is also posted to `POST /v1/extract` (tool calls, cost, what it was handed) and the enterprise dashboard reads those rows.
 
 ## Eval
 

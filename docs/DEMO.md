@@ -1,12 +1,42 @@
-# Demo, 6 minutes
+# Demo
 
-Second screen: `node src/cli.ts console --live --watch /tmp/demo-cold,/tmp/demo-hs` and http://localhost:4177. It shows the two lanes ticking, sessions over time, the similarity graph over every recorded session, and the clean table.
+Three terminals. Everything below is a real agent session; nothing is replayed.
 
-Set up the two lanes once (copies of the fixture with hooks installed):
+Terminal 1, the console. One lane per run appears as it starts.
 
-    for d in demo-cold demo-hs; do rm -rf /tmp/$d && cp -R fixtures/repo /tmp/$d && (cd /tmp/$d && node ~/Documents/GitHub/environment-mem/src/cli.ts install && git init -q && git add -A && git commit -qm f); done
+    node src/cli.ts console --live
+    open http://localhost:4177
 
-Run the cold lane with HEADSTART_INJECT=0 HEADSTART_RECORD=0 and the headstart lane with HEADSTART_INJECT=full, both with HEADSTART_STORE pointing at results/claude-sonnet-r4-clean/store.jsonl.
+Terminal 2, a cold run. Devin CLI in a fresh copy of the fixture repo, hooks on, nothing handed to it.
+
+    node src/cli.ts run --agent devin --lane devin-cold --task bugfix-1 --inject 0
+
+Terminal 3, the same task with memory on. The hook finds the procedure the cold run stored and hands it over before the first tool call. The lane shows the receipt, the head shows the saving against the cold lane.
+
+    node src/cli.ts run --agent claude --lane claude-warm --task bugfix-1
+
+A judge can pick any task id from fixtures/tasks.json or fixtures/tasks-live.json, or type a task in quotes:
+
+    node src/cli.ts run --agent devin --lane judge --task "Add a --limit flag to the list command"
+
+## Many agents at once
+
+    node src/cli.ts orchestrate --fresh
+
+fixtures/orchestrate-demo.json: three waves of two. Wave one runs cold (Devin on bugfix-1, Claude Code on endpoint-1). Wave two runs the same two tasks with the agents swapped: Claude Code is handed Devin's procedure and Devin is handed Claude's. Wave three runs two neighbouring tasks and is handed both. Measured on Sep 19:
+
+    devin-1    devin  bugfix-1     12 calls  5 before first edit   40s  cold
+    claude-1   claude endpoint-1   19 calls  9 before first edit   51s  cold
+    claude-2   claude bugfix-1      5 calls  2 before first edit   25s  handed 1 (devin bugfix-1)
+    devin-2    devin  endpoint-1   13 calls  8 before first edit   36s  handed 1 (claude endpoint-1)
+    devin-3    devin  bugfix-2     12 calls  8 before first edit   54s  handed 1 (devin bugfix-1)
+    claude-3   claude endpoint-2   27 calls 12 before first edit  112s  handed 2 (claude endpoint-1, devin bugfix-1)
+
+`--plan fixtures/orchestrate-populate.json` is the 36-run version over the Devin-style task set.
+
+## The hosted store
+
+With HEADSTART_API_URL and HEADSTART_API_KEY set (`.env`, not committed), every finished session is also posted to POST /v1/extract with its tool calls, cost and what it was handed, and the dashboard's overview, procedures, graph, agents, savings and evals pages fill from those rows. Recall stays local; the hook maps local procedure ids to hosted ones so hand-offs link.
 
 ## 0:00 One sentence
 
