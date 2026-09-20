@@ -99,7 +99,46 @@ context. Control cases remain scripted. The check reports actual usage, not
 estimated token savings. Use a new output directory for each experiment.
 
 See [the integration and evidence report](../../docs/DIMENSIONAL.md) for the
-pinned upstream commit, actual results, and robot-simulation blocker.
+pinned upstream commit and actual results, including a failed robot arrival check.
+
+## Optional robot simulation experiment
+
+This blueprint requires the pinned upstream dimOS checkout and its simulation
+assets. It refuses to construct a robot connection without `--simulation mujoco`.
+Install this package into that checkout's Python environment so dimOS discovers
+its blueprint entry point, activate the environment, then run:
+
+```sh
+pip install -e /absolute/path/to/environment-mem/packages/dimensional
+# Inside the upstream dimOS checkout, with its simulation dependencies installed:
+dimos --simulation mujoco --viewer none --mcp-port 19991 \
+  run memorable-dimensional.inspection
+```
+
+In another terminal using the same environment:
+
+```sh
+python packages/dimensional/examples/inspection.py \
+  --memorable-cli /absolute/path/to/compatible/cli.js \
+  --env-file /absolute/path/to/.env \
+  --output /tmp/dimos-inspection-new-run
+```
+
+The external model can only navigate to two application-defined coordinates
+and inspect measured pose/camera frames, with a maximum of four moves per
+mission. Arrival requires an independent 20 cm check. The second mission runs
+only after the first verifies, and receives its recalled procedure. Actual
+failed observations remain in the report and are stored as unverified. Only
+verified missions are eligible for recall. Camera JPEGs stay outside memory;
+the custom projection retains their hashes, filenames, and observed poses.
+Use this only for the provided MuJoCo experiment; physical robots require their
+own controllers, environment compatibility definitions, and outcome verifiers.
+
+On macOS our pinned environment required PortAudio before PyAudio, Torch,
+`unitree-webrtc-connect==2.2.0`, `langchain==1.2.3`, and Git LFS assets. The activated
+venv's `bin` must be in `PATH` for upstream to find `mjpython`. This blueprint
+uses a separate Zenoh discovery multicast address to avoid another local dimOS
+runtime's RPC names. The adapter itself has no robotics dependencies.
 
 ## Scope
 

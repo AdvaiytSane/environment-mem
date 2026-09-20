@@ -9,5 +9,8 @@ description = "Optional dimOS mission capture and advisory recall through the Me
 requires-python = ">=3.10"
 dependencies = []
 
+[project.entry-points."dimos.blueprints"]
+inspection = "memorable_dimensional.simulation:inspection"
+
 [tool.setuptools.packages.find]
 include = ["memorable_dimensional*"]

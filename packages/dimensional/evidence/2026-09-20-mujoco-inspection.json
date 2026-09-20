@@ -1,0 +1,213 @@
+{
+  "schema": "memorable.dimensional.inspection.v1",
+  "mode": "actual_mujoco_simulation",
+  "scene": "bundled_office1",
+  "simulated_body": "unitree_go1",
+  "host_stack": "unitree_go2",
+  "model": "gpt-4.1-mini",
+  "embedding": "off",
+  "checkpoints": {
+    "A": [
+      -0.5056159555594604,
+      1.000846764627032
+    ],
+    "B": [
+      -1.0056159555594604,
+      1.000846764627032
+    ]
+  },
+  "runs": [
+    {
+      "number": 1,
+      "mission_id": "b7465396-dae9-40d5-89f4-7d5491096e78",
+      "context_delivered": false,
+      "context_chars": 0,
+      "verification": {
+        "ok": false,
+        "checkpoints": {
+          "A": false,
+          "B": true
+        },
+        "returned_to_b": false,
+        "camera_sequence_advanced": false,
+        "camera_hashes_verified": true,
+        "measured_final_pose": [
+          -0.7018403157428861,
+          0.8282923279682913,
+          0.294539765646871
+        ]
+      },
+      "elapsed_ms": 25929.35,
+      "usage": {
+        "input_tokens": 4885,
+        "output_tokens": 150,
+        "total_tokens": 5035
+      },
+      "actions": [
+        {
+          "tool": "inspect_pose",
+          "argument_fields": [],
+          "tool_outcome": "result_received",
+          "summary": "Inspect measured pose and save a fresh camera evidence frame at each checkpoint.",
+          "observation": {
+            "ok": true,
+            "position": [
+              -1.0056332078410712,
+              1.0008878180776788,
+              0.2947887474741387
+            ],
+            "quaternion_wxyz": [
+              0.9999485248646657,
+              0.0005075541394089444,
+              0.0014541030115740006,
+              0.010028738415416853
+            ],
+            "pose_age_seconds": 0.1057,
+            "image_sequence": 143,
+            "odom_sequence": 143,
+            "image_sha256": "34097659910d0b19e62e46ab2d638ed00e9c7443650c657dda3d4476f86ee8d6",
+            "image_file": "34097659910d0b19e62e46ab2d638ed00e9c7443650c657dda3d4476f86ee8d6.jpg",
+            "scene": "upstream-mujoco-office1"
+          },
+          "call_id": "9cb021df-3743-4540-90a6-cc284d97e6dc",
+          "sequence": 1,
+          "duration_ms": 49.306
+        },
+        {
+          "tool": "inspect_pose",
+          "argument_fields": [],
+          "tool_outcome": "result_received",
+          "summary": "Inspect measured pose and save a fresh camera evidence frame at each checkpoint.",
+          "observation": {
+            "ok": true,
+            "position": [
+              -1.0056332078410712,
+              1.0008878180776788,
+              0.2947887474741387
+            ],
+            "quaternion_wxyz": [
+              0.9999485248646657,
+              0.0005075541394089444,
+              0.0014541030115740006,
+              0.010028738415416853
+            ],
+            "pose_age_seconds": 0.1095,
+            "image_sequence": 143,
+            "odom_sequence": 143,
+            "image_sha256": "34097659910d0b19e62e46ab2d638ed00e9c7443650c657dda3d4476f86ee8d6",
+            "image_file": "34097659910d0b19e62e46ab2d638ed00e9c7443650c657dda3d4476f86ee8d6.jpg",
+            "scene": "upstream-mujoco-office1"
+          },
+          "call_id": "5156f802-c4d5-436b-b99a-5ab06e2b7b33",
+          "sequence": 2,
+          "duration_ms": 51.064
+        },
+        {
+          "tool": "move_to",
+          "argument_fields": [
+            "x",
+            "y"
+          ],
+          "tool_outcome": "result_received",
+          "summary": "Navigate to the requested checkpoint, then verify actual pose independently.",
+          "input": {
+            "x": -0.5056159555594604,
+            "y": 1.000846764627032
+          },
+          "call_id": "7d4ce5aa-2db9-48ae-9adf-cc89669716dd",
+          "sequence": 3,
+          "duration_ms": 12266.191
+        },
+        {
+          "tool": "inspect_pose",
+          "argument_fields": [],
+          "tool_outcome": "result_received",
+          "summary": "Inspect measured pose and save a fresh camera evidence frame at each checkpoint.",
+          "observation": {
+            "ok": true,
+            "position": [
+              -0.6953251495458709,
+              0.8915048506751244,
+              0.29188566070905697
+            ],
+            "quaternion_wxyz": [
+              0.9934945202323823,
+              -0.00883707518939541,
+              0.013738942745857848,
+              -0.11270219972366086
+            ],
+            "pose_age_seconds": 0.0721,
+            "image_sequence": 209,
+            "odom_sequence": 210,
+            "image_sha256": "b54a78bdb5b0e55aa81d4ef8d2a81c14aba7d7c00ebd2833e3026da6fcf8fc07",
+            "image_file": "b54a78bdb5b0e55aa81d4ef8d2a81c14aba7d7c00ebd2833e3026da6fcf8fc07.jpg",
+            "scene": "upstream-mujoco-office1"
+          },
+          "call_id": "38b813ab-0e3f-4192-a67f-b559a69e3b78",
+          "sequence": 4,
+          "duration_ms": 64.889
+        },
+        {
+          "tool": "move_to",
+          "argument_fields": [
+            "x",
+            "y"
+          ],
+          "tool_outcome": "result_received",
+          "summary": "Navigate to the requested checkpoint, then verify actual pose independently.",
+          "input": {
+            "x": -1.0056159555594604,
+            "y": 1.000846764627032
+          },
+          "call_id": "c4da9ff0-0ca3-4213-9138-096c7f13ff39",
+          "sequence": 5,
+          "duration_ms": 8343.353
+        },
+        {
+          "tool": "inspect_pose",
+          "argument_fields": [],
+          "tool_outcome": "result_received",
+          "summary": "Inspect measured pose and save a fresh camera evidence frame at each checkpoint.",
+          "observation": {
+            "ok": true,
+            "position": [
+              -0.7008039269846477,
+              0.8255591504892167,
+              0.29238032844158607
+            ],
+            "quaternion_wxyz": [
+              0.7902455381468908,
+              0.002009015859203896,
+              0.003419225454037237,
+              -0.6127774981112667
+            ],
+            "pose_age_seconds": 0.0787,
+            "image_sequence": 276,
+            "odom_sequence": 276,
+            "image_sha256": "62e11a8be7defb3029a14464c88903a79c42737a0c59b1d16dbc49e9dfe0d527",
+            "image_file": "62e11a8be7defb3029a14464c88903a79c42737a0c59b1d16dbc49e9dfe0d527.jpg",
+            "scene": "upstream-mujoco-office1"
+          },
+          "call_id": "ba35fd67-ded2-4a9f-8e79-1c13a24ee881",
+          "sequence": 6,
+          "duration_ms": 14.78
+        }
+      ],
+      "receipt": {
+        "id": "b7465396-dae9-40d5-89f4-7d5491096e78",
+        "procedureId": "procedures/metadata-ee30aaee39406e41062e21e475844e0999824aa0",
+        "status": "stored",
+        "storage": "local",
+        "duplicate": false,
+        "schema": "989d8341ed1faa7b47cc08674bff0f99b9c3ee8f42e8952ce85e5dc62de6dbd5",
+        "embedding": {
+          "status": "off",
+          "model": null,
+          "dimensions": 0
+        }
+      },
+      "diagnostics": []
+    }
+  ],
+  "complete": false
+}
