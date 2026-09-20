@@ -1,12 +1,57 @@
 # Memorable for Browser Use
 
 An optional Python add-on around Browser Use's existing `Tools.act()` boundary.
-The main CLI exposes two generic operations; Browser Use capture and browser
-service mapping live in this package. Browser Use's source does not need a patch.
+The main CLI exposes two generic operations; Browser Use capture and optional
+metadata mapping live in this package. Browser Use's source does not need a patch.
 
 ```text
-Browser Use → this add-on → headstart memory store|recall → package driver → Memorable
+Browser Use → optional capture/mapping → MemorableMemory → memorable memory store|recall
 ```
+
+**Current path:** use `MemorableMemory`, `BrowserMetadata`, and `BROWSER_METADATA`.
+This requires the companion Memorable CLI patch; it uses existing local storage
+and retrieval. [Contract and setup](../../docs/METADATA-MEMORY.md).
+
+```python
+from memorable_browser_use import MemorableMemory, BrowserMetadata, BROWSER_METADATA
+
+memory = MemorableMemory(
+    ["/path/to/node24", "/path/to/memorable/packages/cli/dist/cli.js"],
+    metadata=BROWSER_METADATA,
+    embedding="required",
+)
+mapper = BrowserMetadata(
+    wire, project="quotes-demo", website="quotes.toscrape.com",
+    workflow="Navigate paginated quote listings", recall_query=task,
+)
+# Supply mapper.normalize_event / recall_request / store_request / render_recall
+# to BrowserMemory or run(), using the lifecycle documented below.
+```
+
+`wire` and `task` are application inputs. The complete
+[metadata_browser.py](examples/metadata_browser.py) example runs two real agents:
+
+```sh
+python examples/metadata_browser.py \
+  --memorable-cli /path/to/memorable/packages/cli/dist/cli.js \
+  --node /path/to/node24 --chrome /path/to/chrome \
+  --env-file /private/path/.env --output /private/path/new-evidence \
+  --enable-local-store
+```
+
+The `.env` supplies `OPENAI_API_KEY`; existing Memorable configuration supplies
+embedding access. The example requires a new output directory. Browser Use and
+this package must be installed in the selected Python environment. It verifies
+the final DOM independently and stores an opaque, redacted action trace.
+
+[Live evidence](../../docs/verification/2026-09-19-metadata-browser.md): local
+storage, production embeddings, paraphrase recall and reference inclusion in a
+second Agent's messages succeeded. This is not a hosted browser API claim.
+
+The remainder documents the **retained experimental HTTP driver** (`CliMemory`)
+and the shared capture lifecycle. Use the native client above for the accepted
+metadata design. The driver-specific authorization/deployment limitations below
+do not apply to native local CLI storage.
 
 This package is source-installable, not published on PyPI. It requires Python
 3.11+, Node 24+, and the environment-mem CLI from this branch. The optional

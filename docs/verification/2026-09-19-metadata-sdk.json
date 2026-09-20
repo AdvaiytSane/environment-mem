@@ -1,0 +1,12 @@
+{
+  "transport": "actual TypeScript SDK to final native CLI build",
+  "duplicate_receipt": true,
+  "exact_trace_readback": true,
+  "private_field_omitted": true,
+  "query_embedding": {
+    "status": "ready",
+    "model": "cf:@cf/baai/bge-m3",
+    "dimensions": 1024
+  },
+  "redaction_refusal": "semantic_text_requires_redaction"
+}

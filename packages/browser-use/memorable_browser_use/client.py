@@ -32,6 +32,7 @@ class CliMemory:
             raise ValueError("command must be a nonempty argv list")
         if timeout <= 0 or max_output_bytes <= 0:
             raise ValueError("timeout and max_output_bytes must be positive")
+        self.native = False
         self.command = list(command)
         self.adapter = str(adapter or Path(__file__).with_name("driver.mjs"))
         self.config = dict(config or {})
@@ -46,8 +47,9 @@ class CliMemory:
 
     async def _call(self, operation: str, request: Mapping[str, Any]) -> dict[str, Any]:
         payload = json.dumps({"request": request, "config": self.config}, allow_nan=False).encode()
-        if len(payload) > 8_000_000:
-            raise MemoryError("memory request exceeds 8 MB")
+        max_input = 2_000_000 if self.native else 8_000_000
+        if len(payload) > max_input:
+            raise MemoryError(f"memory request exceeds {max_input // 1_000_000} MB")
         # A browser agent can carry several unrelated provider credentials. Only
         # system process configuration and Memorable's own variables cross here.
         system_keys = {
@@ -59,7 +61,7 @@ class CliMemory:
                if key in system_keys or key.startswith("MEMORABLE_")}
         try:
             process = await asyncio.create_subprocess_exec(
-                *self.command, "memory", operation, "--adapter", self.adapter,
+                *self.command, "memory", operation, *(["-"] if self.native else ["--adapter", self.adapter]),
                 stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE, env=env,
                 start_new_session=os.name == "posix",
@@ -122,9 +124,29 @@ class CliMemory:
             code = detail.get("code", "transport_error") if isinstance(detail, dict) else "transport_error"
             safe_code = str(code) if str(code).replace("_", "").isalnum() and len(str(code)) < 80 else "transport_error"
             raise MemoryError(f"memory CLI failed: {safe_code} (exit {process.returncode})", code=safe_code)
-        if not isinstance(envelope, dict) or envelope.get("schema") != "memorable.adapter.v1" or envelope.get("operation") != operation:
+        if not isinstance(envelope, dict) or envelope.get("schema") != ("memorable.memory.v1" if self.native else "memorable.adapter.v1") or envelope.get("operation") != operation:
             raise MemoryError("memory CLI returned an incompatible adapter envelope")
         result = envelope.get("result")
         if not isinstance(result, dict):
             raise MemoryError("memory adapter result must be an object")
+        if self.native:
+            if operation == "store" and (result.get("status") != "stored" or result.get("storage") != "local"):
+                raise MemoryError("missing local storage receipt")
+            if operation == "recall" and not isinstance(result.get("matches"), list):
+                raise MemoryError("missing recall matches")
         return result
+
+
+class MemorableMemory(CliMemory):
+    """Generic metadata store/recall via the extended native Memorable CLI.
+
+    Requires the metadata CLI patch; published older builds are not compatible.
+    Fields marked private stay in the local store and are excluded from recall.
+    """
+    def __init__(self, command: Sequence[str] = ("memorable",), *, metadata: Mapping[str, Any],
+                 embedding: str = "required", timeout: float = 30, max_output_bytes: int = 2_000_000):
+        if embedding not in {"required", "optional", "off"}:
+            raise ValueError("embedding must be required, optional, or off")
+        super().__init__(command, config=json.loads(json.dumps({"metadata": metadata, "embedding": embedding})),
+                         timeout=timeout, max_output_bytes=max_output_bytes)
+        self.native = True

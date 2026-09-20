@@ -2,6 +2,25 @@
 
 Updated September 19, 2026. This plan builds on Memorable's existing CLI and service. It supersedes the architecture direction in [PLAN.html](PLAN.html); historical results there remain historical results.
 
+## Current implementation update
+
+The accepted metadata contract is now implemented for the standalone local CLI
+and optional Browser Use package. See [the contract](METADATA-MEMORY.md) and
+[live verification](verification/2026-09-19-metadata-browser.md).
+
+- Public SDK: two operations, declared metadata roles, preserved redacted JSON
+  traces, native CLI transport, optional Browser Use capture/rendering.
+- Private local CLI patch: existing store/encryption and ranker, filter-first
+  candidates, semantic field embeddings, explicit local receipts and stable retries.
+- Verified: two real OpenAI-driven browser runs, production BGE-M3 embeddings,
+  paraphrase recall, reference in model messages and wrong-filter rejection.
+- Remaining: upstream review/release of `codex/metadata-cli`, broader retrieval
+  evaluation, another harness mapping, and separately scoped hosted storage/read.
+
+This supersedes the earlier browser HTTP transport as the integration direction.
+The sections below retain the legacy connector and upstream planning context;
+statements about a future metadata contract describe the earlier baseline.
+
 ## 1. Reuse the existing system
 
 [memorable-gbrain](https://github.com/NIkhil-cmd-cmd/memorable-gbrain) is a private monorepo containing the standalone CLI, core procedure/retrieval logic, the extraction service, and related applications. The name does not make it only a GBrain plugin. Public integration surfaces are documented on [memorable.sh](https://www.memorable.sh/docs/integrate).

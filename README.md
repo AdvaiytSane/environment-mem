@@ -1,15 +1,28 @@
 # environment-mem
 
-Connect a coding agent to Memorable through two operations: **`store` and `recall`**. Developers choose where to capture work and where to use recalled context. Memorable performs its existing extraction and retrieval.
+Connect an agent to Memorable through two operations: **`store` and `recall`**. Developers choose where to capture work and where to use recalled context. Memorable performs its existing extraction and retrieval.
 
 This repository's package and executable remain named **`headstart`**. The connection layer is available from **`headstart/memorable`** on this branch; it wraps the existing Memorable CLI. This is not a newly published npm release or a deployed HTTP SDK.
+
+## Metadata-driven Browser Use integration
+
+The new [metadata SDK](docs/METADATA-MEMORY.md) lets developers declare `filter`,
+`semantic`, `context`, and `private` fields once, then use `store({id, trace,
+metadata})` and `recall({query, metadata})`. The optional [Browser Use package](packages/browser-use/README.md)
+captures actions and returns recalled references through the same Memorable CLI.
+
+This path uses the existing encrypted local procedure store, production embedding
+service and ranker. A real second Browser Use Agent recalled the first run using
+a paraphrased task and received its reference in model messages. See the
+[live evidence](docs/verification/2026-09-19-metadata-browser.md).
+**Requires the companion private CLI patch; not yet published on npm.**
 
 ## What lives where
 
 | Component | Responsibility | Status |
 |---|---|---|
 | This repository | Importable connector, coding-agent hook adapter, integration documentation, verification evidence | Branch implementation |
-| Optional [Browser Use package](packages/browser-use/README.md) | Python capture, page metadata and a browser-specific transport through the same CLI | Real browser capture verified; hosted round trip blocked |
+| Optional [Browser Use package](packages/browser-use/README.md) | Python capture and developer-defined metadata through native CLI | Local store/recall and live model context verified; companion CLI patch required |
 | [Memorable upstream](https://github.com/NIkhil-cmd-cmd/memorable-gbrain) | CLI, shared procedure/retrieval code, extraction service and other Memorable applications | Separate private monorepo; not just a GBrain plugin |
 | Existing `memorable-cli` | `ingest -`, `recall`, `show`, `chain`, and local MCP access | Published CLI; see [CLI docs](https://www.memorable.sh/docs/cli) |
 | Existing HTTP API | Extraction and query embeddings | [Documented API](https://www.memorable.sh/docs/api); extraction response alone is not a durable storage receipt |
@@ -19,7 +32,7 @@ The prior Headstart local lexical engine and evaluation tools remain available u
 
 The current [SDK plan](docs/SDK-PLAN.md) supersedes the architecture direction in [the historical demo plan](docs/PLAN.html). See [connections](docs/CONNECTIONS.md) for setup and [verification](docs/VERIFICATION.md) for what counts as evidence.
 
-## Use the two operations
+## Legacy extraction interface
 
 Use Node.js 24 or newer. Install this checkout as a local dependency in the consuming project:
 
@@ -79,8 +92,9 @@ For a custom agent, call the SDK from your own lifecycle directly. You do not ne
 Platform packages remain optional. The core exports `loadAdapter` / `invokeAdapter`
 from `headstart/adapters` and offers `headstart memory store|recall --adapter <file>`.
 Developers can implement a local module with those two methods without changing
-the main CLI. The [Browser Use add-on](packages/browser-use/README.md) uses that
-interface; it adds no browser dependency to the core. Its experimental driver
+the main CLI. The [Browser Use add-on](packages/browser-use/README.md) adds no browser dependency
+to the core. Its current metadata client calls the native Memorable CLI directly.
+Its retained experimental HTTP driver
 targets the browser-specific backend contract, because published `memorable ingest`
 does not preserve browser targets and input shapes. This does not establish a
 general deployed HTTP recall API.
@@ -97,13 +111,14 @@ The [Browser Use live report](docs/verification/2026-09-19-browser-use.md) recor
 a real public website run with captured navigation and click targets, a retained
 outbox, independently checked page contents and explicit omissions. The initial
 scripted check was followed by a successful OpenAI-driven Browser Use Agent run.
-Memorable browser authorization and its advisory-retrieval contract still block
-the full store/recall experiment.
+The earlier browser HTTP experiment remains blocked by authorization and its
+advisory-retrieval contract. The newer metadata CLI path completed the local
+round trip; see the metadata evidence above.
 
 The [September 19 live check](docs/verification/2026-09-19.md) reached the extraction service, persisted a procedure locally and read it back in fresh CLI processes. Close wording and an exact filename retrieved it; a paraphrase missed. The hook returned context, but native Claude verification was blocked by revoked authentication before tools ran. Hosted durability, HTTP recall and native context consumption remain unverified. [VERIFICATION.md](docs/VERIFICATION.md) defines the remaining evidence gates.
 
-Remaining contract work includes accepted-trace preservation, explicit metadata/compatibility rules, precondition and outcome evidence, durable store receipts, and structured HTTP recall. Those belong in coordinated upstream changes before the connector can promise them.
+The metadata CLI path now preserves accepted traces, enforces metadata definitions, and returns local storage receipts. Structured HTTP recall, hosted storage, richer precondition checking and a published compatible CLI release remain upstream work.
 
-Capture currently retains only a 300-character result snippet plus explicit outcome fields. Events without stable IDs cannot be reliably deduplicated; overlapping tasks need explicit run IDs. Journal writes have no cross-process lock. Deterministic replay and task-success verification are not provided.
+The legacy coding hook capture retains only a 300-character result snippet plus explicit outcome fields. Events without stable IDs cannot be reliably deduplicated; overlapping tasks need explicit run IDs. Journal writes have no cross-process lock. Deterministic replay and task-success verification are not provided.
 
 The retained `headstart eval` / `report` tools and historical reports evaluate the previous local Headstart engine. They do not establish retrieval quality or a performance benefit for this connector.

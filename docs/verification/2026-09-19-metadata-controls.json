@@ -1,0 +1,64 @@
+{
+  "execution": "scripted real Browser Use Tools.act; no model",
+  "cases": [
+    {
+      "case": "disabled",
+      "page_verified": true,
+      "context_empty": true,
+      "captured_actions": 0,
+      "diagnostics": [],
+      "journal_exists": false,
+      "outbox_retained": false,
+      "store_receipt": null
+    },
+    {
+      "case": "kill_switch",
+      "page_verified": true,
+      "context_empty": true,
+      "captured_actions": 0,
+      "diagnostics": [],
+      "journal_exists": false,
+      "outbox_retained": false,
+      "store_receipt": null
+    },
+    {
+      "case": "missing_cli",
+      "page_verified": true,
+      "context_empty": true,
+      "captured_actions": 1,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "memory_error"
+        },
+        {
+          "stage": "store",
+          "error": "memory_error"
+        }
+      ],
+      "journal_exists": true,
+      "outbox_retained": true,
+      "store_receipt": null
+    },
+    {
+      "case": "no_consent",
+      "page_verified": true,
+      "context_empty": true,
+      "captured_actions": 1,
+      "diagnostics": [
+        {
+          "stage": "recall",
+          "error": "consent_required"
+        },
+        {
+          "stage": "store",
+          "error": "consent_required"
+        }
+      ],
+      "journal_exists": true,
+      "outbox_retained": true,
+      "store_receipt": null
+    }
+  ],
+  "complete": true
+}

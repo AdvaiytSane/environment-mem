@@ -1,4 +1,6 @@
 import { spawn } from 'node:child_process';
+import { metadataClient, type MetadataDefinition, type MetadataClient } from './metadata.ts';
+export type { MetadataRole, MetadataDefinition, MetadataClient, MemoryStoreRequest, MemoryRecallRequest, MemoryReceipt, MemoryRecallResult, MemoryMatch } from './metadata.ts';
 
 export interface ToolCall {
   name: string;
@@ -6,7 +8,7 @@ export interface ToolCall {
   result?: { ok?: boolean; exit_code?: number };
 }
 
-/** The public Memorable CLI ingest envelope. No arbitrary metadata contract yet. */
+/** The public Memorable CLI ingest envelope. Use the metadata overload below for explicit trace storage. */
 export interface StoreRequest {
   session_id: string;
   workflow_id?: string;
@@ -119,14 +121,24 @@ function envelope(trace: StoreRequest): string {
   return json;
 }
 
+export interface MetadataMemorableOptions extends MemorableOptions {
+  metadata: MetadataDefinition;
+  embedding?: 'required' | 'optional' | 'off';
+}
+export interface LegacyMemorableClient {
+  store(trace: StoreRequest, call?: CallOptions): Promise<CommandResult>;
+  recall(request: RecallRequest, call?: CallOptions): Promise<CommandResult>;
+}
 /** A connection to the existing CLI, not a replacement retrieval engine. */
-export function createMemorable(options: MemorableOptions = {}) {
+export function createMemorable(options: MetadataMemorableOptions): MetadataClient;
+export function createMemorable(options?: MemorableOptions): LegacyMemorableClient;
+export function createMemorable(options: MemorableOptions | MetadataMemorableOptions = {}): MetadataClient | LegacyMemorableClient {
   const command = options.command ?? 'memorable';
   nonempty(command, 'command');
   const prefix = options.args ?? [];
   if (!Array.isArray(prefix) || prefix.some(a => typeof a !== 'string' || a.includes('\0'))) throw new TypeError('args must be strings without NUL bytes');
   const timeoutMs = options.timeoutMs ?? 30_000;
-  const maxOutputBytes = options.maxOutputBytes ?? 1024 * 1024;
+  const maxOutputBytes = options.maxOutputBytes ?? ('metadata' in options ? 2_000_000 : 1024 * 1024);
   if (!Number.isFinite(timeoutMs) || timeoutMs < 1) throw new TypeError('timeoutMs must be positive');
   if (!Number.isInteger(maxOutputBytes) || maxOutputBytes < 1) throw new TypeError('maxOutputBytes must be a positive integer');
 
@@ -135,7 +147,10 @@ export function createMemorable(options: MemorableOptions = {}) {
     return new Promise((resolve, reject) => {
       const child = spawn(command, [...prefix, ...args], {
         cwd: options.cwd,
-        env: { ...process.env, NO_COLOR: '1', ...options.env },
+        env: 'metadata' in options
+          ? Object.fromEntries(Object.entries({ ...process.env, ...options.env }).filter(([key, value]) => value !== undefined &&
+              (key.startsWith('MEMORABLE_') || ['PATH', 'HOME', 'USERPROFILE', 'SYSTEMROOT', 'WINDIR', 'TMP', 'TEMP', 'TMPDIR', 'LANG', 'LC_ALL', 'SSL_CERT_FILE', 'SSL_CERT_DIR', 'NODE_EXTRA_CA_CERTS'].includes(key))))
+          : { ...process.env, NO_COLOR: '1', ...options.env },
         shell: false,
         detached: process.platform !== 'win32',
         stdio: ['pipe', 'pipe', 'pipe'],
@@ -210,6 +225,8 @@ export function createMemorable(options: MemorableOptions = {}) {
       child.stdin.end(input);
     });
   }
+
+  if ('metadata' in options) return metadataClient({ metadata: options.metadata, embedding: options.embedding }, run);
 
   return {
     async store(trace: StoreRequest, call: CallOptions = {}): Promise<CommandResult> {
