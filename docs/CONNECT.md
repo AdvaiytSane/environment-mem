@@ -27,8 +27,11 @@ agent loop. Source snippets and credentials are not included in its JSON.
 `--write` creates `.memorable/connection.json` (`memorable.connect.v1`) and
 `.agents/skills/memorable-connect/SKILL.md`. Give the generated prompt to your
 coding assistant or explicitly invoke the generated skill. Existing metadata and
-custom manifest fields are retained; changing target/schema requires explicit
-review. An existing unowned skill, malformed configuration or symlink output is
+custom manifest fields are retained. Inspection and repeated setup reuse the
+existing target, agent, metadata and backend; coding targets also honor the
+project's existing backend setting. Explicit conflicts or disagreements between
+the two configuration files are refused before writing. Changing target/schema
+requires explicit review. An existing unowned skill, malformed configuration or symlink output is
 refused. Existing agent instructions and hooks are not overwritten by setup.
 
 ## Explicit coding-assistant setup

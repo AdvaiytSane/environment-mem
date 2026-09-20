@@ -88,6 +88,47 @@ test('connect refuses target changes, unowned skills and symlink output paths be
   assert.deepEqual(readdirSync(outside), []);
 });
 
+test('read-only inspection and repeated CLI setup preserve the declared local route and metadata', t => {
+  const { root, write } = repo(t);
+  const config = JSON.stringify({ backend: 'local', owner: 'preserve existing config' });
+  write('.headstart/config.json', config);
+  const run = (...args) => spawnSync(process.execPath, [cli, 'connect', '--repo', root, ...args, '--json'], { encoding: 'utf8' });
+  const initial = run('--target', 'coding-agent', '--agent', 'devin', '--write');
+  assert.equal(initial.status, 0, initial.stderr);
+  assert.equal(JSON.parse(initial.stdout).backend, 'local');
+  const path = join(root, '.memorable/connection.json');
+  const customized = JSON.parse(readFileSync(path, 'utf8'));
+  customized.metadata = { repository: { use: 'filter' }, objective: { use: 'semantic' }, evidence: { use: 'context' } };
+  writeFileSync(path, JSON.stringify(customized));
+  const before = readFileSync(path, 'utf8');
+  const inspection = run();
+  assert.equal(inspection.status, 0, inspection.stderr);
+  const report = JSON.parse(inspection.stdout);
+  assert.equal(report.target, 'coding-agent');
+  assert.equal(report.agent, 'devin');
+  assert.equal(report.backend, 'local');
+  assert.deepEqual(report.metadata, customized.metadata);
+  assert.equal(readFileSync(path, 'utf8'), before);
+  const repeated = run('--target', 'coding-agent', '--write');
+  assert.equal(repeated.status, 0, repeated.stderr);
+  const stored = JSON.parse(readFileSync(path, 'utf8'));
+  assert.equal(stored.backend, 'local');
+  assert.equal(stored.agent, 'devin');
+  assert.deepEqual(stored.metadata, customized.metadata);
+  assert.equal(readFileSync(join(root, '.headstart/config.json'), 'utf8'), config);
+  assert.ok(Object.values(JSON.parse(repeated.stdout).status).every(value => value === null));
+  const stable = readFileSync(path, 'utf8');
+  const conflict = run('--backend', 'memorable', '--write');
+  assert.equal(conflict.status, 1);
+  assert.match(conflict.stderr, /backend conflicts/);
+  assert.equal(readFileSync(path, 'utf8'), stable);
+  assert.equal(readFileSync(join(root, '.headstart/config.json'), 'utf8'), config);
+  assert.throws(() => writeConnection({ ...report, backend: 'memorable' }), /backend conflicts/);
+  write('.headstart/config.json', JSON.stringify({ backend: 'memorable' }));
+  assert.throws(() => inspectConnection(root), /backend declarations conflict/);
+  assert.throws(() => writeConnection(report), /backend declarations conflict/);
+});
+
 test('merged CLI retains SDK and demo commands, and hosted capture does not invent missing exit codes', () => {
   const help = spawnSync(process.execPath, [cli, '--help'], { encoding: 'utf8' });
   assert.equal(help.status, 0, help.stderr);
