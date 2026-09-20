@@ -45,7 +45,7 @@ existing dashboard.
 Devin numbers are means across **18 runs per arm**, nine synthetic tasks with
 two repeats, from source commit `87807eb084a2c1dd65a62967e0719b27087a7c10`:
 
-| Recorded arm | Aggregate context tokens | Time | Tool calls |
+| Recorded arm | Mean context tokens | Time | Tool calls |
 |---|---:|---:|---:|
 | Cold | 593,882 | 64.50 s | 17.67 |
 | Static repository guide | 463,359 | 51.89 s | 14.61 |
