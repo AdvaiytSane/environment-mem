@@ -25,6 +25,20 @@ a paraphrased task and received its reference in model messages. See the
 [live evidence](docs/verification/2026-09-19-metadata-browser.md).
 **Requires the companion private CLI patch; not yet published on npm.**
 
+## Demos on this branch
+
+Everything below is on `main` now: the coding-agent demo, the browser demo, the robotics demo, their recordings, and the console that plays them back.
+
+| Demo | Run it | Recording |
+|---|---|---|
+| Devin, before and after memory | `headstart demo --agent devin --task bugfix-1` (two lanes in `headstart console --live`) | [hosted console](https://headstart-demo.vercel.app/dash/enterprise), use case Devin |
+| Browser Use, a web task recalled by the next agent | `pip install -e packages/browser-use && python packages/browser-use/examples/live_browser.py` | [replay](https://headstart-demo.vercel.app/dash/enterprise/environments/browser), [evidence](docs/verification/2026-09-20-browser-replay.md) |
+| Browser Use, ten-page audit with and without memory | `python packages/browser-use/examples/long_task_benchmark.py` | [numbers and limits](docs/verification/2026-09-20-long-browser-task.md) |
+| Dimensional (dimOS), a robot mission recalled through MCP | `pip install -e packages/dimensional && python packages/dimensional/examples/inspection.py` | [replay](https://headstart-demo.vercel.app/dash/enterprise/environments/dimensional), [evidence](packages/dimensional/evidence/2026-09-20-verified-inspection/report.json), [notes](docs/DIMENSIONAL.md) |
+| Multi-agent orchestration | `headstart orchestrate --plan fixtures/orchestrate-demo.json` | [DEMO.md](docs/DEMO.md) |
+
+The hosted console shows every recorded session per use case (Devin, Claude Code, Codex, Browser Use, Dimensional): pick one in the sidebar. The browser and robot recordings were pushed to it with `scripts/evidence-sessions.mjs`. The [three-minute runbook](docs/DEMO-RUNBOOK.md) walks the pitch.
+
 ## Dashboard and recorded demos
 
 The [Workflow Studio source](apps/workflow-studio/README.md) includes the
