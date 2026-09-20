@@ -1,4 +1,4 @@
-# Demo
+# DejaDo, demo
 
 Three terminals. Everything below is a real agent session; nothing is replayed.
 
@@ -7,7 +7,12 @@ Terminal 1, the console. One lane per run appears as it starts.
     node src/cli.ts console --live
     open http://localhost:4177
 
-Terminal 2, a cold run. Devin CLI in a fresh copy of the fixture repo, hooks on, nothing handed to it.
+One command for before and after, the same task, two lanes, the difference printed at the end:
+
+    node src/cli.ts demo --agent devin --task bugfix-1
+    node src/cli.ts demo --agent devin --task bugfix-1 --warm-agent claude   # Devin writes it, Claude Code is handed it
+
+Or lane by lane. Terminal 2, a cold run. Devin CLI in a fresh copy of the fixture repo, hooks on, nothing handed to it.
 
     node src/cli.ts run --agent devin --lane devin-cold --task bugfix-1 --inject 0
 

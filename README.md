@@ -1,4 +1,6 @@
-# headstart
+# DejaDo
+
+`headstart` is the CLI. `dejado` is an alias for it.
 
 The second coding-agent session on a repo starts where the first one finished.
 
@@ -34,6 +36,7 @@ From this repo, three terminals. Every line is a real agent session in a fresh c
 
 ```
 headstart console --live                                             # http://localhost:4177, one lane per run
+headstart demo --agent devin --task bugfix-1                          # before and after, one command
 headstart run --agent devin  --lane devin-cold  --task bugfix-1 --inject 0   # cold: nothing handed
 headstart run --agent claude --lane claude-warm --task bugfix-1              # warm: handed what the cold run stored
 headstart orchestrate --fresh                                        # six agents in three waves, hand-offs across Devin and Claude
