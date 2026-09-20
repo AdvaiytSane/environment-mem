@@ -6,7 +6,7 @@ Live console, no login: **https://headstart-demo.vercel.app/dash/enterprise**. E
 
 `headstart` is the CLI, `dejado` is its alias.
 
-![Overview](docs/screens/overview.png)
+![DejaDo](docs/screens/hero.png)
 
 ## The problem
 
@@ -106,6 +106,20 @@ Browser and robot demos: `pip install -e packages/browser-use` then `python pack
 - The browser and robot sessions were pushed from the recordings in this repository (`scripts/evidence-sessions.mjs`). For the ten-page browser audit the original step history was not kept, so the order of its actions is rebuilt from the recorded action counts; tokens, time, counts and verdicts are the recorded ones.
 - The procedure that helped on one pair did not help on every pair. The Devin eval rounds are in `results/` unedited, negative pairs included.
 - Devin Cloud sessions from the console are not built. Pin and Retire need a migration that is not applied on the demo database.
+
+## Slides
+
+![Slide 1](docs/slides/slide-1.png)
+
+![Slide 2](docs/slides/slide-2.png)
+
+![Slide 3](docs/slides/slide-3.png)
+
+![Slide 4](docs/slides/slide-4.png)
+
+![Slide 5](docs/slides/slide-5.png)
+
+![Slide 6](docs/slides/slide-6.png)
 
 ## Team
 
