@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DejaDo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0b; --fg:#ffffff; --muted:#a1a1a1; --subtle:#8a8a8a; --dim:#5a5a5e;
+  --line:rgba(255,255,255,.12); --line-fade:rgba(255,255,255,.06);
+  --sky:#38bdf8; --mint:#3ddc97; --lav:#b7a6ff; --warm:#e07a4a; --amber:#e9b949; --red:#f0616d;
+  --ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);}
+body{font-family:var(--ui);color:var(--fg);-webkit-font-smoothing:antialiased;}
+@page{size:1920px 1080px;margin:0;}
+.slide{width:1920px;height:1080px;position:relative;overflow:hidden;background:var(--bg);page-break-after:always;padding:96px 120px;}
+.slide:last-of-type{page-break-after:auto;}
+
+.kicker{position:absolute;top:96px;left:120px;font:400 18px/24px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--subtle);}
+.pg{position:absolute;bottom:64px;right:120px;font:400 16px/20px var(--mono);letter-spacing:.1em;color:var(--dim);}
+.rule{position:absolute;left:120px;right:120px;top:140px;height:1px;background:var(--line-fade);}
+h1{font:600 64px/1.15 var(--ui);letter-spacing:-.025em;max-width:1040px;}
+.sub{font:400 28px/1.45 var(--ui);color:var(--muted);max-width:900px;margin-top:28px;}
+.cap{font:400 16px/24px var(--mono);color:var(--subtle);letter-spacing:.02em;max-width:820px;}
+.cap b{color:var(--muted);font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-right:12px;}
+.lbl{font-family:var(--mono);font-size:17px;letter-spacing:.08em;text-transform:uppercase;fill:var(--subtle);}
+.lbl.fg{fill:var(--muted);}
+.num{font-family:var(--mono);font-size:22px;fill:var(--fg);}
+.abs{position:absolute;}
+
+/* 1 */
+.s1 .word{position:absolute;left:120px;top:400px;font:600 168px/1 var(--ui);letter-spacing:-.04em;}
+.s1 .word .vu{color:var(--dim);text-decoration:line-through;text-decoration-thickness:6px;text-decoration-color:var(--subtle);}
+.s1 .sub{position:absolute;left:120px;top:600px;}
+.s1 .brand{position:absolute;bottom:64px;left:120px;font:400 18px/24px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--subtle);}
+
+/* 6 stats */
+.stat .v{font:500 80px/1 var(--ui);letter-spacing:-.04em;color:var(--fg);font-variant-numeric:tabular-nums;}
+.stat .v.good{color:var(--mint);}
+.stat .l{font:400 17px/24px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);margin-top:12px;}
+</style>
+</head>
+<body>
+
+<!-- 1 TITLE -->
+<section class="slide s1">
+  <div class="kicker">DejaDo &nbsp;·&nbsp; procedural memory for agents</div>
+  <div class="rule"></div>
+  <div class="word">déjà <span class="vu">vu</span> do</div>
+  <p class="sub">The feeling you have done this before. Then doing it.</p>
+  <svg class="abs" style="left:1000px;top:330px" width="800" height="440" viewBox="0 0 800 440">
+    <path d="M0 80 H800" stroke="#2a2a2e" stroke-width="2"/>
+    <path d="M0 220 H800" stroke="#2a2a2e" stroke-width="2"/>
+    <path d="M0 360 H800" stroke="#2a2a2e" stroke-width="2"/>
+    <circle cx="24" cy="80" r="9" fill="#5a5a5e"/><circle cx="88" cy="80" r="9" fill="#5a5a5e"/><circle cx="152" cy="80" r="9" fill="#5a5a5e"/><circle cx="216" cy="80" r="9" fill="#5a5a5e"/><circle cx="280" cy="80" r="9" fill="#5a5a5e"/><circle cx="344" cy="80" r="9" fill="#5a5a5e"/><circle cx="408" cy="80" r="9" fill="#5a5a5e"/><circle cx="472" cy="80" r="9" fill="#5a5a5e"/><circle cx="536" cy="80" r="9" fill="#5a5a5e"/><circle cx="600" cy="80" r="9" fill="#5a5a5e"/><circle cx="664" cy="80" r="9" fill="#5a5a5e"/><circle cx="728" cy="80" r="9" fill="#5a5a5e"/>
+    <circle cx="24" cy="220" r="9" fill="#8a8a8a"/><circle cx="88" cy="220" r="9" fill="#8a8a8a"/><circle cx="152" cy="220" r="9" fill="#8a8a8a"/><circle cx="216" cy="220" r="9" fill="#8a8a8a"/><circle cx="280" cy="220" r="9" fill="#8a8a8a"/><circle cx="344" cy="220" r="9" fill="#8a8a8a"/><circle cx="408" cy="220" r="9" fill="#8a8a8a"/><circle cx="472" cy="220" r="9" fill="#8a8a8a"/>
+    <circle cx="24" cy="360" r="9" fill="#ffffff"/><circle cx="88" cy="360" r="9" fill="#ffffff"/><circle cx="152" cy="360" r="9" fill="#ffffff"/><circle cx="216" cy="360" r="9" fill="#ffffff"/><circle cx="280" cy="360" r="9" fill="#ffffff"/>
+    <text x="800" y="35" class="lbl" text-anchor="end" style="font-size:14px">session 1</text>
+    <text x="800" y="175" class="lbl" text-anchor="end" style="font-size:14px">session 2</text>
+    <text x="800" y="315" class="lbl" text-anchor="end" style="font-size:14px">session 3</text>
+  </svg>
+  <div class="cap abs" style="left:1000px;top:800px;width:800px"><b>fig. 1</b>the same task, three sessions. each dot is one step.</div>
+  <div class="brand">headstart &nbsp;·&nbsp; hackmit 2026</div>
+  <div class="pg">1 / 6</div>
+</section>
+
+<!-- 2 THESIS -->
+<section class="slide s2">
+  <div class="kicker">§ 01 &nbsp; thesis</div>
+  <div class="rule"></div>
+  <h1 style="position:absolute;left:120px;top:220px">Memory is the bottleneck, whatever the model.</h1>
+  <p class="sub" style="position:absolute;left:120px;top:400px">People learn by doing, then remember. Agents read the manual, then forget.</p>
+
+  <svg class="abs" style="left:1000px;top:230px" width="800" height="560" viewBox="0 0 800 560">
+    <path d="M80 40 V480 H760" fill="none" stroke="#3a3a3e" stroke-width="1.5"/>
+    <path d="M100 150 H740" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-dasharray="10 10"/>
+    <path d="M100 150 C 260 150, 300 300, 420 340 S 640 400, 740 405" fill="none" stroke="#ffffff" stroke-width="3"/>
+    <g fill="#ffffff"><circle cx="100" cy="150" r="7"/><circle cx="260" cy="230" r="7"/><circle cx="420" cy="340" r="7"/><circle cx="580" cy="385" r="7"/><circle cx="740" cy="405" r="7"/></g>
+    <text x="756" y="140" class="lbl" text-anchor="end">manual, every time</text>
+    <text x="756" y="440" class="lbl fg" text-anchor="end">experience</text>
+    <text x="420" y="530" class="lbl" text-anchor="middle">tasks done</text>
+    <text x="40" y="260" class="lbl" transform="rotate(-90 40 260)" text-anchor="middle">effort per task</text>
+  </svg>
+  <div class="cap abs" style="left:1080px;top:820px;width:720px"><b>fig. 2</b>schematic. effort to do the same kind of task again, by how it was learned.</div>
+  <div class="pg">2 / 6</div>
+</section>
+
+<!-- 3 DEMO -->
+<section class="slide s3">
+  <div class="kicker">§ 02 &nbsp; demo</div>
+  <div class="rule"></div>
+  <h1 style="position:absolute;left:120px;top:220px">Same task, twice. The second time with memory.</h1>
+  <p class="sub" style="position:absolute;left:120px;top:400px">Live: a coding agent, then a browser agent.</p>
+
+  <svg class="abs" style="left:120px;top:500px" width="1680" height="380" viewBox="0 0 1680 380">
+    <text x="0" y="66" class="lbl">devin &nbsp; no memory</text>
+    <circle cx="600" cy="60" r="14" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><circle cx="672" cy="60" r="14" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><circle cx="744" cy="60" r="14" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><circle cx="816" cy="60" r="14" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><circle cx="888" cy="60" r="14" fill="none" stroke="#8a8a8a" stroke-width="2.5"/>
+    <circle cx="960" cy="60" r="14" fill="#8a8a8a"/><circle cx="1032" cy="60" r="14" fill="#8a8a8a"/><circle cx="1104" cy="60" r="14" fill="#8a8a8a"/><circle cx="1176" cy="60" r="14" fill="#8a8a8a"/><circle cx="1248" cy="60" r="14" fill="#8a8a8a"/><circle cx="1320" cy="60" r="14" fill="#8a8a8a"/><circle cx="1392" cy="60" r="14" fill="#8a8a8a"/>
+    <text x="1490" y="68" class="num">12</text>
+
+    <path d="M600 92 V188" stroke="#3ddc97" stroke-width="2" stroke-dasharray="6 8"/>
+    <text x="624" y="146" class="lbl" style="fill:#3ddc97;font-size:14px">steps handed to claude code</text>
+
+    <text x="0" y="226" class="lbl">claude code &nbsp; with devin's steps</text>
+    <circle cx="600" cy="220" r="14" fill="none" stroke="#3ddc97" stroke-width="2.5"/><circle cx="672" cy="220" r="14" fill="none" stroke="#3ddc97" stroke-width="2.5"/>
+    <circle cx="744" cy="220" r="14" fill="#3ddc97"/><circle cx="816" cy="220" r="14" fill="#3ddc97"/><circle cx="888" cy="220" r="14" fill="#3ddc97"/>
+    <text x="986" y="228" class="num" style="fill:#3ddc97">5</text>
+
+    <g transform="translate(0,340)">
+      <circle cx="9" cy="0" r="8" fill="none" stroke="#8a8a8a" stroke-width="2"/><text x="30" y="6" class="lbl">looking around</text>
+      <circle cx="289" cy="0" r="8" fill="#8a8a8a"/><text x="310" y="6" class="lbl">doing the work</text>
+    </g>
+  </svg>
+  <div class="cap abs" style="right:120px;top:900px;width:640px;text-align:right"><b>fig. 3</b>one bug in a 125-file service, one step per dot. measured sep 19.</div>
+  <div class="pg">3 / 6</div>
+</section>
+
+<!-- 4 HOW IT WORKS -->
+<section class="slide s4">
+  <div class="kicker">§ 03 &nbsp; how it works</div>
+  <div class="rule"></div>
+  <h1 style="position:absolute;left:120px;top:200px;max-width:1300px">Record every step. Boil it down. Hand it to the next agent.</h1>
+  <p class="sub" style="position:absolute;left:120px;top:380px;max-width:1300px">No AI in the loop. Every session adds a node, so the memory grows on its own.</p>
+
+  <svg class="abs" style="left:120px;top:480px" width="1680" height="460" viewBox="0 0 1680 460">
+    <rect x="0" y="160" width="180" height="110" rx="4" fill="none" stroke="#38bdf8" stroke-width="2"/>
+    <text x="90" y="208" class="lbl" text-anchor="middle" style="fill:#38bdf8">agent</text>
+    <text x="90" y="236" class="lbl" text-anchor="middle" style="font-size:14px">does a task</text>
+    <path d="M180 215 H290" stroke="#3a3a3e" stroke-width="1.5"/>
+    <text x="235" y="198" class="lbl" text-anchor="middle" style="font-size:14px">records</text>
+
+    <circle cx="320" cy="215" r="7" fill="#8a8a8a"/><circle cx="346" cy="215" r="7" fill="#8a8a8a"/><circle cx="372" cy="215" r="7" fill="#8a8a8a"/><circle cx="398" cy="215" r="7" fill="#8a8a8a"/><circle cx="424" cy="215" r="7" fill="#8a8a8a"/><circle cx="450" cy="215" r="7" fill="#8a8a8a"/><circle cx="476" cy="215" r="7" fill="#8a8a8a"/><circle cx="502" cy="215" r="7" fill="#8a8a8a"/><circle cx="528" cy="215" r="7" fill="#8a8a8a"/><circle cx="554" cy="215" r="7" fill="#8a8a8a"/>
+    <text x="437" y="270" class="lbl" text-anchor="middle">trace</text>
+    <text x="437" y="296" class="lbl" text-anchor="middle" style="font-size:14px">every action</text>
+    <path d="M580 215 H690" stroke="#3a3a3e" stroke-width="1.5"/>
+    <text x="635" y="198" class="lbl" text-anchor="middle" style="font-size:14px">boil down</text>
+
+    <circle cx="740" cy="215" r="16" fill="#b7a6ff"/>
+    <text x="740" y="270" class="lbl" text-anchor="middle" style="fill:#b7a6ff">procedure</text>
+    <text x="740" y="296" class="lbl" text-anchor="middle" style="font-size:14px">steps, files, check</text>
+    <path d="M790 215 H880" stroke="#3a3a3e" stroke-width="1.5"/>
+    <text x="835" y="198" class="lbl" text-anchor="middle" style="font-size:14px">store</text>
+
+    <g transform="translate(140,0)">
+    <g stroke="#3a3a3e" stroke-width="2.5" fill="none">
+      <path d="M780 215 L900 60 L1060 130 L1180 20"/>
+      <path d="M900 60 L960 290 L1120 350"/>
+      <path d="M780 215 L960 290"/>
+      <path d="M1060 130 L1120 350 L1260 200 L1180 20"/>
+      <path d="M1060 130 L1260 200"/>
+      <path d="M1180 20 L1300 90 L1260 200"/>
+      <path d="M960 290 L1060 130"/>
+    </g>
+    <path d="M960 290 L1120 350" stroke="#3ddc97" stroke-width="4"/>
+    <g fill="#b7a6ff">
+      <circle cx="780" cy="215" r="16"/><circle cx="900" cy="60" r="16"/><circle cx="1060" cy="130" r="16"/><circle cx="1180" cy="20" r="16"/><circle cx="960" cy="290" r="16"/><circle cx="1260" cy="200" r="16"/><circle cx="1300" cy="90" r="16"/>
+    </g>
+    <circle cx="1120" cy="350" r="20" fill="#3ddc97"/>
+    <text x="1040" y="420" class="lbl" text-anchor="middle">memory</text>
+    <text x="1040" y="446" class="lbl" text-anchor="middle" style="font-size:14px">one node per session. closest match by compression, no ai</text>
+    <path d="M1150 350 H1340" stroke="#3ddc97" stroke-width="2" stroke-dasharray="6 8"/>
+    <text x="1245" y="332" class="lbl" text-anchor="middle" style="font-size:14px;fill:#3ddc97">recall</text>
+    <rect x="1360" y="295" width="180" height="110" rx="4" fill="none" stroke="#38bdf8" stroke-width="2"/>
+    <text x="1450" y="343" class="lbl" text-anchor="middle" style="fill:#38bdf8">next agent</text>
+    <text x="1450" y="371" class="lbl" text-anchor="middle" style="font-size:14px">starts ahead</text>
+    </g>
+  </svg>
+  <div class="cap abs" style="left:120px;top:960px;width:1100px"><b>fig. 4</b>90 recorded sessions. the closest node is the same kind of task every time, the exact same task 88 times.</div>
+  <div class="pg">4 / 6</div>
+</section>
+
+<!-- 5 MEASURED -->
+<section class="slide s5">
+  <div class="kicker">§ 04 &nbsp; measured</div>
+  <div class="rule"></div>
+  <h1 style="position:absolute;left:120px;top:220px;max-width:700px">Same tasks, with and without memory.</h1>
+  <p class="sub" style="position:absolute;left:120px;top:420px;max-width:640px">9 tasks, 36 runs, Claude Code. Every run still passed every test.</p>
+
+  <div class="abs" style="left:960px;top:230px;display:grid;grid-template-columns:1fr 1fr;gap:96px 120px">
+    <div class="stat"><div class="v good">-18%</div><div class="l">steps</div></div>
+    <div class="stat"><div class="v good">-25%</div><div class="l">tokens read</div></div>
+    <div class="stat"><div class="v good">-21%</div><div class="l">time</div></div>
+    <div class="stat"><div class="v good">-13%</div><div class="l">cost</div></div>
+  </div>
+
+  <svg class="abs" style="left:120px;top:600px" width="760" height="260" viewBox="0 0 760 260">
+    <text x="0" y="20" class="lbl">devin &nbsp; no memory</text>
+    <circle cx="9" cy="54" r="9" fill="#5a5a5e"/><circle cx="45" cy="54" r="9" fill="#5a5a5e"/><circle cx="81" cy="54" r="9" fill="#5a5a5e"/><circle cx="117" cy="54" r="9" fill="#5a5a5e"/><circle cx="153" cy="54" r="9" fill="#5a5a5e"/><circle cx="189" cy="54" r="9" fill="#5a5a5e"/><circle cx="225" cy="54" r="9" fill="#5a5a5e"/><circle cx="261" cy="54" r="9" fill="#5a5a5e"/><circle cx="297" cy="54" r="9" fill="#5a5a5e"/><circle cx="333" cy="54" r="9" fill="#5a5a5e"/><circle cx="369" cy="54" r="9" fill="#5a5a5e"/><circle cx="405" cy="54" r="9" fill="#5a5a5e"/><text x="460" y="61" class="num">12</text>
+    <text x="0" y="112" class="lbl">claude code &nbsp; no memory</text>
+    <circle cx="9" cy="146" r="9" fill="#5a5a5e"/><circle cx="45" cy="146" r="9" fill="#5a5a5e"/><circle cx="81" cy="146" r="9" fill="#5a5a5e"/><circle cx="117" cy="146" r="9" fill="#5a5a5e"/><circle cx="153" cy="146" r="9" fill="#5a5a5e"/><circle cx="189" cy="146" r="9" fill="#5a5a5e"/><circle cx="225" cy="146" r="9" fill="#5a5a5e"/><circle cx="261" cy="146" r="9" fill="#5a5a5e"/><circle cx="297" cy="146" r="9" fill="#5a5a5e"/><circle cx="333" cy="146" r="9" fill="#5a5a5e"/><circle cx="369" cy="146" r="9" fill="#5a5a5e"/><circle cx="405" cy="146" r="9" fill="#5a5a5e"/><circle cx="441" cy="146" r="9" fill="#5a5a5e"/><circle cx="477" cy="146" r="9" fill="#5a5a5e"/><circle cx="513" cy="146" r="9" fill="#5a5a5e"/><text x="568" y="153" class="num">15</text>
+    <text x="0" y="204" class="lbl" style="fill:#3ddc97">claude code &nbsp; with devin's steps</text>
+    <circle cx="9" cy="238" r="9" fill="#3ddc97"/><circle cx="45" cy="238" r="9" fill="#3ddc97"/><circle cx="81" cy="238" r="9" fill="#3ddc97"/><circle cx="117" cy="238" r="9" fill="#3ddc97"/><circle cx="153" cy="238" r="9" fill="#3ddc97"/><text x="208" y="245" class="num" style="fill:#3ddc97">5</text>
+  </svg>
+  <div class="cap abs" style="left:120px;top:900px;width:900px"><b>fig. 5</b>steps to fix one bug. memory crosses agents: devin recorded it, claude code used it.</div>
+  <div class="pg">5 / 6</div>
+</section>
+
+<!-- 6 USE CASES -->
+<section class="slide s6">
+  <div class="kicker">§ 05 &nbsp; use cases</div>
+  <div class="rule"></div>
+  <h1 style="position:absolute;left:120px;top:220px;max-width:900px">Any agent that takes steps can remember them.</h1>
+  <p class="sub" style="position:absolute;left:120px;top:420px;max-width:700px">One CLI, one API. Saves tokens and time on every repeat.</p>
+
+  <svg class="abs" style="left:1000px;top:200px" width="820" height="700" viewBox="0 0 820 700">
+    <path d="M80 40 V580 H780" fill="none" stroke="#3a3a3e" stroke-width="1.5"/>
+    <path d="M120 540 L720 100" fill="none" stroke="#2a2a2e" stroke-width="1.5" stroke-dasharray="4 10"/>
+    <text x="700" y="80" class="lbl" text-anchor="end" style="font-size:14px">saving grows</text>
+    <circle cx="680" cy="150" r="12" fill="#3ddc97"/><text x="660" y="156" class="lbl fg" text-anchor="end">coding agents</text>
+    <circle cx="620" cy="300" r="12" fill="#38bdf8"/><text x="600" y="306" class="lbl fg" text-anchor="end">browser agents</text>
+    <circle cx="440" cy="110" r="12" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><text x="420" y="116" class="lbl" text-anchor="end">robotics</text>
+    <circle cx="330" cy="210" r="12" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><text x="310" y="216" class="lbl" text-anchor="end">research agents</text>
+    <circle cx="500" cy="370" r="12" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><text x="480" y="376" class="lbl" text-anchor="end">audit agents</text>
+    <circle cx="700" cy="450" r="12" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><text x="680" y="456" class="lbl" text-anchor="end">search agents</text>
+    <circle cx="740" cy="520" r="12" fill="none" stroke="#8a8a8a" stroke-width="2.5"/><text x="720" y="526" class="lbl" text-anchor="end">voice agents</text>
+    <text x="430" y="630" class="lbl" text-anchor="middle">how often the same task repeats</text>
+    <text x="40" y="310" class="lbl" transform="rotate(-90 40 310)" text-anchor="middle">cost of one session</text>
+    <g transform="translate(100,670)">
+      <circle cx="9" cy="0" r="8" fill="#8a8a8a"/><text x="30" y="6" class="lbl" style="font-size:14px">running today</text>
+      <circle cx="229" cy="0" r="8" fill="none" stroke="#8a8a8a" stroke-width="2"/><text x="250" y="6" class="lbl" style="font-size:14px">next</text>
+    </g>
+  </svg>
+  <div class="cap abs" style="left:1080px;top:920px;width:740px"><b>fig. 6</b>where memory pays. hooks today: claude code, devin, codex, browser use.</div>
+  <div class="pg">6 / 6</div>
+</section>
+
+</body>
+</html>

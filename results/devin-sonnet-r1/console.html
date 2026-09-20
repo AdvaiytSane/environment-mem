@@ -1,0 +1,97 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>headstart</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#1c1b18;--mute:#6b6862;--line:#d9d6cd;--panel:#fff;--accent:#8a4b1f;--ok:#2f6b3a;--bad:#9c2b2b;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--bad:#e07b7b}}
+body{margin:0;padding:32px 20px 80px;background:var(--bg);color:var(--ink);font:15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px;font-weight:600}.sub{color:var(--mute);margin:0 0 32px}
+h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:36px 0 12px;font-weight:500}
+.row{display:grid;grid-template-columns:160px 1fr 180px;gap:12px;align-items:center;margin:6px 0}
+.lab .n{color:var(--mute);margin-left:8px;font-size:12px}
+.track{height:18px;background:var(--panel);border:1px solid var(--line)}.bar{height:100%;background:var(--accent);opacity:.85}.bar.base{opacity:.35}
+.val{font-variant-numeric:tabular-nums}.d{color:var(--mute);margin-left:8px;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);font-weight:500}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.sd{color:var(--mute);font-size:11px;margin-left:6px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.wrap{overflow-x:auto}
+</style>
+<main>
+<h1>headstart</h1>
+<p class="sub">54 runs, devin sonnet. Cold is the baseline. Mean ± standard deviation over runs without errors.</p>
+<h2>Context tokens per session</h2>
+<div class="row"><div class="lab">Cold<span class="n">n=18</span></div>
+      <div class="track"><div class="bar base" style="width:100%"></div></div>
+      <div class="val">593,882<span class="d"></span></div></div>
+<div class="row"><div class="lab">Hand-written doc<span class="n">n=18</span></div>
+      <div class="track"><div class="bar" style="width:78%"></div></div>
+      <div class="val">463,359<span class="d">-22%</span></div></div>
+<div class="row"><div class="lab">Procedure<span class="n">n=18</span></div>
+      <div class="track"><div class="bar" style="width:78%"></div></div>
+      <div class="val">462,350<span class="d">-22%</span></div></div>
+<h2>Per session</h2>
+<div class="wrap"><table><tr><th>metric</th><th class="num">Cold</th><th class="num">Hand-written doc</th><th class="num">Procedure</th></tr><tr><td>context tokens</td><td class="num">593,882<span class="sd">± 200,795</span></td><td class="num">463,359<span class="sd">± 138,656</span><span class="d">-22%</span></td><td class="num">462,350<span class="sd">± 136,322</span><span class="d">-22%</span></td></tr>
+<tr><td>tool calls</td><td class="num">18<span class="sd">± 5</span></td><td class="num">15<span class="sd">± 4</span><span class="d">-17%</span></td><td class="num">17<span class="sd">± 4</span><span class="d">-7%</span></td></tr>
+<tr><td>calls before first edit</td><td class="num">9<span class="sd">± 2</span></td><td class="num">8<span class="sd">± 3</span><span class="d">-10%</span></td><td class="num">10<span class="sd">± 5</span><span class="d">+19%</span></td></tr>
+<tr><td>seconds</td><td class="num">65<span class="sd">± 23</span></td><td class="num">52<span class="sd">± 20</span><span class="d">-20%</span></td><td class="num">54<span class="sd">± 19</span><span class="d">-16%</span></td></tr>
+<tr><td>cost</td><td class="num">not reported</td><td class="num">not reported</td><td class="num">not reported</td></tr><tr><td>tests pass</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td></tr></table></div>
+<h2>Fleet of 9,000 sessions, projected from the mean delta</h2>
+<div class="wrap"><table><tr><th>arm</th><th class="num">context tokens saved</th><th class="num">minutes saved</th><th class="num">ACU saved</th><th class="num">cost saved</th></tr><tr><td>Hand-written doc</td><td class="num">1,174,710,000</td><td class="num">1,892</td><td class="num">126</td><td class="num">not reported</td></tr>
+<tr><td>Procedure</td><td class="num">1,183,795,500</td><td class="num">1,525</td><td class="num">102</td><td class="num">not reported</td></tr></table></div>
+<h2>Runs</h2>
+<div class="wrap"><table><tr><th>task</th><th>arm</th><th class="num">#</th><th>runner</th><th class="num">ctx tok</th><th class="num">tools</th><th class="num">before edit</th><th class="num">s</th><th class="num">$</th><th>check</th><th class="num">injected</th><th></th></tr><tr><td>flag-2</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">422,542</td><td class="num">13</td><td class="num">8</td><td class="num">41</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">421,574</td><td class="num">13</td><td class="num">8</td><td class="num">43</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">590,904</td><td class="num">18</td><td class="num">10</td><td class="num">56</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">739,568</td><td class="num">22</td><td class="num">11</td><td class="num">72</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">735,152</td><td class="num">20</td><td class="num">8</td><td class="num">74</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">701,011</td><td class="num">20</td><td class="num">12</td><td class="num">67</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">517,318</td><td class="num">15</td><td class="num">8</td><td class="num">46</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">265,684</td><td class="num">8</td><td class="num">6</td><td class="num">37</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Cold</td><td class="num">1</td><td>devin</td><td class="num">652,269</td><td class="num">20</td><td class="num">14</td><td class="num">105</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">576,243</td><td class="num">17</td><td class="num">8</td><td class="num">49</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">738,391</td><td class="num">21</td><td class="num">10</td><td class="num">61</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">638,796</td><td class="num">23</td><td class="num">10</td><td class="num">68</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">462,491</td><td class="num">17</td><td class="num">7</td><td class="num">59</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">808,817</td><td class="num">22</td><td class="num">7</td><td class="num">85</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">1,120,539</td><td class="num">27</td><td class="num">9</td><td class="num">125</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">490,655</td><td class="num">15</td><td class="num">4</td><td class="num">46</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">333,661</td><td class="num">10</td><td class="num">6</td><td class="num">45</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Cold</td><td class="num">2</td><td>devin</td><td class="num">474,269</td><td class="num">17</td><td class="num">11</td><td class="num">82</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">325,257</td><td class="num">12</td><td class="num">8</td><td class="num">33</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">442,927</td><td class="num">16</td><td class="num">10</td><td class="num">41</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">425,337</td><td class="num">15</td><td class="num">7</td><td class="num">47</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">608,672</td><td class="num">21</td><td class="num">10</td><td class="num">64</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">518,674</td><td class="num">15</td><td class="num">5</td><td class="num">53</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">612,349</td><td class="num">20</td><td class="num">9</td><td class="num">73</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">293,557</td><td class="num">8</td><td class="num">4</td><td class="num">29</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">376,367</td><td class="num">11</td><td class="num">8</td><td class="num">53</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Hand-written doc</td><td class="num">1</td><td>devin</td><td class="num">581,484</td><td class="num">17</td><td class="num">14</td><td class="num">102</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">434,845</td><td class="num">13</td><td class="num">7</td><td class="num">43</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">272,845</td><td class="num">8</td><td class="num">3</td><td class="num">28</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">475,048</td><td class="num">19</td><td class="num">11</td><td class="num">45</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">454,675</td><td class="num">13</td><td class="num">7</td><td class="num">47</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">668,253</td><td class="num">22</td><td class="num">11</td><td class="num">64</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">773,211</td><td class="num">20</td><td class="num">5</td><td class="num">90</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">386,569</td><td class="num">11</td><td class="num">8</td><td class="num">44</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">349,688</td><td class="num">12</td><td class="num">8</td><td class="num">41</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Hand-written doc</td><td class="num">2</td><td>devin</td><td class="num">340,706</td><td class="num">10</td><td class="num">6</td><td class="num">37</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">514,867</td><td class="num">15</td><td class="num">10</td><td class="num">55</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1235</td><td></td></tr>
+<tr><td>flag-2</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">378,501</td><td class="num">15</td><td class="num">9</td><td class="num">40</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1282</td><td></td></tr>
+<tr><td>flag-3</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">357,198</td><td class="num">16</td><td class="num">10</td><td class="num">41</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1194</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">530,836</td><td class="num">18</td><td class="num">9</td><td class="num">50</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1241</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">312,102</td><td class="num">16</td><td class="num">6</td><td class="num">43</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1275</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">621,151</td><td class="num">28</td><td class="num">23</td><td class="num">85</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1275</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">400,783</td><td class="num">17</td><td class="num">14</td><td class="num">44</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1243</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">493,427</td><td class="num">15</td><td class="num">11</td><td class="num">58</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1284</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Procedure</td><td class="num">1</td><td>devin</td><td class="num">278,568</td><td class="num">8</td><td class="num">4</td><td class="num">35</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1266</td><td></td></tr>
+<tr><td>flag-1</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">362,624</td><td class="num">16</td><td class="num">11</td><td class="num">45</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1235</td><td></td></tr>
+<tr><td>flag-2</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">349,939</td><td class="num">16</td><td class="num">9</td><td class="num">45</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1282</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">492,193</td><td class="num">14</td><td class="num">7</td><td class="num">48</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1241</td><td></td></tr>
+<tr><td>flag-3</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">542,743</td><td class="num">16</td><td class="num">11</td><td class="num">60</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1194</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">435,204</td><td class="num">16</td><td class="num">8</td><td class="num">49</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1275</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">474,383</td><td class="num">21</td><td class="num">10</td><td class="num">62</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1275</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">504,701</td><td class="num">14</td><td class="num">8</td><td class="num">45</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1243</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">401,197</td><td class="num">12</td><td class="num">6</td><td class="num">57</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1266</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Procedure</td><td class="num">2</td><td>devin</td><td class="num">871,876</td><td class="num">24</td><td class="num">21</td><td class="num">116</td><td class="num">n/a</td><td class="ok">pass</td><td class="num">1284</td><td></td></tr></table></div>
+</main>

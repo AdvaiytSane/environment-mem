@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,3 +29,6 @@ for (const input of files(source).sort()) {
   writeFileSync(temporary, javascript);
   renameSync(temporary, output);
 }
+
+// Preserve the live console assets beside emitted modules.
+cpSync(join(source, 'ui'), join(destination, 'ui'), { recursive: true });

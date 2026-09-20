@@ -7,3 +7,7 @@ dist/
 results/*/work/
 !results/.keep
 *.log
+results/vault/.obsidian/workspace*.json
+.env
+results/live/*/
+results/populate/*/

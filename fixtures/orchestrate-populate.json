@@ -1,0 +1,282 @@
+{
+  "live": "results/populate",
+  "store": "results/populate/store.jsonl",
+  "repo": "fixtures/repo",
+  "model": "sonnet",
+  "tasks": [
+    "fixtures/tasks.json",
+    "fixtures/tasks-live.json"
+  ],
+  "waves": [
+    [
+      {
+        "lane": "devin-migration-1",
+        "agent": "devin",
+        "task": "migration-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "claude-auth-1",
+        "agent": "claude",
+        "task": "auth-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "devin-ops-1",
+        "agent": "devin",
+        "task": "ops-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "claude-refactor-1",
+        "agent": "claude",
+        "task": "refactor-1",
+        "inject": "0",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "claude-migration-2",
+        "agent": "claude",
+        "task": "migration-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-auth-2",
+        "agent": "devin",
+        "task": "auth-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-ops-2",
+        "agent": "claude",
+        "task": "ops-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-refactor-2",
+        "agent": "devin",
+        "task": "refactor-2",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "devin-migration-3",
+        "agent": "devin",
+        "task": "migration-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-auth-3",
+        "agent": "claude",
+        "task": "auth-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-ops-3",
+        "agent": "devin",
+        "task": "ops-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-refactor-3",
+        "agent": "claude",
+        "task": "refactor-3",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "claude-migration-4",
+        "agent": "claude",
+        "task": "migration-4",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-auth-4",
+        "agent": "devin",
+        "task": "auth-4",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-ops-4",
+        "agent": "claude",
+        "task": "ops-4",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-refactor-4",
+        "agent": "devin",
+        "task": "refactor-4",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "claude-migration-1b",
+        "agent": "claude",
+        "task": "migration-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-auth-1b",
+        "agent": "devin",
+        "task": "auth-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-ops-1b",
+        "agent": "claude",
+        "task": "ops-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-refactor-1b",
+        "agent": "devin",
+        "task": "refactor-1",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "devin-bugfix-1",
+        "agent": "devin",
+        "task": "bugfix-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "claude-endpoint-1",
+        "agent": "claude",
+        "task": "endpoint-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "devin-flag-1",
+        "agent": "devin",
+        "task": "flag-1",
+        "inject": "0",
+        "record": true
+      },
+      {
+        "lane": "claude-bugfix-2",
+        "agent": "claude",
+        "task": "bugfix-2",
+        "inject": "0",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "claude-bugfix-1b",
+        "agent": "claude",
+        "task": "bugfix-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-endpoint-1b",
+        "agent": "devin",
+        "task": "endpoint-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-flag-1b",
+        "agent": "claude",
+        "task": "flag-1",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-bugfix-2b",
+        "agent": "devin",
+        "task": "bugfix-2",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "claude-endpoint-2",
+        "agent": "claude",
+        "task": "endpoint-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-flag-2",
+        "agent": "devin",
+        "task": "flag-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-bugfix-3",
+        "agent": "claude",
+        "task": "bugfix-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-endpoint-3",
+        "agent": "devin",
+        "task": "endpoint-3",
+        "inject": "full",
+        "record": true
+      }
+    ],
+    [
+      {
+        "lane": "devin-endpoint-2b",
+        "agent": "devin",
+        "task": "endpoint-2",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-flag-3",
+        "agent": "claude",
+        "task": "flag-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "devin-bugfix-3b",
+        "agent": "devin",
+        "task": "bugfix-3",
+        "inject": "full",
+        "record": true
+      },
+      {
+        "lane": "claude-endpoint-3b",
+        "agent": "claude",
+        "task": "endpoint-3",
+        "inject": "full",
+        "record": true
+      }
+    ]
+  ]
+}

@@ -20,13 +20,26 @@ export function renderFacts(f: RepoFacts, cwd = process.cwd()): string {
   return lines.join('\n');
 }
 
+import { HARNESS_NAME } from './harness.ts';
+function harnessNote(s: Similar): string {
+  const known = s.harnesses.filter(h => h.name !== 'unknown');
+  if (!known.length) return '';
+  return `, recorded by ${known.map(h => `${HARNESS_NAME[h.name] ?? h.name} (${h.n})`).join(' and ')}`;
+}
+
 export function renderSimilar(s: Similar): string {
   const p = s.closest.procedure;
   const lines = [`<headstart kind="similar" repo="${p.repo}" matches="${s.n}">`,
-    `${s.n} earlier task${s.n === 1 ? '' : 's'} in this repository looked like this one. Counts are how many of them agree.`,
-    `Closest: "${p.title.slice(0, 90)}"${p.postconditions.length ? ' (verified)' : ''}`];
-  if (s.changed.length) lines.push(`Files changed: ${s.changed.map(c => `${c.name} (${c.n} of ${s.n})`).join(', ')}`);
-  if (s.readFirst.length) lines.push(`Read before changing: ${s.readFirst.map(c => c.name).join(', ')}`);
+    `${s.n} earlier task${s.n === 1 ? '' : 's'} in this repository looked like this one${harnessNote(s)}. Counts are how many of them agree.`,
+    `Closest: "${p.title.slice(0, 90)}"${p.postconditions.length ? ' (verified)' : ''}${p.harness ? `, recorded by ${HARNESS_NAME[p.harness] ?? p.harness}` : ''}`];
+  // A file only one of the matches touched is that task's own business;
+  // naming it sent agents on detours (audit-1: ten extra calls on one task).
+  // Files most matches changed are stated as a rule, the rest are left out.
+  const agreed = s.changed.filter(c => c.n >= Math.max(2, Math.ceil(s.n / 2)));
+  if (agreed.length) lines.push(`Every task like this changed: ${agreed.map(c => `${c.name}${c.n < s.n ? ` (${c.n} of ${s.n})` : ''}`).join(', ')}`);
+  else if (s.n === 1 && s.changed.length) lines.push(`It changed: ${s.changed.slice(0, 3).map(c => c.name).join(', ')}`);
+  const read = s.readFirst.filter(c => c.n >= 2 || s.n === 1).slice(0, 4);
+  if (read.length) lines.push(`Read before changing: ${read.map(c => c.name).join(', ')}`);
   if (s.verify.length) lines.push(`Verified with: ${s.verify[0].name}`);
   lines.push(`Calls spent finding this out last time: ${s.discovery}.`, 'Check anything that looks wrong against the code.', '</headstart>');
   return lines.join('\n');

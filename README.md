@@ -1,4 +1,6 @@
-# environment-mem
+# Memorable connections and DejaDo
+
+`headstart` is the CLI; `dejado` is its alias.
 
 Connect an agent to Memorable through two operations: **`store` and `recall`**. Developers choose where to capture work and where to use recalled context. Memorable performs its existing extraction and retrieval.
 
@@ -70,6 +72,21 @@ The small trace above illustrates the envelope only; it is not evidence of a cap
 
 `store()` runs `memorable ingest -`. A successful `command_completed` result means the CLI exited successfully; it does **not** promise durable remote storage, extraction admission, or index readiness. `recall({ query })` runs CLI recall and returns its text; `recall({ procedureId })` runs `show`. It does **not** return the original full trace. No undocumented JSON output is assumed.
 
+## See it run
+
+From this repo, three terminals. Every line is a real agent session in a fresh copy of `fixtures/repo` with the hooks on.
+
+```
+headstart console --live                                             # http://localhost:4177, one lane per run
+headstart demo --agent devin --task bugfix-1                          # before and after, one command
+headstart run --agent devin  --lane devin-cold  --task bugfix-1 --inject 0   # cold: nothing handed
+headstart run --agent claude --lane claude-warm --task bugfix-1              # warm: handed what the cold run stored
+headstart orchestrate --fresh                                        # six agents in three waves, hand-offs across Devin and Claude
+```
+
+`docs/DEMO.md` has the script and the measured numbers. `docs/ARCHITECTURE.png` is the picture.
+
+
 ## Connect hooks
 
 Run these commands from the agent's project, using this checkout's executable:
@@ -86,6 +103,8 @@ The installer pins the absolute Node executable and CLI path, preserves unrelate
 The adapter's lifecycle is: prompt starts a run and recalls a candidate listing → completed tool events are captured → task stop submits that run. It forwards the captured calls rather than the local extracted procedure and hashes session/run IDs into stable CLI-safe identities. Missing tool outcomes remain unknown. The listing is injected as reference data; use `headstart recall --procedure <slug>` to read a full rendered procedure. It is still not the original trace.
 
 Failed submissions remain in the local outbox. `headstart connection` reports pending submissions; `headstart sync` explicitly retries them. A completed CLI command may itself have queued work, so an empty local outbox is not a durable-storage guarantee. A timeout can occur after the upstream operation has taken effect.
+
+The local DejaDo demo procedures live in `.headstart/procedures.jsonl`. On that separate local path, with `HEADSTART_API_URL` and `HEADSTART_API_KEY` set, every finished session is also posted to `POST /v1/extract` (tool calls, cost, what it was handed) and the enterprise dashboard reads those rows.
 
 For a custom agent, call the SDK from your own lifecycle directly. You do not need the hook installer, a dashboard, or a pasted sample trace.
 

@@ -1,0 +1,97 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>headstart</title>
+<style>
+:root{--bg:#f6f5f1;--ink:#1c1b18;--mute:#6b6862;--line:#d9d6cd;--panel:#fff;--accent:#8a4b1f;--ok:#2f6b3a;--bad:#9c2b2b;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#141412;--ink:#ebe8e0;--mute:#9a968c;--line:#2e2d29;--panel:#1c1b18;--accent:#d69a6a;--ok:#7fbf8a;--bad:#e07b7b}}
+body{margin:0;padding:32px 20px 80px;background:var(--bg);color:var(--ink);font:15px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+main{max-width:1100px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px;font-weight:600}.sub{color:var(--mute);margin:0 0 32px}
+h2{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:36px 0 12px;font-weight:500}
+.row{display:grid;grid-template-columns:160px 1fr 180px;gap:12px;align-items:center;margin:6px 0}
+.lab .n{color:var(--mute);margin-left:8px;font-size:12px}
+.track{height:18px;background:var(--panel);border:1px solid var(--line)}.bar{height:100%;background:var(--accent);opacity:.85}.bar.base{opacity:.35}
+.val{font-variant-numeric:tabular-nums}.d{color:var(--mute);margin-left:8px;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);font-weight:500}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}.sd{color:var(--mute);font-size:11px;margin-left:6px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.wrap{overflow-x:auto}
+</style>
+<main>
+<h1>headstart</h1>
+<p class="sub">54 runs, claude sonnet. Cold is the baseline. Mean ± standard deviation over runs without errors.</p>
+<h2>Context tokens per session</h2>
+<div class="row"><div class="lab">Cold<span class="n">n=18</span></div>
+      <div class="track"><div class="bar base" style="width:100%"></div></div>
+      <div class="val">1,009,927<span class="d"></span></div></div>
+<div class="row"><div class="lab">Hand-written doc<span class="n">n=18</span></div>
+      <div class="track"><div class="bar" style="width:70%"></div></div>
+      <div class="val">702,535<span class="d">-30%</span></div></div>
+<div class="row"><div class="lab">Procedure<span class="n">n=18</span></div>
+      <div class="track"><div class="bar" style="width:75%"></div></div>
+      <div class="val">758,606<span class="d">-25%</span></div></div>
+<h2>Per session</h2>
+<div class="wrap"><table><tr><th>metric</th><th class="num">Cold</th><th class="num">Hand-written doc</th><th class="num">Procedure</th></tr><tr><td>context tokens</td><td class="num">1,009,927<span class="sd">± 241,110</span></td><td class="num">702,535<span class="sd">± 165,888</span><span class="d">-30%</span></td><td class="num">758,606<span class="sd">± 227,132</span><span class="d">-25%</span></td></tr>
+<tr><td>tool calls</td><td class="num">18<span class="sd">± 4</span></td><td class="num">13<span class="sd">± 3</span><span class="d">-31%</span></td><td class="num">15<span class="sd">± 5</span><span class="d">-18%</span></td></tr>
+<tr><td>calls before first edit</td><td class="num">10<span class="sd">± 5</span></td><td class="num">7<span class="sd">± 4</span><span class="d">-24%</span></td><td class="num">9<span class="sd">± 3</span><span class="d">-4%</span></td></tr>
+<tr><td>seconds</td><td class="num">75<span class="sd">± 27</span></td><td class="num">48<span class="sd">± 19</span><span class="d">-36%</span></td><td class="num">59<span class="sd">± 24</span><span class="d">-21%</span></td></tr>
+<tr><td>cost</td><td class="num">$0.423<span class="sd">± 0.079</span></td><td class="num">$0.338<span class="sd">± 0.054</span><span class="d">-20%</span></td><td class="num">$0.366<span class="sd">± 0.066</span><span class="d">-13%</span></td></tr><tr><td>tests pass</td><td class="num">100%</td><td class="num">100%</td><td class="num">100%</td></tr></table></div>
+<h2>Fleet of 9,000 sessions, projected from the mean delta</h2>
+<div class="wrap"><table><tr><th>arm</th><th class="num">context tokens saved</th><th class="num">minutes saved</th><th class="num">ACU saved</th><th class="num">cost saved</th></tr><tr><td>Hand-written doc</td><td class="num">2,766,531,500</td><td class="num">4,042</td><td class="num">269</td><td class="num">$761</td></tr>
+<tr><td>Procedure</td><td class="num">2,261,894,000</td><td class="num">2,350</td><td class="num">157</td><td class="num">$513</td></tr></table></div>
+<h2>Runs</h2>
+<div class="wrap"><table><tr><th>task</th><th>arm</th><th class="num">#</th><th>runner</th><th class="num">ctx tok</th><th class="num">tools</th><th class="num">before edit</th><th class="num">s</th><th class="num">$</th><th>check</th><th class="num">injected</th><th></th></tr><tr><td>flag-2</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">692,621</td><td class="num">17</td><td class="num">9</td><td class="num">38</td><td class="num">$0.333</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">774,988</td><td class="num">14</td><td class="num">6</td><td class="num">50</td><td class="num">$0.329</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">1,139,818</td><td class="num">19</td><td class="num">9</td><td class="num">53</td><td class="num">$0.433</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">769,836</td><td class="num">25</td><td class="num">17</td><td class="num">71</td><td class="num">$0.385</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">1,301,804</td><td class="num">24</td><td class="num">9</td><td class="num">75</td><td class="num">$0.530</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">879,867</td><td class="num">14</td><td class="num">4</td><td class="num">78</td><td class="num">$0.383</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">830,337</td><td class="num">14</td><td class="num">7</td><td class="num">49</td><td class="num">$0.344</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">931,225</td><td class="num">16</td><td class="num">12</td><td class="num">82</td><td class="num">$0.411</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Cold</td><td class="num">1</td><td>claude</td><td class="num">1,388,039</td><td class="num">24</td><td class="num">22</td><td class="num">126</td><td class="num">$0.570</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">796,291</td><td class="num">13</td><td class="num">4</td><td class="num">59</td><td class="num">$0.347</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">908,679</td><td class="num">15</td><td class="num">6</td><td class="num">66</td><td class="num">$0.371</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">1,314,042</td><td class="num">21</td><td class="num">12</td><td class="num">95</td><td class="num">$0.481</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">915,074</td><td class="num">17</td><td class="num">7</td><td class="num">66</td><td class="num">$0.380</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">1,127,279</td><td class="num">18</td><td class="num">6</td><td class="num">95</td><td class="num">$0.452</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">914,169</td><td class="num">16</td><td class="num">6</td><td class="num">46</td><td class="num">$0.384</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">955,758</td><td class="num">20</td><td class="num">9</td><td class="num">89</td><td class="num">$0.459</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">989,768</td><td class="num">14</td><td class="num">10</td><td class="num">74</td><td class="num">$0.418</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Cold</td><td class="num">2</td><td>claude</td><td class="num">1,549,099</td><td class="num">26</td><td class="num">18</td><td class="num">140</td><td class="num">$0.596</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">608,500</td><td class="num">12</td><td class="num">7</td><td class="num">38</td><td class="num">$0.304</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">657,644</td><td class="num">13</td><td class="num">5</td><td class="num">47</td><td class="num">$0.301</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">611,487</td><td class="num">12</td><td class="num">8</td><td class="num">58</td><td class="num">$0.309</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">679,338</td><td class="num">12</td><td class="num">4</td><td class="num">41</td><td class="num">$0.322</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">605,818</td><td class="num">16</td><td class="num">11</td><td class="num">66</td><td class="num">$0.348</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">789,472</td><td class="num">13</td><td class="num">4</td><td class="num">62</td><td class="num">$0.348</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">757,498</td><td class="num">12</td><td class="num">7</td><td class="num">47</td><td class="num">$0.345</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">433,716</td><td class="num">7</td><td class="num">2</td><td class="num">20</td><td class="num">$0.242</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">840,700</td><td class="num">13</td><td class="num">5</td><td class="num">49</td><td class="num">$0.364</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Hand-written doc</td><td class="num">1</td><td>claude</td><td class="num">921,259</td><td class="num">17</td><td class="num">15</td><td class="num">59</td><td class="num">$0.398</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-2</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">662,374</td><td class="num">11</td><td class="num">7</td><td class="num">38</td><td class="num">$0.312</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">634,665</td><td class="num">11</td><td class="num">4</td><td class="num">30</td><td class="num">$0.336</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">603,834</td><td class="num">11</td><td class="num">6</td><td class="num">35</td><td class="num">$0.298</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">579,948</td><td class="num">11</td><td class="num">6</td><td class="num">37</td><td class="num">$0.345</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">767,055</td><td class="num">12</td><td class="num">7</td><td class="num">39</td><td class="num">$0.331</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">659,470</td><td class="num">15</td><td class="num">8</td><td class="num">69</td><td class="num">$0.360</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">633,142</td><td class="num">9</td><td class="num">7</td><td class="num">32</td><td class="num">$0.315</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-1</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">387,284</td><td class="num">9</td><td class="num">7</td><td class="num">32</td><td class="num">$0.255</td><td class="ok">pass</td><td class="num">1210</td><td></td></tr>
+<tr><td>flag-2</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">462,668</td><td class="num">10</td><td class="num">7</td><td class="num">32</td><td class="num">$0.284</td><td class="ok">pass</td><td class="num">1179</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Hand-written doc</td><td class="num">2</td><td>claude</td><td class="num">1,199,711</td><td class="num">20</td><td class="num">18</td><td class="num">100</td><td class="num">$0.508</td><td class="ok">pass</td><td class="num">0</td><td></td></tr>
+<tr><td>flag-3</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">812,684</td><td class="num">19</td><td class="num">13</td><td class="num">74</td><td class="num">$0.384</td><td class="ok">pass</td><td class="num">1191</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">892,164</td><td class="num">18</td><td class="num">7</td><td class="num">63</td><td class="num">$0.382</td><td class="ok">pass</td><td class="num">1247</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">705,180</td><td class="num">14</td><td class="num">7</td><td class="num">45</td><td class="num">$0.361</td><td class="ok">pass</td><td class="num">1198</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">1,282,241</td><td class="num">26</td><td class="num">11</td><td class="num">77</td><td class="num">$0.529</td><td class="ok">pass</td><td class="num">1168</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">867,601</td><td class="num">15</td><td class="num">13</td><td class="num">61</td><td class="num">$0.379</td><td class="ok">pass</td><td class="num">1268</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">918,143</td><td class="num">14</td><td class="num">9</td><td class="num">49</td><td class="num">$0.387</td><td class="ok">pass</td><td class="num">1195</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Procedure</td><td class="num">1</td><td>claude</td><td class="num">723,584</td><td class="num">11</td><td class="num">7</td><td class="num">60</td><td class="num">$0.360</td><td class="ok">pass</td><td class="num">1204</td><td></td></tr>
+<tr><td>flag-1</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">696,189</td><td class="num">15</td><td class="num">11</td><td class="num">56</td><td class="num">$0.349</td><td class="ok">pass</td><td class="num">1210</td><td></td></tr>
+<tr><td>flag-2</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">559,797</td><td class="num">10</td><td class="num">7</td><td class="num">40</td><td class="num">$0.291</td><td class="ok">pass</td><td class="num">1179</td><td></td></tr>
+<tr><td>flag-3</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">631,607</td><td class="num">14</td><td class="num">11</td><td class="num">45</td><td class="num">$0.334</td><td class="ok">pass</td><td class="num">1191</td><td></td></tr>
+<tr><td>endpoint-1</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">533,206</td><td class="num">16</td><td class="num">8</td><td class="num">40</td><td class="num">$0.313</td><td class="ok">pass</td><td class="num">1247</td><td></td></tr>
+<tr><td>endpoint-2</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">726,662</td><td class="num">17</td><td class="num">9</td><td class="num">44</td><td class="num">$0.356</td><td class="ok">pass</td><td class="num">1168</td><td></td></tr>
+<tr><td>endpoint-3</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">795,681</td><td class="num">19</td><td class="num">8</td><td class="num">82</td><td class="num">$0.405</td><td class="ok">pass</td><td class="num">1198</td><td></td></tr>
+<tr><td>bugfix-1</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">1,032,138</td><td class="num">14</td><td class="num">11</td><td class="num">106</td><td class="num">$0.435</td><td class="ok">pass</td><td class="num">1268</td><td></td></tr>
+<tr><td>bugfix-3</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">567,597</td><td class="num">7</td><td class="num">3</td><td class="num">48</td><td class="num">$0.316</td><td class="ok">pass</td><td class="num">1204</td><td></td></tr>
+<tr><td>bugfix-2</td><td>Procedure</td><td class="num">2</td><td>claude</td><td class="num">1,060,480</td><td class="num">19</td><td class="num">17</td><td class="num">116</td><td class="num">$0.461</td><td class="ok">pass</td><td class="num">1195</td><td></td></tr></table></div>
+</main>

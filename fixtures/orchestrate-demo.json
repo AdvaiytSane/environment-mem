@@ -1,0 +1,20 @@
+{
+  "live": "results/live",
+  "store": "results/live/store.jsonl",
+  "repo": "fixtures/repo",
+  "model": "sonnet",
+  "waves": [
+    [
+      { "lane": "devin-1", "agent": "devin", "task": "bugfix-1", "inject": "0", "record": true },
+      { "lane": "claude-1", "agent": "claude", "task": "endpoint-1", "inject": "0", "record": true }
+    ],
+    [
+      { "lane": "claude-2", "agent": "claude", "task": "bugfix-1", "inject": "full", "record": true },
+      { "lane": "devin-2", "agent": "devin", "task": "endpoint-1", "inject": "full", "record": true }
+    ],
+    [
+      { "lane": "devin-3", "agent": "devin", "task": "bugfix-2", "inject": "full", "record": true },
+      { "lane": "claude-3", "agent": "claude", "task": "endpoint-2", "inject": "full", "record": true }
+    ]
+  ]
+}

@@ -41,4 +41,4 @@ Discovery calls are the part of a trace that repeats, and a recording of them he
 
 ## Prior work, disclosed
 
-Everything in the headstart repo was written during HackMIT 2026. Devin CLI, Claude Code and Codex are the harnesses under test. memorable-cli (public npm, EULA) is an optional backend behind `HEADSTART_BACKEND=memorable`, off by default, built by this team before the event.
+Everything in the headstart repo was written during HackMIT 2026. Devin CLI, Claude Code and Codex are the harnesses under test.

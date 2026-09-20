@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Coding-agent capture and a two-operation connection to Memorable's existing CLI.",
   "type": "module",
-  "bin": { "headstart": "./bin/headstart" },
+  "bin": { "headstart": "./bin/headstart", "dejado": "./bin/headstart" },
   "types": "./src/sdk/index.ts",
   "exports": {
     ".": { "types": "./src/sdk/index.ts", "default": "./dist/sdk/index.js" },

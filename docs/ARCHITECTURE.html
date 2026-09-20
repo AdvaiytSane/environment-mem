@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>headstart architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --surface:#111113;
+    --text:#ffffff; --muted:#a1a1a1; --dim:#666666;
+    --line: rgba(255,255,255,.06);
+    --mint:#3ddc97; --sky:#38bdf8; --lav:#b7a6ff; --warm:#e07a4a;
+    --gray:#8a8a8d;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{
+    font-family:'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    overflow-wrap:break-word;
+  }
+  .muted{color:var(--muted);}
+  .dim{color:var(--dim);}
+  .t-mint{color:var(--mint);}
+  .t-sky{color:var(--sky);}
+  .t-lav{color:var(--lav);}
+  .t-warm{color:var(--warm);}
+
+  .page{width:1440px;margin:0 auto;padding:28px 0 44px;background:var(--bg);}
+
+  /* ---------- header ---------- */
+  .page-header{padding:0 32px 18px;border-bottom:1px solid var(--line);}
+  .title-row{display:flex;align-items:baseline;gap:14px;margin-bottom:12px;}
+  .title{font-size:22px;font-weight:600;letter-spacing:-0.01em;}
+  .tagline{font-size:13px;color:var(--muted);}
+  .legend{display:flex;gap:26px;align-items:center;flex-wrap:wrap;}
+  .legend-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px;}
+  .chip{width:9px;height:9px;border-radius:2px;display:inline-block;}
+  .chip.mint{background:var(--mint);}
+  .chip.sky{background:var(--sky);}
+  .chip.lav{background:var(--lav);}
+  .chip.warm{background:var(--warm);}
+
+  /* ---------- diagram canvases ---------- */
+  .canvas{position:relative;width:1440px;}
+  .canvas svg{position:absolute;top:0;left:0;width:1440px;height:100%;pointer-events:none;}
+
+  .col-label{
+    position:absolute;top:38px;font-size:10.5px;font-family:'Geist Mono', monospace;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--dim);
+  }
+
+  .box{
+    position:absolute;background:var(--surface);border:1px solid var(--line);
+    border-radius:4px;padding:10px 12px;overflow:hidden;
+  }
+  .box-plain{position:absolute;padding:0;}
+  .tag{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:5px;}
+
+  /* ---------- timeline ---------- */
+  .tl-label{
+    position:absolute;font-size:10.5px;font-family:'Geist Mono', monospace;font-weight:600;
+    text-transform:uppercase;letter-spacing:.08em;
+  }
+  .node{
+    position:absolute;background:var(--surface);border:1px solid var(--line);border-radius:4px;
+    padding:9px 10px;display:flex;flex-direction:column;justify-content:center;
+  }
+  .node .t{font-size:10px;font-family:'Geist Mono', monospace;margin-bottom:4px;}
+  .node .d{font-size:10px;color:var(--muted);line-height:1.35;}
+
+  /* ---------- caption ---------- */
+  .caption{padding:20px 32px 0;border-top:1px solid var(--line);margin-top:8px;}
+  .caption p{margin:0 0 6px;font-size:12.5px;line-height:1.55;color:var(--muted);}
+  .caption p:last-child{margin-bottom:0;}
+  .caption b{color:var(--text);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-header">
+    <div class="title-row">
+      <span class="mono title">headstart</span>
+      <span class="tagline">procedural memory for coding agents · architecture</span>
+    </div>
+    <div class="legend">
+      <span class="legend-item"><i class="chip mint"></i>mint · injected / handed to the agent</span>
+      <span class="legend-item"><i class="chip sky"></i>sky · commands and the API</span>
+      <span class="legend-item"><i class="chip lav"></i>lavender · files and stored procedures</span>
+      <span class="legend-item"><i class="chip warm"></i>warm · the cold path only</span>
+    </div>
+  </header>
+
+  <!-- ============================================================ MAIN DIAGRAM ============================================================ -->
+  <div class="canvas" id="main-canvas" style="height:536px;">
+
+    <div class="col-label" style="left:32px;">AGENTS</div>
+    <div class="col-label" style="left:314px;">HOOK</div>
+    <div class="col-label" style="left:596px;">EXTRACT · deterministic</div>
+    <div class="col-label" style="left:878px;">RECALL · deterministic</div>
+    <div class="col-label" style="left:1160px;">OUTPUTS</div>
+
+    <!-- column 1: AGENTS -->
+    <div class="box" style="left:32px; top:62px; width:250px; height:38px; display:flex; align-items:center; font-size:12.5px;">Devin CLI</div>
+    <div class="box" style="left:32px; top:108px; width:250px; height:38px; display:flex; align-items:center; font-size:12.5px;">Claude Code</div>
+    <div class="box" style="left:32px; top:154px; width:250px; height:38px; display:flex; align-items:center; font-size:12.5px;">Codex</div>
+
+    <div class="box-plain" style="left:32px; top:204px; width:250px; height:54px;">
+      <span class="dim" style="font-size:9px;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;">fires</span>
+      <span class="mono t-sky" style="font-size:11px;line-height:1.55;">SessionStart, UserPromptSubmit,<br>PostToolUse, Stop</span>
+    </div>
+
+    <div class="box" style="left:32px; top:268px; width:250px; height:120px; font-size:11px; color:var(--muted);">
+      <p style="margin:0 0 8px 0;line-height:1.6;">Devin CLI reads the project&rsquo;s <span class="mono t-lav">.claude/settings.json</span>.</p>
+      <p style="margin:0;line-height:1.6;"><span class="mono t-lav">install --all</span> also writes <span class="mono t-lav">~/.config/devin/config.json</span> and <span class="mono t-lav">~/.codex/hooks.json</span>.</p>
+    </div>
+
+    <!-- column 2: HOOK -->
+    <div class="box" style="left:314px; top:62px; width:250px; height:76px;">
+      <span class="mono t-sky" style="font-size:13px;font-weight:600;">headstart hook &lt;Event&gt;</span>
+      <div class="muted" style="font-size:10px;margin-top:6px;line-height:1.4;">one process per event &middot; stdin JSON in, JSON out</div>
+    </div>
+
+    <div class="box" style="left:314px; top:150px; width:250px; height:54px;">
+      <span class="tag">trace</span>
+      <span class="mono t-lav" style="font-size:11px;">.headstart/sessions/&lt;id&gt;.jsonl</span>
+    </div>
+
+    <div class="box" style="left:314px; top:216px; width:250px; height:84px;">
+      <span class="tag">injection · back into the agent</span>
+      <span class="mono t-mint" style="font-size:9.5px;">hookSpecificOutput.additionalContext</span>
+      <div class="muted" style="font-size:10px;margin-top:6px;line-height:1.4;">repo facts on SessionStart &middot; closest procedures on UserPromptSubmit</div>
+    </div>
+
+    <div class="box" style="left:314px; top:312px; width:250px; height:36px; display:flex; align-items:center; font-size:11px;">
+      on Stop &rarr; extraction
+    </div>
+
+    <!-- column 3: EXTRACT -->
+    <div class="box" style="left:596px; top:62px; width:250px; height:176px;">
+      <div class="muted" style="font-size:11px;">trace &rarr; procedure</div>
+      <div class="mono t-lav" style="font-size:10.5px;line-height:1.65;margin-top:8px;">
+        {&nbsp;title,<br>
+        &nbsp;&nbsp;steps: read | search |<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;write | execute,<br>
+        &nbsp;&nbsp;preconditions,<br>
+        &nbsp;&nbsp;postconditions,<br>
+        &nbsp;&nbsp;files, commands,<br>
+        &nbsp;&nbsp;discovery_calls&nbsp;}
+      </div>
+    </div>
+
+    <div class="box" style="left:596px; top:250px; width:250px; height:60px;">
+      <span class="mono t-lav" style="font-size:11px;">.headstart/procedures.jsonl</span>
+      <div class="dim" style="font-size:9px;margin-top:7px;">local, default</div>
+    </div>
+
+    <div class="box" style="left:596px; top:322px; width:250px; height:84px;">
+      <span class="mono t-sky" style="font-size:11px;">POST /v1/extract</span>
+      <div class="muted" style="font-size:9.5px;margin-top:6px;line-height:1.45;"><span class="mono t-sky">HEADSTART_API_URL</span> + <span class="mono t-sky">HEADSTART_API_KEY</span> set · Postgres behind an API</div>
+    </div>
+
+    <!-- column 4: RECALL -->
+    <div class="box" style="left:878px; top:62px; width:250px; height:176px;">
+      <div class="muted" style="font-size:11px;line-height:1.5;">lexical match + normalised compression distance (gzip) over step text</div>
+      <div class="muted" style="font-size:10px;margin-top:14px;line-height:1.5;">average-linkage dendrogram cut at <span class="mono">0.50</span> = community, <span class="mono">0.62</span> = shape</div>
+    </div>
+
+    <div class="box" style="left:878px; top:250px; width:250px; height:60px;">
+      <span class="mono t-lav" style="font-size:11px;">.headstart/procedures.jsonl</span>
+      <div class="dim" style="font-size:9px;margin-top:7px;">local, default</div>
+    </div>
+
+    <div class="box" style="left:878px; top:322px; width:250px; height:84px;">
+      <span class="mono t-sky" style="font-size:11px;">POST /v1/recall</span>
+      <div class="muted" style="font-size:9.5px;margin-top:6px;line-height:1.45;"><span class="mono t-sky">HEADSTART_API_URL</span> + <span class="mono t-sky">HEADSTART_API_KEY</span> set · Postgres behind an API</div>
+    </div>
+
+    <div class="box" style="left:878px; top:418px; width:250px; height:78px;">
+      <span class="mono t-mint" style="font-size:9.5px;">hookSpecificOutput.additionalContext</span>
+      <div class="muted" style="font-size:10px;margin-top:6px;line-height:1.45;">agreement floor: only files most similar sessions changed are named</div>
+    </div>
+
+    <!-- column 5: OUTPUTS -->
+    <div class="box" style="left:1160px; top:62px; width:250px; height:78px;">
+      <span class="mono t-sky" style="font-size:11px;">headstart console --live</span>
+      <div class="muted" style="font-size:10px;margin-top:6px;line-height:1.4;">one lane per run &middot; graph &middot; distance matrix &middot; hand-off receipts</div>
+    </div>
+
+    <div class="box" style="left:1160px; top:152px; width:250px; height:72px;">
+      <span style="font-size:11px;">SKILL.md export</span>
+      <div class="mono t-lav" style="font-size:9.5px;margin-top:6px;line-height:1.5;">.agents/skills (Devin Cloud)<br>.claude/skills (Claude Code)</div>
+    </div>
+
+    <div class="box" style="left:1160px; top:236px; width:250px; height:70px;">
+      <span class="mono t-lav" style="font-size:10.5px;">headstart obsidian --out &lt;dir&gt;</span>
+      <div class="muted" style="font-size:9.5px;margin-top:6px;line-height:1.4;">graphify-shaped vault: session + file notes, canvas</div>
+    </div>
+
+    <div class="box" style="left:1160px; top:318px; width:250px; height:76px;">
+      <span style="font-size:11px;">enterprise dashboard</span>
+      <div class="muted" style="font-size:10px;margin-top:6px;line-height:1.4;">reads the same Postgres: overview, procedures, agents, savings, evals</div>
+    </div>
+
+    <svg viewBox="0 0 1440 536" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah-gray" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#8a8a8d"/></marker>
+        <marker id="ah-sky" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#38bdf8"/></marker>
+        <marker id="ah-mint" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#3ddc97"/></marker>
+        <marker id="ah-lav" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#b7a6ff"/></marker>
+      </defs>
+
+      <!-- agents converge -> hook (comb: bus + stubs + one arrow) -->
+      <path d="M300,81 L300,173" stroke="#8a8a8d" stroke-width="1" fill="none"/>
+      <path d="M282,81 L300,81" stroke="#8a8a8d" stroke-width="1" fill="none"/>
+      <path d="M282,127 L300,127" stroke="#8a8a8d" stroke-width="1" fill="none"/>
+      <path d="M282,173 L300,173" stroke="#8a8a8d" stroke-width="1" fill="none"/>
+      <path d="M300,127 L312,101" stroke="#38bdf8" stroke-width="1" fill="none" marker-end="url(#ah-sky)"/>
+
+      <!-- hook internal chain -->
+      <path d="M439,138 L439,148" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M439,204 L439,214" stroke="#3ddc97" stroke-width="1" fill="none" marker-end="url(#ah-mint)"/>
+      <path d="M439,300 L439,310" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#ah-gray)"/>
+
+      <!-- hook -> extract -->
+      <path d="M564,330 L594,150" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#ah-gray)"/>
+      <rect x="558" y="234" width="38" height="14" fill="#0a0a0b"/>
+      <text x="577" y="244" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10" fill="#a1a1a1">Stop</text>
+
+      <!-- extract main -> local -> remote -->
+      <path d="M721,238 L721,248" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M721,310 L721,320" stroke="#38bdf8" stroke-width="1" fill="none" marker-end="url(#ah-sky)"/>
+
+      <!-- shared store: extract -> recall -->
+      <path d="M846,280 L876,280" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+
+      <!-- recall main -> local -> remote -> output -->
+      <path d="M1003,238 L1003,248" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M1003,310 L1003,320" stroke="#38bdf8" stroke-width="1" fill="none" marker-end="url(#ah-sky)"/>
+      <path d="M1003,406 L1003,416" stroke="#3ddc97" stroke-width="1" fill="none" marker-end="url(#ah-mint)"/>
+
+      <!-- recall -> outputs -->
+      <path d="M1128,150 L1158,101" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M1128,280 L1158,188" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M1128,280 L1158,271" stroke="#b7a6ff" stroke-width="1" fill="none" marker-end="url(#ah-lav)"/>
+      <path d="M1128,378 L1158,382" stroke="#38bdf8" stroke-width="1" fill="none" marker-end="url(#ah-sky)"/>
+      <rect x="1118" y="373" width="56" height="14" fill="#0a0a0b"/>
+      <text x="1146" y="383" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10" fill="#38bdf8">Postgres</text>
+
+      <!-- the loop: recall output -> back into the agent -->
+      <path d="M878,457 L864,457 L864,18 L157,18 L157,60" stroke="#3ddc97" stroke-width="1" fill="none" marker-end="url(#ah-mint)"/>
+      <rect x="376" y="9" width="240" height="16" fill="#0a0a0b"/>
+      <text x="496" y="21" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10" fill="#3ddc97">hookSpecificOutput.additionalContext</text>
+    </svg>
+  </div>
+
+  <!-- ============================================================ TIMELINE ============================================================ -->
+  <div class="canvas" id="timeline-canvas" style="height:240px; margin-top:26px; border-top:1px solid var(--line); padding-top:20px;">
+    <div class="col-label" style="left:32px; top:0px;">one run, in time</div>
+
+    <div class="tl-label t-mint" style="left:32px; top:44px; height:62px; display:flex; align-items:center;">warm</div>
+    <div class="tl-label t-warm" style="left:32px; top:140px; height:62px; display:flex; align-items:center;">cold</div>
+
+    <!-- warm row nodes -->
+    <div class="node" style="left:115px; top:44px; width:150px; height:62px;">
+      <span class="t t-mint">t0 &middot; SessionStart</span>
+      <span class="d">inject facts</span>
+    </div>
+    <div class="node" style="left:405px; top:44px; width:150px; height:62px;">
+      <span class="t t-mint">t1 &middot; prompt</span>
+      <span class="d">recall, handed procedure</span>
+    </div>
+    <div class="node" style="left:695px; top:44px; width:150px; height:62px;">
+      <span class="t">t2&hellip;tn</span>
+      <span class="d">tool calls traced</span>
+    </div>
+    <div class="node" style="left:985px; top:44px; width:150px; height:62px;">
+      <span class="t">stop</span>
+      <span class="d">extract, store</span>
+    </div>
+    <div class="node" style="left:1275px; top:44px; width:150px; height:62px;">
+      <span class="t t-mint">next session</span>
+      <span class="d">recalls it</span>
+    </div>
+
+    <!-- cold row nodes -->
+    <div class="node" style="left:115px; top:140px; width:150px; height:62px;">
+      <span class="t t-warm">t0 &middot; SessionStart</span>
+      <span class="d">no injection</span>
+    </div>
+    <div class="node" style="left:405px; top:140px; width:150px; height:62px;">
+      <span class="t t-warm">t1 &middot; prompt</span>
+      <span class="d">no recall</span>
+    </div>
+    <div class="node" style="left:695px; top:140px; width:150px; height:62px;">
+      <span class="t t-warm">t2&hellip;tn</span>
+      <span class="d">more tool calls</span>
+    </div>
+    <div class="node" style="left:985px; top:140px; width:150px; height:62px;">
+      <span class="t">stop</span>
+      <span class="d">extract, store</span>
+    </div>
+    <div class="node" style="left:1275px; top:140px; width:150px; height:62px;">
+      <span class="t">next session</span>
+      <span class="d">recalls it</span>
+    </div>
+
+    <svg viewBox="0 0 1440 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="tah-gray" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#8a8a8d"/></marker>
+        <marker id="tah-mint" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#3ddc97"/></marker>
+        <marker id="tah-warm" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="#e07a4a"/></marker>
+      </defs>
+
+      <line x1="32" y1="128" x2="1408" y2="128" stroke="#ffffff" stroke-opacity=".06" stroke-width="1"/>
+
+      <!-- warm chain -->
+      <path d="M265,75 L403,75" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#tah-gray)"/>
+      <path d="M555,75 L693,75" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#tah-gray)"/>
+      <path d="M845,75 L983,75" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#tah-gray)"/>
+      <path d="M1135,75 L1273,75" stroke="#3ddc97" stroke-width="1" fill="none" marker-end="url(#tah-mint)"/>
+      <!-- loop back -->
+      <path d="M1350,106 L1350,124 L190,124 L190,106" stroke="#3ddc97" stroke-width="1" fill="none" marker-end="url(#tah-mint)"/>
+
+      <!-- cold chain -->
+      <path d="M265,171 L403,171" stroke="#e07a4a" stroke-width="1" fill="none" marker-end="url(#tah-warm)"/>
+      <path d="M555,171 L693,171" stroke="#e07a4a" stroke-width="1" fill="none" marker-end="url(#tah-warm)"/>
+      <path d="M845,171 L983,171" stroke="#e07a4a" stroke-width="1" fill="none" marker-end="url(#tah-warm)"/>
+      <path d="M1135,171 L1273,171" stroke="#8a8a8d" stroke-width="1" fill="none" marker-end="url(#tah-gray)"/>
+    </svg>
+  </div>
+
+  <footer class="caption">
+    <p><b>Deterministic:</b> extract · trace to procedure, no model call. recall · lexical match plus gzip compression distance, no model call.</p>
+    <p><b>Not deterministic:</b> the agent · what it reads, runs, and decides to write each session.</p>
+  </footer>
+
+</div>
+</body>
+</html>

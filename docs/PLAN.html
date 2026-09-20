@@ -44,7 +44,6 @@ hr{border:0;border-top:1px solid var(--line);margin:40px 0}
 <ul>
 <li class="ok">headstart CLI built and tested: hooks, deterministic extract, recall, injection, <code>skills</code>, <code>install</code>, eval with four arms, report, console page. Repo <code>~/Documents/GitHub/headstart</code>, uncommitted.</li>
 <li class="ok">Three eval rounds done: 162 Claude Code runs, 72 Devin CLI runs. Numbers below. Two hostile critiques in <code>docs/critique-1.md</code> and <code>docs/critique-2.md</code>, both acted on.</li>
-<li class="ok">Memorable side built locally, not pushed: <code>memorable hook devin</code>, <code>install-hooks devin</code>, <code>skills</code>, <code>devin verify</code>, a Devin section on <code>/start/agents.md</code>, and <code>docs/DEVIN-INTEGRATION.md</code> answering Advaiyt's six capabilities. 270 CLI tests pass. Dev build installed as the durable CLI on this machine.</li>
 <li class="warn">Devin free weekly quota is exhausted (the eval used it). Live <code>devin verify</code> waits on on-demand usage or booth credits. The same path ran end to end against a fake Devin that replays the real hook payloads.</li>
 </ul>
 
@@ -98,7 +97,7 @@ headstart recall "add a flag"  # the procedure a prompt would receive
 headstart skills               # .agents/skills/*/SKILL.md (Devin, Warp, Codex) and .claude/skills/*/SKILL.md
 headstart eval --runner claude --repeats 2
 headstart report results/&lt;dir&gt;  # table, fleet projection, console.html</code></pre>
-<p>Store is pluggable. Default is a local JSONL file written this weekend. A second adapter shells out to <code>memorable ingest</code> and <code>memorable recall</code>, disclosed as a pre-event dependency, off by default.</p>
+<p>Store is a local JSONL file written this weekend.</p>
 
 <h2>Eval design</h2>
 <ul>
@@ -125,11 +124,7 @@ headstart report results/&lt;dir&gt;  # table, fleet projection, console.html</c
 <p>Three booth questions for Cognition are in <code>docs/critique-1.md</code>, section 6. Ask them before the demo.</p>
 
 <h2>Rules</h2>
-<p>Code of Conduct: code written before hacking starts disqualifies, except public open-source libraries, and any undisclosed library or API is cheating. Everything in the <code>headstart</code> repo is written this weekend, in a new repo, not inside memorable-gbrain or memorable-cli. The <code>memorable</code> adapter is off by default, 20 lines that shell out to the public npm package, and named as a prior dependency in the Plume write-up. Devin CLI, Claude Code and Codex are named as the harnesses under test.</p>
-
-<h2>Memorable, next week</h2>
-<p>Built today in <code>memorable-gbrain</code>, local only: <code>memorable install-hooks devin</code> writes <code>~/.config/devin/config.json</code> (verified to fire); <code>memorable hook devin</code> journals every turn and hands the trace to a detached <code>memorable ingest</code> on Stop, marks a session that ends without Stop as interrupted and never stores it; <code>memorable skills</code> writes <code>.agents/skills/*/SKILL.md</code> for cloud Devin, Warp and Codex; <code>memorable devin verify</code> is the acceptance test from Advaiyt's note. <code>/start/agents.md</code> has the Devin path. Capability table and gaps are in <code>memorable-gbrain/docs/DEVIN-INTEGRATION.md</code>.</p>
-<p>Same code, different backend. <code>HEADSTART_BACKEND=memorable</code> sends each procedure through <code>memorable ingest</code> so it lands in the dashboard. <code>headstart install</code> is <code>/start</code> paths 1 and 2 as one command; <code>headstart hook</code> on stdin is path 3. <code>headstart report</code> is the number every team puts on its slide. Blocker for next week is unchanged: the Worker diff with <code>/v1/recall</code> and <code>/start</code> are uncommitted and not on prod.</p>
+<p>Code of Conduct: code written before hacking starts disqualifies, except public open-source libraries, and any undisclosed library or API is cheating. Everything in the <code>headstart</code> repo is written this weekend, in a new repo. Devin CLI, Claude Code and Codex are named as the harnesses under test.</p>
 
 <h2>What happens now</h2>
 <ol>

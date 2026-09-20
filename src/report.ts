@@ -26,7 +26,7 @@ function fmt(n: number, unit: string): string {
 }
 function pct(a: number, b: number): string { return b ? `${a <= b ? '-' : '+'}${Math.abs(Math.round((1 - a / b) * 100))}%` : 'n/a'; }
 
-export interface Summary { arms: Record<string, Record<string, { mean: number; sd: number; n: number }>>; pass: Record<string, number>; fleet: Record<string, Record<string, number>>; n: number }
+export interface Summary { arms: Record<string, Record<string, { mean: number; sd: number; n: number }>>; pass: Record<string, number>; fleet: Record<string, Record<string, number>>; delta: Record<string, Record<string, { pct: number; ci_pct: number }>>; n: number }
 
 // Half-width of a 95% interval on the difference of two means, both sampled.
 function ci(a: { sd: number; n: number }, b: { sd: number; n: number }): number {
@@ -36,7 +36,7 @@ function ci(a: { sd: number; n: number }, b: { sd: number; n: number }): number 
 
 export function summarize(runs: Run[]): Summary {
   const arms = [...new Set(runs.map(r => r.arm))];
-  const out: Summary = { arms: {}, pass: {}, fleet: {}, n: runs.length };
+  const out: Summary = { arms: {}, pass: {}, fleet: {}, delta: {}, n: runs.length };
   for (const arm of arms) {
     const rs = runs.filter(r => r.arm === arm && !r.error);
     out.arms[arm] = {};
@@ -49,6 +49,11 @@ export function summarize(runs: Run[]): Summary {
   const cold = out.arms.cold;
   if (cold) for (const arm of arms.filter(a => a !== 'cold')) {
     const a = out.arms[arm];
+    out.delta[arm] = {};
+    for (const m of METRICS) {
+      const base = cold[m.key].mean || 1;
+      out.delta[arm][m.key] = { pct: Number(((a[m.key].mean / base - 1) * 100).toFixed(1)), ci_pct: Number((ci(cold[m.key], a[m.key]) / base * 100).toFixed(1)) };
+    }
     const dTok = cold.context_tokens.mean - a.context_tokens.mean;
     const dSec = cold.duration_s.mean - a.duration_s.mean;
     const dCost = cold.cost_usd.mean - a.cost_usd.mean;

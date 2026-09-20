@@ -1,0 +1,36 @@
+/* headstart design tokens. */
+:root {
+  --bg: #0a0a0b; --hero-bg: #05070d; --canvas: #0c0c0e;
+  --surface: #111113; --surface-2: #1a1a1d; --surface-hover: #16161a;
+  --line: rgba(255,255,255,.12); --line-fade: rgba(255,255,255,.06);
+  --border: rgba(255,255,255,.10); --border-strong: rgba(255,255,255,.14);
+  --fg: #fff; --muted: rgb(161,161,161); --subtle: rgb(138,138,138); --cell: rgba(255,255,255,.04);
+  --node-grey: #8A8A8E;
+
+  --acc-sky: #38bdf8; --acc-mint: #3ddc97; --acc-lav: #b7a6ff; --acc-warm: #e07a4a; --acc-red: #f0616d; --acc-amber: #e9b949;
+  --accent: var(--acc-sky);            /* chrome interaction only */
+  --good: var(--acc-mint);             /* the head start */
+  --bad: var(--acc-red);               /* a cost, a loss, a failed run */
+  --shape-1: var(--acc-lav); --shape-2: var(--acc-warm); --shape-3: var(--acc-amber);
+
+  --ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --t-lead: 500 40px/48px var(--ui);    /* -0.03em */
+  --t-stat: 500 40px/44px var(--ui);    /* -0.04em, tabular */
+  --t-head: 500 17px/22px var(--ui);
+  --t-title: 400 15px/21px var(--ui);   /* the person's prompt */
+  --t-body: 400 13px/18px var(--ui);
+  --t-cmd: 400 13px/20px var(--mono);
+  --t-count: 400 13px/16px var(--mono); /* tabular */
+  --t-small: 400 12px/16px var(--mono);
+  --t-label: 400 11px/14px var(--mono); /* uppercase, --track */
+  --t-key: 400 10px/14px var(--mono);   /* uppercase, .12em */
+  --track: .16em; --track-cap: .1em;
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --r-chip: 3px; --r-panel: 4px; --r-input: 6px;
+  --rail: 300px; --drawer: 240px;
+  --dur-hover: 120ms; --dur-swap: 240ms; --dur-enter: 400ms; --dur-count: 900ms;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+}
