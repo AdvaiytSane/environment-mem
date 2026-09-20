@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8"><title>DejaDo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0b;--card:#111113;--line:rgba(255,255,255,.1);--fg:#fff;--muted:#a1a1a1;--subtle:#6b6b70;--mint:#3ddc97;--lav:#b7a6ff;--sky:#38bdf8;--warm:#e07a4a;--mono:"Geist Mono",ui-monospace,monospace;--ui:Inter,system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui)}
+.frame{width:1600px;height:900px;position:relative;overflow:hidden;background:radial-gradient(1200px 600px at 78% 50%,rgba(61,220,151,.07),transparent 60%),radial-gradient(900px 500px at 20% 20%,rgba(183,166,255,.08),transparent 60%),var(--bg)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px;opacity:.25;mask-image:radial-gradient(900px 600px at 50% 50%,#000 30%,transparent 100%)}
+.left{position:absolute;left:96px;top:120px;width:640px}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:44px}
+.brand svg{width:40px;height:40px}.brand b{font-size:26px;font-weight:600;letter-spacing:-.02em}
+.brand span{font:500 12px/16px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 9px;border-radius:4px;margin-left:4px}
+h1{font-size:72px;line-height:76px;letter-spacing:-.035em;font-weight:700;margin:0 0 28px}
+h1 em{font-style:normal;color:var(--mint)}
+p.sub{font-size:22px;line-height:32px;color:var(--muted);margin:0 0 44px;max-width:600px}
+.nums{display:flex;gap:40px}.num b{display:block;font-size:40px;line-height:44px;letter-spacing:-.03em;color:var(--mint)}.num span{font:500 11px/16px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--subtle)}
+.agents{position:absolute;left:96px;bottom:64px;display:flex;gap:10px}.agents i{font:500 11px/16px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:6px 10px;font-style:normal;background:rgba(17,17,19,.8)}
+.race{position:absolute;right:96px;top:120px;width:640px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.col .h{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);font:500 11px/16px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--subtle)}
+.col.on .h{color:var(--mint)}.col .h b{color:var(--fg);font-weight:500}
+.row{display:flex;gap:10px;align-items:center;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.05);font:400 11px/16px var(--mono);color:var(--fg)}
+.row .t{width:38px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle)}.row .t.sky{color:var(--sky)}.row .t.lav{color:var(--lav)}.row .t.mint{color:var(--mint)}
+.row .bar{height:6px;border-radius:3px;background:rgba(255,255,255,.14);flex:1}.row .bar.m{background:var(--mint);opacity:.9}.row .bar.l{background:var(--lav);opacity:.7}.row .bar.s{background:var(--sky);opacity:.7}
+.row.dim{opacity:.28}.done{padding:12px 14px;font:500 11px/16px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.handed{padding:8px 14px;font:400 11px/16px var(--mono);color:var(--mint);background:rgba(61,220,151,.08);border-bottom:1px solid var(--line)}
+.delta{position:absolute;right:96px;bottom:64px;display:flex;gap:28px;font:500 12px/16px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--subtle)}.delta b{color:var(--mint);font-weight:500}
+.foot{position:absolute;left:0;right:0;bottom:24px;text-align:center;font:400 11px/16px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--subtle)}
+</style></head><body><div class="frame"><div class="grid"></div>
+<div class="left">
+  <div class="brand"><svg viewBox="0 0 24 24"><rect x="2.5" y="8.5" width="13" height="13" rx="3.5" fill="#fff" opacity=".38"/><rect x="8.5" y="2.5" width="13" height="13" rx="3.5" fill="#fff"/></svg><b>DejaDo</b><span>for Devin</span></div>
+  <h1>Your agent did this <em>yesterday.</em></h1>
+  <p class="sub">Record every step. Boil it down. Hand it to the next agent. Devin, Claude Code, a browser agent, a robot: one memory.</p>
+  <div class="nums"><div class="num"><b>55%</b><span>fewer tokens</span></div><div class="num"><b>20 → 16</b><span>steps</span></div><div class="num"><b>67s → 43s</b><span>same task</span></div></div>
+</div>
+<div class="agents"><i>Devin</i><i>Claude Code</i><i>Codex</i><i>Browser Use</i><i>Dimensional</i></div>
+<div class="race">
+  <div class="col"><div class="h"><span>Without DejaDo</span><b>20 steps · 705k</b></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.9"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.7"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.5"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.6"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.4"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.55"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.45"></span></div>
+    <div class="row"><span class="t lav">grep</span><span class="bar l" style="flex:.3"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.65"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.5"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.35"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.6"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.5"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.4"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.55"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.45"></span></div>
+    <div class="row dim"><span class="t lav">read</span><span class="bar" style="flex:.4"></span></div>
+    <div class="row dim"><span class="t mint">edit</span><span class="bar" style="flex:.5"></span></div>
+    <div class="row dim"><span class="t sky">exec</span><span class="bar" style="flex:.6"></span></div>
+    <div class="row dim"><span class="t sky">exec</span><span class="bar" style="flex:.3"></span></div>
+  </div>
+  <div class="col on"><div class="h"><span>With DejaDo</span><b>16 steps · 315k</b></div>
+    <div class="handed">↳ handed the procedure before step 1</div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.5"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.45"></span></div>
+    <div class="row"><span class="t lav">read</span><span class="bar l" style="flex:.4"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.6"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.55"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.5"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.45"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.5"></span></div>
+    <div class="row"><span class="t mint">edit</span><span class="bar m" style="flex:.4"></span></div>
+    <div class="row"><span class="t sky">exec</span><span class="bar s" style="flex:.35"></span></div>
+    <div class="done">✓ passed · 43s</div>
+  </div>
+</div>
+<div class="delta"><span>steps <b>−4 (20%)</b></span><span>tokens <b>−390k (55%)</b></span><span>time <b>−24s (36%)</b></span></div>
+<div class="foot">headstart-demo.vercel.app · every number is a recorded session</div>
+</div></body></html>
