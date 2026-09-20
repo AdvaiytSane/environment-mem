@@ -1,0 +1,646 @@
+[
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_ivNieYk7t0S69nO0xEuQtriq",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.5978892128427299, 0.887108061887898, 0.2954581464757761], \"quaternion_wxyz\": [0.9992554013613054, -0.001919325928434255, 0.009706411159766205, 0.0372926885680706], \"pose_age_seconds\": 0.1151, \"image_sequence\": 334, \"odom_sequence\": 335, \"image_sha256\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367\", \"image_file\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.14649116134029788, \"B\": 0.4233375204200637}, \"within_arrival_tolerance\": {\"A\": true, \"B\": false}}",
+        "role": "tool",
+        "tool_call_id": "call_ivNieYk7t0S69nO0xEuQtriq"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_ivNieYk7t0S69nO0xEuQtriq",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.5978892128427299, 0.887108061887898, 0.2954581464757761], \"quaternion_wxyz\": [0.9992554013613054, -0.001919325928434255, 0.009706411159766205, 0.0372926885680706], \"pose_age_seconds\": 0.1151, \"image_sequence\": 334, \"odom_sequence\": 335, \"image_sha256\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367\", \"image_file\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.14649116134029788, \"B\": 0.4233375204200637}, \"within_arrival_tolerance\": {\"A\": true, \"B\": false}}",
+        "role": "tool",
+        "tool_call_id": "call_ivNieYk7t0S69nO0xEuQtriq"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_6sZhxOBpJt7rFkOOejxKyoOY",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.98 y=0.91 heading=22deg; goal was x=-1.01 y=1.00 heading=4deg.",
+        "role": "tool",
+        "tool_call_id": "call_6sZhxOBpJt7rFkOOejxKyoOY"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_ivNieYk7t0S69nO0xEuQtriq",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.5978892128427299, 0.887108061887898, 0.2954581464757761], \"quaternion_wxyz\": [0.9992554013613054, -0.001919325928434255, 0.009706411159766205, 0.0372926885680706], \"pose_age_seconds\": 0.1151, \"image_sequence\": 334, \"odom_sequence\": 335, \"image_sha256\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367\", \"image_file\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.14649116134029788, \"B\": 0.4233375204200637}, \"within_arrival_tolerance\": {\"A\": true, \"B\": false}}",
+        "role": "tool",
+        "tool_call_id": "call_ivNieYk7t0S69nO0xEuQtriq"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_6sZhxOBpJt7rFkOOejxKyoOY",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.98 y=0.91 heading=22deg; goal was x=-1.01 y=1.00 heading=4deg.",
+        "role": "tool",
+        "tool_call_id": "call_6sZhxOBpJt7rFkOOejxKyoOY"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_VSeWDTkQcLSbNRg5WfMEYxRE",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.9829185193901923, 0.9047032294212162, 0.29441296160079516], \"quaternion_wxyz\": [-0.9807980944534048, -0.0013021364910360859, -0.007744915236233621, -0.1948676952322101], \"pose_age_seconds\": 0.0632, \"image_sequence\": 649, \"odom_sequence\": 649, \"image_sha256\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e\", \"image_file\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.48687391047892276, \"B\": 0.09885289071218083}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_VSeWDTkQcLSbNRg5WfMEYxRE"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_ivNieYk7t0S69nO0xEuQtriq",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.5978892128427299, 0.887108061887898, 0.2954581464757761], \"quaternion_wxyz\": [0.9992554013613054, -0.001919325928434255, 0.009706411159766205, 0.0372926885680706], \"pose_age_seconds\": 0.1151, \"image_sequence\": 334, \"odom_sequence\": 335, \"image_sha256\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367\", \"image_file\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.14649116134029788, \"B\": 0.4233375204200637}, \"within_arrival_tolerance\": {\"A\": true, \"B\": false}}",
+        "role": "tool",
+        "tool_call_id": "call_ivNieYk7t0S69nO0xEuQtriq"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_6sZhxOBpJt7rFkOOejxKyoOY",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.98 y=0.91 heading=22deg; goal was x=-1.01 y=1.00 heading=4deg.",
+        "role": "tool",
+        "tool_call_id": "call_6sZhxOBpJt7rFkOOejxKyoOY"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_VSeWDTkQcLSbNRg5WfMEYxRE",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.9829185193901923, 0.9047032294212162, 0.29441296160079516], \"quaternion_wxyz\": [-0.9807980944534048, -0.0013021364910360859, -0.007744915236233621, -0.1948676952322101], \"pose_age_seconds\": 0.0632, \"image_sequence\": 649, \"odom_sequence\": 649, \"image_sha256\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e\", \"image_file\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.48687391047892276, \"B\": 0.09885289071218083}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_VSeWDTkQcLSbNRg5WfMEYxRE"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_L3DjWdk9nO5yXIn074WJPuM3",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.99 y=0.90 heading=36deg; goal was x=-1.01 y=1.00 heading=23deg.",
+        "role": "tool",
+        "tool_call_id": "call_L3DjWdk9nO5yXIn074WJPuM3"
+      }
+    ],
+    "context_present": false
+  },
+  {
+    "model": "gpt-4.1-mini",
+    "messages": [
+      {
+        "content": "You inspect the two specified coordinates in a local MuJoCo simulation. Call only one tool at a time. Inspect once, visit A and verify it, then visit B and verify it. Arrival requires measured distance <= 0.20 meters. Check within_arrival_tolerance. A navigation response is not proof of arrival. Retry a missed checkpoint once, then report failure. Never claim success when a measured arrival check fails.\n",
+        "role": "system"
+      },
+      {
+        "content": "Complete the checkpoint inspection. Coordinates: {\"A\": [-0.5056442086873085, 1.000908411444459], \"B\": [-1.0056442086873085, 1.000908411444459]}",
+        "role": "user"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_98rH2zT2BXNRZ6LcjJ8rASB9",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-1.0056477900078682, 1.0009121942616543, 0.2947875288777314], \"quaternion_wxyz\": [0.9999475792169384, 0.0005008077580628345, 0.0014477473411720042, 0.010123835113757904], \"pose_age_seconds\": 0.0559, \"image_sequence\": 231, \"odom_sequence\": 232, \"image_sha256\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b\", \"image_file\": \"60cc03468338973bb58178209c0b8e0724c2f7bd52f65666b0f6bddff4631e8b.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.5000035813348692, \"B\": 5.209180634596857e-06}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_98rH2zT2BXNRZ6LcjJ8rASB9"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_91LCVFGV0CNIdIRzEbTK1Y5S",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -0.5056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.57 y=0.89 heading=6deg; goal was x=-0.51 y=1.00 heading=1deg.",
+        "role": "tool",
+        "tool_call_id": "call_91LCVFGV0CNIdIRzEbTK1Y5S"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_ivNieYk7t0S69nO0xEuQtriq",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.5978892128427299, 0.887108061887898, 0.2954581464757761], \"quaternion_wxyz\": [0.9992554013613054, -0.001919325928434255, 0.009706411159766205, 0.0372926885680706], \"pose_age_seconds\": 0.1151, \"image_sequence\": 334, \"odom_sequence\": 335, \"image_sha256\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367\", \"image_file\": \"c1f1074d97c6ad88cabf1d4846b81acbc6fd2d75f4577001965922290ac00367.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.14649116134029788, \"B\": 0.4233375204200637}, \"within_arrival_tolerance\": {\"A\": true, \"B\": false}}",
+        "role": "tool",
+        "tool_call_id": "call_ivNieYk7t0S69nO0xEuQtriq"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_6sZhxOBpJt7rFkOOejxKyoOY",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.98 y=0.91 heading=22deg; goal was x=-1.01 y=1.00 heading=4deg.",
+        "role": "tool",
+        "tool_call_id": "call_6sZhxOBpJt7rFkOOejxKyoOY"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_VSeWDTkQcLSbNRg5WfMEYxRE",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.9829185193901923, 0.9047032294212162, 0.29441296160079516], \"quaternion_wxyz\": [-0.9807980944534048, -0.0013021364910360859, -0.007744915236233621, -0.1948676952322101], \"pose_age_seconds\": 0.0632, \"image_sequence\": 649, \"odom_sequence\": 649, \"image_sha256\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e\", \"image_file\": \"67fe92b2298f31ebc488bb7002ef30f41481f5e67e568f0381e345335150605e.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.48687391047892276, \"B\": 0.09885289071218083}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_VSeWDTkQcLSbNRg5WfMEYxRE"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_L3DjWdk9nO5yXIn074WJPuM3",
+            "function": {
+              "name": "move_to",
+              "arguments": "{\"x\": -1.0056442086873085, \"y\": 1.000908411444459}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "Navigation goal reached. Robot is at x=-0.99 y=0.90 heading=36deg; goal was x=-1.01 y=1.00 heading=23deg.",
+        "role": "tool",
+        "tool_call_id": "call_L3DjWdk9nO5yXIn074WJPuM3"
+      },
+      {
+        "content": null,
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "type": "function",
+            "id": "call_Z4V7ZkBhoHzl4ZzVK8ACsvdS",
+            "function": {
+              "name": "inspect_pose",
+              "arguments": "{}"
+            }
+          }
+        ]
+      },
+      {
+        "content": "{\"ok\": true, \"position\": [-0.997782928664228, 0.9153521400603805, 0.2971647125553517], \"quaternion_wxyz\": [-0.9455475836971589, 0.011416708614485249, -0.001170231465095432, -0.32528150314334514], \"pose_age_seconds\": 0.0565, \"image_sequence\": 673, \"odom_sequence\": 674, \"image_sha256\": \"c15fba84bc3fe52b4c7acba733cdd87b63bfc34102b434fa23572a5b92b5398c\", \"image_file\": \"c15fba84bc3fe52b4c7acba733cdd87b63bfc34102b434fa23572a5b92b5398c.jpg\", \"scene\": \"upstream-mujoco-office1\", \"checkpoint_distances_m\": {\"A\": 0.4995201650320704, \"B\": 0.0859166764763826}, \"within_arrival_tolerance\": {\"A\": false, \"B\": true}}",
+        "role": "tool",
+        "tool_call_id": "call_Z4V7ZkBhoHzl4ZzVK8ACsvdS"
+      }
+    ],
+    "context_present": false
+  }
+]
