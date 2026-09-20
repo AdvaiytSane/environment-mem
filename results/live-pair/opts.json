@@ -1,0 +1,19 @@
+{
+  "tasks": "/Users/nikhilkrishnaswamy/Documents/GitHub/environment-mem/fixtures/tasks.json",
+  "fixture": "/Users/nikhilkrishnaswamy/Documents/GitHub/environment-mem/fixtures/repo",
+  "out": "/Users/nikhilkrishnaswamy/Documents/GitHub/environment-mem/results/live-pair",
+  "arms": [
+    "cold",
+    "full"
+  ],
+  "repeats": 1,
+  "runner": "claude",
+  "model": "sonnet",
+  "parallel": 2,
+  "staticDoc": "/Users/nikhilkrishnaswamy/Documents/GitHub/environment-mem/fixtures/static-doc/AGENTS.md",
+  "timeoutMs": 720000,
+  "only": [
+    "flag-2",
+    "flag-3"
+  ]
+}
