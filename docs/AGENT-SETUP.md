@@ -1,13 +1,30 @@
 # One-prompt integration handoff
 
+Start with `headstart connect --repo /path/to/repo --target application --write`
+to generate a repository-specific handoff and versioned manifest. Use
+`--target coding-agent --agent claude|devin` when connecting the coding assistant
+working in the repo, rather than the application it builds. Inspection is read-only;
+`--write` creates setup files only. See [Connect](CONNECT.md) and the committed
+[integration skill](../skills/memorable-connect/SKILL.md).
+
 Give this prompt to a coding agent in the application you want to connect. Supply a local checkout of this branch. The prompt does not remove the need for Memorable credentials or a working native-agent account. This repository currently provides the CLI transport; an HTTP-only application still needs the upstream read endpoint.
 
 ```text
 Connect this application to Memorable using the environment-mem checkout I provide.
 Read its README.md, docs/CONNECTIONS.md, docs/SDK-PLAN.md and latest verification report first.
 
+First confirm whether the target is the coding assistant working in this repository
+or an agent application implemented here. Do not configure both implicitly.
+
 Use the existing two-operation SDK: createMemorable(), store(), recall(). Keep retrieval
 inside Memorable. Do not build another database, ranker, dashboard or replay engine.
+
+For developer-defined metadata, read docs/METADATA-MEMORY.md and use the native
+memorable.memory.v1 contract with a compatible companion local CLI build. Verify the
+actual installed version supports it; it is not in the published npm CLI. Store opaque
+redacted traces and selected metadata, not coding extraction over arbitrary events.
+Legacy ingest/recall hooks remain a separate coding-trace route. Do not conflate either
+path with the Headstart local demo engine or claim hosted persistence from a local receipt.
 
 Inspect this application's actual task lifecycle and tool result format. Identify the
 task-start boundary for recall and the settled task-end boundary for store. Preserve

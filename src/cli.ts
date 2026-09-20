@@ -11,6 +11,7 @@ import { report } from './report.ts';
 import { writeConsole } from './console.ts';
 import { backendFor, memorableConnection, pendingMemorable, syncMemorable } from './memorable.ts';
 import { adapterCommand } from './sdk/adapters.ts';
+import { connectCommand } from './connect.ts';
 import { serveLive } from './live.ts';
 import { buildGraph, readStores } from './graph.ts';
 import { writeVault } from './obsidian.ts';
@@ -21,6 +22,9 @@ import { stateDir, storePath } from './paths.ts';
 const HELP = `headstart  the second session starts where the first one finished
 
   init                 write .headstart/config.json
+  connect              inspect integration seams without executing the repo or reading credentials
+                       --repo <path> --target coding-agent|application [--agent claude|devin|codex]
+                       [--json|--prompt] [--write] [--install-hooks --agent claude|devin] [--backend memorable|local]
   install [--all]      write hook files for Claude Code, Devin CLI, Codex found on this machine
   uninstall            remove headstart hooks from those files
   hook <Event>         stdin: one hook event (SessionStart | UserPromptSubmit | PostToolUse | Stop)
@@ -78,10 +82,12 @@ function loadDotEnv(): void {
 }
 
 async function main(argv: string[]): Promise<void> {
-  loadDotEnv();
   const [cmd, ...args] = argv;
+  // Inspection must not read credentials, including this checkout's .env.
+  if (cmd !== 'connect') loadDotEnv();
   const cwd = process.cwd();
   switch (cmd) {
+    case 'connect': return connectCommand(args, cwd);
     case 'memory': return adapterCommand(args);
     case 'hook': return runHook(args[0]);
     case 'init': {

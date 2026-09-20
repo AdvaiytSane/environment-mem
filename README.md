@@ -4,6 +4,12 @@
 
 Connect an agent to Memorable through two operations: **`store` and `recall`**. Developers choose where to capture work and where to use recalled context. Memorable performs its existing extraction and retrieval.
 
+Use `headstart connect --repo /path/to/app --target application` for read-only
+integration discovery. Add `--write` to create a versioned manifest and a handoff
+skill for your coding assistant; it does not automatically wire application hooks.
+Choose `--target coding-agent --agent claude|devin` for the assistant working on
+the repo. [Connect setup and evidence stages](docs/CONNECT.md).
+
 This repository's package and executable remain named **`headstart`**. The connection layer is available from **`headstart/memorable`** on this branch; it wraps the existing Memorable CLI. This is not a newly published npm release or a deployed HTTP SDK.
 
 ## Metadata-driven Browser Use integration

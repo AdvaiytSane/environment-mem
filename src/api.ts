@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { classify, succeeded } from './trace.ts';
+import { classify } from './trace.ts';
 import { harnessOf } from './harness.ts';
 import type { TraceEvent } from './types.ts';
 import { stateDir, storePath } from './paths.ts';
@@ -86,9 +86,7 @@ export function extractPayload(events: TraceEvent[], repo?: string): ExtractPayl
     const cls = classify(e.tool_name!);
     const raw = typeof e.tool_input === 'string' ? (() => { try { return JSON.parse(e.tool_input as unknown as string); } catch { return { raw: e.tool_input }; } })() : (e.tool_input ?? {});
     const input = Object.fromEntries(Object.entries(raw as Record<string, unknown>).map(([k, v]) => [k, rel(v)]));
-    // A command's exit code is what the extractor reads a postcondition from.
-    // Harnesses that report none get the same rule the local extractor uses.
-    const ok = succeeded(e);
+    // Preserve observed fields; a missing result is neither success nor failure.
     const result = e.result ? { ...e.result } : e.ok === undefined ? undefined : { ok: e.ok };
     return { name: cls && NAME[cls] ? NAME[cls] : e.tool_name!, input, result };
   }).filter(t => classify(t.name) !== null);
