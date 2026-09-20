@@ -157,3 +157,14 @@ td .good { color: var(--good); } td .bad { color: var(--bad); } td .dash { color
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 @media (max-width: 1100px) { .app { grid-template-columns: 1fr; } .rail { display: none; } .drawer { grid-template-columns: 1fr; } }
+
+/* run panel: the same demo/run commands a terminal gets, from the console */
+.top .runbtn { font: var(--t-small); color: var(--fg); background: none; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; cursor: pointer; margin-right: var(--s3); }
+.top .runbtn:hover { background: var(--hover); }
+.runpanel { position: absolute; top: 48px; right: var(--s4); z-index: 20; width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: var(--s2); }
+.runpanel .label { font: var(--t-label); color: var(--fg-3); letter-spacing: .16em; text-transform: uppercase; margin-bottom: var(--s1); }
+.runpanel .row { display: flex; align-items: center; gap: var(--s2); font: var(--t-body); color: var(--fg-2); }
+.runpanel .row > span { width: 96px; flex-shrink: 0; }
+.runpanel select, .runpanel input { flex: 1; min-width: 0; font: var(--t-body); color: var(--fg); background: var(--sunk); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; }
+.runpanel .go { font: var(--t-small); color: #000; background: #fff; border: 0; border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+.runpanel .note { font: var(--t-small); color: var(--fg-3); }

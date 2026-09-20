@@ -36,6 +36,7 @@ const HELP = `headstart  the second session starts where the first one finished
                        --agent claude|devin --lane <name> --task <id or text> [--inject full|facts|0] [--record 0|1]
                        [--repo fixtures/repo] [--live results/live] [--store results/live/store.jsonl] [--model sonnet]
   push <file>          post one stored session to the hosted store (HEADSTART_API_URL, HEADSTART_API_KEY)
+  backfill --results <dir>  post every recorded eval session in a results directory (cold first, then the runs that were handed something), with its measured cost
   demo                 before and after, one command: the same task cold, then with memory on, two lanes
                        --agent devin|claude --task <id or text> [--warm-agent devin|claude] [--model sonnet]
   orchestrate          waves of runs from a plan; a wave runs at once, the next wave recalls what it stored
@@ -60,7 +61,18 @@ function flag(args: string[], name: string, dflt?: string): string | undefined {
   return i >= 0 ? args[i + 1] : dflt;
 }
 
+// A .env beside the CLI (HEADSTART_API_URL, HEADSTART_API_KEY) applies to every command; the shell's own values win.
+function loadDotEnv(): void {
+  const f = resolve(new URL('../.env', import.meta.url).pathname);
+  if (!existsSync(f)) return;
+  for (const line of readFileSync(f, 'utf8').split('\n')) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (!m || process.env[m[1]] !== undefined) continue;
+    process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+  }
+}
+
 async function main(argv: string[]): Promise<void> {
+  loadDotEnv();
   const [cmd, ...args] = argv;
   const cwd = process.cwd();
   switch (cmd) {
@@ -156,6 +168,37 @@ async function main(argv: string[]): Promise<void> {
       const r = await extractRemote(a, readPending(file), flag(args, 'store', storePath(cwd))!);
       if (!r.ok) { console.error(`push failed: ${r.error}`); process.exit(1); }
       console.log(`pushed ${r.workflow_id ?? ''}`);
+      return;
+    }
+    case 'backfill': {
+      // backfill --results results/claude-sonnet-r4-clean [--arms cold,full]
+      const a = api(); if (!a) { console.error('set HEADSTART_API_URL and HEADSTART_API_KEY'); process.exit(2); }
+      const dir = resolve(flag(args, 'results', 'results/claude-sonnet-r4-clean')!);
+      const arms = (flag(args, 'arms', 'cold,full') ?? 'cold,full').split(',');
+      const runs = readFileSync(join(dir, 'runs.jsonl'), 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
+      const store = join(dir, 'store.jsonl');
+      const local = existsSync(store) ? readFileSync(store, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)) : [];
+      const idBySession = new Map(local.map((p: any) => [p.session_id, p.id]));
+      const { extractPayload } = await import('./api.ts');
+      const { readdirSync } = await import('node:fs');
+      let n = 0, failed = 0;
+      for (const arm of arms) for (const r of runs.filter((x: any) => x.arm === arm && !x.error)) {
+        const wd = existsSync(r.workdir) ? r.workdir : join(dir, 'work', r.workdir.split('/work/').pop());
+        const sdir = join(wd, '.headstart', 'sessions'); if (!existsSync(sdir)) continue;
+        let events: any[] = [];
+        for (const f of readdirSync(sdir)) { const evs = readFileSync(join(sdir, f), 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l)); if (evs.length > events.length) events = evs; }
+        const payload = extractPayload(events, 'fixture'); if (!payload) continue;
+        const log = existsSync(join(wd, '.headstart', 'headstart.log')) ? readFileSync(join(wd, '.headstart', 'headstart.log'), 'utf8') : '';
+        const from = [...log.matchAll(/inject prompt \S+ score=\S+ chars=\d+ from=(\S+)/g)].map(m => m[1]);
+        const ids = [...log.matchAll(/ ids=(\S+)/g)].flatMap(m => m[1].split(','));
+        payload.recalled_local = [...new Set([...from, ...ids])].filter(Boolean);
+        payload.local_id = idBySession.get(payload.session_id);
+        payload.cost = { input_tokens: (r.input_tokens ?? 0) + (r.cache_create ?? 0), cached_input_tokens: r.cache_read ?? 0, output_tokens: r.output_tokens ?? 0, model: r.model, duration_ms: Math.round((r.duration_s ?? 0) * 1000) };
+        const res = await extractRemote(a, payload, store);
+        if (res.ok) { n++; console.log(`${arm.padEnd(5)} ${String(r.task).padEnd(11)} ${payload.harness.padEnd(12)} ${payload.tool_calls.length} calls  ${res.admitted ? 'admitted' : 'not admitted'}${payload.recalled_local.length ? '  handed ' + payload.recalled_local.length : ''}`); }
+        else { failed++; console.log(`${arm} ${r.task} failed: ${res.error}`); }
+      }
+      console.log(`${n} posted, ${failed} failed`);
       return;
     }
     case 'run': {

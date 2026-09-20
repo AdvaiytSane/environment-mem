@@ -1,5 +1,6 @@
 import { createServer, type ServerResponse } from 'node:http';
 import { closeSync, existsSync, openSync, readFileSync, readSync, readdirSync, statSync, watch } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { buildGraph, readStores } from './graph.ts';
 import { summarize } from './report.ts';
@@ -168,6 +169,36 @@ export function serveLive(o: LiveOpts): void {
       const f = join(UI_DIR, url.pathname.slice(4).replace(/\.\./g, ''));
       if (!existsSync(f)) { res.writeHead(404); res.end(); return; }
       res.writeHead(200, { 'content-type': MIME[f.slice(f.lastIndexOf('.'))] ?? 'application/octet-stream', 'cache-control': 'no-cache' }); res.end(readFileSync(f)); return;
+    }
+    // The run panel: the task list, and a start button that spawns the same
+    // `headstart demo` or `headstart run` a terminal would.
+    if (url.pathname === '/api/tasks') {
+      const files = ['fixtures/tasks.json', 'fixtures/tasks-live.json'].map(f => resolve(f)).filter(existsSync);
+      const tasks = files.flatMap(f => JSON.parse(readFileSync(f, 'utf8')) as Array<{ id: string; shape: string; prompt: string }>).map(t => ({ id: t.id, shape: t.shape, prompt: t.prompt }));
+      res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify({ tasks, hosted: !!(process.env.HEADSTART_API_URL && process.env.HEADSTART_API_KEY) })); return;
+    }
+    if (url.pathname === '/api/run' && req.method === 'POST') {
+      let body = '';
+      req.on('data', d => { body += d; });
+      req.on('end', () => {
+        let b: { agent?: string; warmAgent?: string; task?: string; mode?: string } = {};
+        try { b = JSON.parse(body || '{}'); } catch {}
+        const agent = b.agent === 'claude' ? 'claude' : 'devin';
+        const warmAgent = b.warmAgent === 'claude' ? 'claude' : b.warmAgent === 'devin' ? 'devin' : agent;
+        const task = String(b.task ?? '').trim();
+        if (!task) { res.writeHead(400, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: 'task' })); return; }
+        const cli = new URL('./cli.ts', import.meta.url).pathname;
+        const live = o.live ? resolve(o.live) : resolve('results/live');
+        const stamp = Date.now().toString(36).slice(-4);
+        const args = b.mode === 'cold' ? ['run', '--agent', agent, '--lane', `${agent}-before-${stamp}`, '--task', task, '--inject', '0', '--live', live]
+          : b.mode === 'warm' ? ['run', '--agent', agent, '--lane', `${agent}-after-${stamp}`, '--task', task, '--inject', 'full', '--live', live]
+          : ['demo', '--agent', agent, '--warm-agent', warmAgent, '--task', task, '--live', live];
+        const child = spawn(process.execPath, [cli, ...args], { cwd: process.cwd(), env: process.env, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
+        child.stdout.on('data', d => process.stdout.write(`[run] ${d}`)); child.stderr.on('data', d => process.stderr.write(`[run] ${d}`));
+        child.unref();
+        res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify({ ok: true, args }));
+      });
+      return;
     }
     if (url.pathname === '/api/graph') { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(graph)); return; }
     if (url.pathname === '/api/summary') { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(summary())); return; }

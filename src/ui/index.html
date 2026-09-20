@@ -15,7 +15,16 @@
       <button class="tab" role="tab" data-view="matrix">Distances</button>
       <button class="tab" role="tab" data-view="measured">Measured</button>
     </nav>
-    <div class="status"><span id="status-sessions"></span><span id="status-live" class="live off"><i></i>offline</span></div>
+    <div class="status"><button class="runbtn" id="runbtn" type="button">Run an agent</button><span id="status-sessions"></span><span id="status-live" class="live off"><i></i>offline</span></div>
+  </div>
+  <div class="runpanel" id="runpanel" hidden>
+    <div class="label">Run an agent, watch it in a lane</div>
+    <div class="row"><span>Agent</span><select id="run-agent"><option value="devin">Devin CLI</option><option value="claude">Claude Code</option></select></div>
+    <div class="row"><span>Task</span><select id="run-task"></select></div>
+    <div class="row"><input id="run-free" placeholder="or type a task in your own words"></div>
+    <div class="row"><span>Mode</span><select id="run-mode"><option value="demo">before and after: cold, then with memory</option><option value="warm">with memory</option><option value="cold">without memory</option></select></div>
+    <div class="row" id="run-warm-row"><span>After, run by</span><select id="run-warm"><option value="">same agent</option><option value="devin">Devin CLI</option><option value="claude">Claude Code</option></select></div>
+    <div class="row"><button class="go" id="run-go" type="button">Start</button><span class="note" id="run-note"></span></div>
   </div>
 
   <aside class="rail">

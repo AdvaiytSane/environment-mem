@@ -136,3 +136,24 @@ bus.on('lane:done', d => { if (d.lane === 'cold') timeline.addLive({ arm: 'cold'
 bus.on('focus', id => { showView('graph'); graph.focus(id); });
 bus.on('select-id', id => { graph.select(id); matrix.select(id); });
 setInterval(() => bus.emit('tick-minute'), 60000);
+
+// run panel
+{
+  const btn = $('#runbtn'), panel = $('#runpanel'), taskSel = $('#run-task'), free = $('#run-free'), note = $('#run-note');
+  let tasks = [];
+  fetch('/api/tasks').then(r => r.json()).then(d => {
+    tasks = d.tasks || [];
+    taskSel.innerHTML = tasks.map(t => `<option value="${esc(t.id)}">${esc(t.id)}  ${esc(t.prompt.slice(0, 70))}</option>`).join('');
+    if (!d.hosted) note.textContent = 'local store only (no HEADSTART_API_URL)';
+  });
+  btn.onclick = () => { panel.hidden = !panel.hidden; };
+  $('#run-mode').onchange = () => { $('#run-warm-row').style.display = $('#run-mode').value === 'demo' ? '' : 'none'; };
+  $('#run-go').onclick = async () => {
+    const task = free.value.trim() || taskSel.value;
+    const body = { agent: $('#run-agent').value, task, mode: $('#run-mode').value, warmAgent: $('#run-warm').value || undefined };
+    note.textContent = 'starting';
+    const r = await fetch('/api/run', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    note.textContent = j.ok ? `started: headstart ${j.args.slice(0, 6).join(' ')}` : `failed: ${j.error}`;
+  };
+}
