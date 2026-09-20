@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { runHook } from './hook.ts';
 import { detect, install, uninstall } from './install.ts';
@@ -13,7 +13,8 @@ import { serveLive } from './live.ts';
 import { buildGraph, readStores } from './graph.ts';
 import { writeVault } from './obsidian.ts';
 import { describe, loadTasks, orchestrate, runOne, type Plan, type RunSpec } from './run.ts';
-import { stateDir } from './paths.ts';
+import { api, extractRemote, readPending } from './api.ts';
+import { stateDir, storePath } from './paths.ts';
 
 const HELP = `headstart  the second session starts where the first one finished
 
@@ -30,12 +31,13 @@ const HELP = `headstart  the second session starts where the first one finished
   report <dir>         print the table for an eval directory, write console.html
   obsidian --out <dir> write an Obsidian vault in graphify's shape: a note per session and file, _COMMUNITY_ and _SHAPE_ notes, a canvas
   console --live       serve the live page: one lane per run, sessions over time, the similarity graph, the table
-                       [--live results/live] [--watch dir1,dir2] [--results <dir>] [--stores a,b] [--port 4177]
+                       [--lanes results/live] [--watch dir1,dir2] [--results <dir>] [--stores a,b] [--port 4177]
   run                  one real agent session in a fresh copy of a repo, hooks on, traced into a lane
                        --agent claude|devin --lane <name> --task <id or text> [--inject full|facts|0] [--record 0|1]
                        [--repo fixtures/repo] [--live results/live] [--store results/live/store.jsonl] [--model sonnet]
+  push <file>          post one stored session to the hosted store (HEADSTART_API_URL, HEADSTART_API_KEY)
   orchestrate          waves of runs from a plan; a wave runs at once, the next wave recalls what it stored
-                       [--plan fixtures/orchestrate-demo.json] [--agent claude|devin] [--live <dir>] [--repo <dir>] [--model <id>]
+                       [--plan fixtures/orchestrate-demo.json] [--fresh] [--agent claude|devin] [--live <dir>] [--repo <dir>] [--model <id>]
 
 eval flags
   --tasks <file>       default fixtures/tasks.json
@@ -142,8 +144,17 @@ async function main(argv: string[]): Promise<void> {
       if (args.includes('--graph')) { console.log(JSON.stringify(buildGraph(readStores(stores)))); return; }
       const watchDirs = (flag(args, 'watch') ?? '').split(',').filter(Boolean);
       const mark = flag(args, 'mark', join(import.meta.dirname, 'ui', 'mark.svg'));
-      serveLive({ port: Number(flag(args, 'port', '4177')), results: flag(args, 'results', 'results/claude-sonnet-r4-clean'), stores, watch: watchDirs, mark, live: flag(args, 'live', 'results/live') });
+      serveLive({ port: Number(flag(args, 'port', '4177')), results: flag(args, 'results', 'results/claude-sonnet-r4-clean'), stores, watch: watchDirs, mark, live: flag(args, 'lanes', 'results/live') });
       return new Promise(() => {});
+    }
+    case 'push': {
+      // push <pending.json>: post one stored session to the hosted store
+      const a = api(); if (!a) { console.error('set HEADSTART_API_URL and HEADSTART_API_KEY'); process.exit(2); }
+      const file = args[0]; if (!file) { console.error('push needs a file'); process.exit(2); }
+      const r = await extractRemote(a, readPending(file), flag(args, 'store', storePath(cwd))!);
+      if (!r.ok) { console.error(`push failed: ${r.error}`); process.exit(1); }
+      console.log(`pushed ${r.workflow_id ?? ''}`);
+      return;
     }
     case 'run': {
       const agent = (flag(args, 'agent', 'claude') as RunSpec['agent']);
@@ -155,7 +166,7 @@ async function main(argv: string[]): Promise<void> {
       console.log(`${spec.lane}: ${agent} on "${task}"  inject=${spec.inject} record=${spec.record ? 1 : 0}
   traces  ${join(live, spec.lane, '.headstart')}
   store   ${store}`);
-      const r = await runOne(spec, { live, store, repo: resolve(flag(args, 'repo', 'fixtures/repo')!), tasks: loadTasks(flag(args, 'tasks', 'fixtures/tasks.json')) });
+      const r = await runOne(spec, { live, store, repo: resolve(flag(args, 'repo', 'fixtures/repo')!), tasks: loadTasks(...flag(args, 'tasks', 'fixtures/tasks.json,fixtures/tasks-live.json')!.split(',')) });
       console.log(describe(r));
       return;
     }
@@ -164,9 +175,10 @@ async function main(argv: string[]): Promise<void> {
       for (const k of ['live', 'repo', 'model'] as const) { const v = flag(args, k); if (v) plan[k] = v; }
       const agent = flag(args, 'agent') as RunSpec['agent'] | undefined;
       if (agent) for (const w of plan.waves) for (const r of w) r.agent = agent;
+      if (args.includes('--fresh')) { rmSync(resolve(plan.live ?? 'results/live'), { recursive: true, force: true }); console.log(`fresh: ${plan.live ?? 'results/live'} emptied, the store starts blank`); }
       console.log(`plan: ${plan.waves.length} waves, ${plan.waves.flat().length} runs, store ${plan.store ?? join(plan.live ?? 'results/live', 'store.jsonl')}`);
       plan.waves.forEach((w, i) => console.log(`  wave ${i + 1}: ${w.map(r => `${r.lane} (${r.agent}, ${r.task}, inject=${r.inject ?? 'full'})`).join('; ')}`));
-      const rs = await orchestrate(plan, { tasks: loadTasks(), onDone: r => console.log(describe(r)) });
+      const rs = await orchestrate(plan, { tasks: loadTasks(...(plan.tasks ?? [])), onDone: r => console.log(describe(r)) });
       const handed = rs.filter(r => r.handed).length, cross = rs.filter(r => r.handed && r.handed.from.some(f => f.harness && f.harness !== r.agent)).length;
       console.log(`
 ${rs.length} runs, ${handed} handed a procedure, ${cross} across agents, ${rs.filter(r => r.stored).length} stored`);

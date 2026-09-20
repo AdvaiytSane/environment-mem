@@ -5,6 +5,9 @@ import { extract } from './extract.ts';
 import { appendLog, readAll, upsert } from './store.ts';
 import { similar, repoFacts } from './recall.ts';
 import { renderFacts, renderSimilar } from './inject.ts';
+import { api, recallRemote, renderRemote, extractPayload, writePending } from './api.ts';
+import { spawn } from 'node:child_process';
+import { repoName, storePath } from './paths.ts';
 
 type Raw = Record<string, any>;
 
@@ -40,7 +43,7 @@ function okOf(resp: unknown): boolean | undefined {
   return undefined;
 }
 
-export function runHook(argvEvent?: string): void {
+export async function runHook(argvEvent?: string): Promise<void> {
   const text = readStdin();
   let raw: Raw = {};
   try { raw = text.trim() ? JSON.parse(text) : {}; } catch { raw = {}; }
@@ -71,9 +74,24 @@ export function runHook(argvEvent?: string): void {
       const prompt: string = raw.prompt ?? raw.user_prompt ?? raw.message ?? '';
       write({ ts, event: 'prompt', session_id: sessionId, cwd, prompt });
       if (!inject || !injectProcedures || !prompt) return;
+      const remote = api();
+      if (remote) {
+        // The hosted store answers first. A miss or a slow answer falls
+        // through to the local store, so a session never waits on the network.
+        const rs = await recallRemote(remote, prompt, 3);
+        if (rs && rs.length) {
+          const ctx = renderRemote(rs);
+          write({ ts, event: 'recall', session_id: sessionId, cwd, ids: rs.map(r => r.workflow_id) });
+          appendLog(cwd, `inject prompt ${sessionId} score=${rs[0].similarity.toFixed(2)} chars=${ctx.length} from=${rs[0].workflow_id} matches=${rs.length} ids=${rs.map(r => r.workflow_id).join(',')} harnesses=hosted:${rs.length} recorded=${rs[0].updated_at}`);
+          appendLog(cwd, JSON.stringify({ handoff: 1, session: sessionId, at: new Date().toISOString(), prompt: prompt.slice(0, 200), from: rs.map(r => ({ id: r.workflow_id, harness: 'hosted', task_id: r.title.slice(0, 60), created_at: r.updated_at, title: r.title.slice(0, 80) })), n: rs.length, agree: [], verify: rs[0].postconditions?.[0] ?? null, discovery: 0, score: Number(rs[0].similarity.toFixed(2)) }));
+          process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: ctx } }));
+          return;
+        }
+      }
       const sim = similar(cwd, prompt, { k: 3, excludeTask });
       if (!sim) { appendLog(cwd, `recall miss ${sessionId}`); return; }
       const ctx = renderSimilar(sim);
+      write({ ts, event: 'recall', session_id: sessionId, cwd, ids: sim.ids });
       appendLog(cwd, `inject prompt ${sessionId} score=${sim.closest.score.toFixed(2)} chars=${ctx.length} from=${sim.closest.procedure.id} matches=${sim.n} ids=${sim.ids.join(',')} harnesses=${sim.harnesses.map(h => `${h.name}:${h.n}`).join(',')} recorded=${sim.closest.procedure.created_at}`);
       // The hand-off record: written by the sender, so the page never has to
       // search for a source. One JSON line, read by the live server.
@@ -103,6 +121,20 @@ export function runHook(argvEvent?: string): void {
       if (!pr) return;
       upsert(cwd, pr);
       appendLog(cwd, `stored ${pr.id} steps=${pr.steps.length} discovery=${pr.discovery_calls} total=${pr.total_calls}`);
+      const remote = api();
+      if (remote) {
+        // Posted from a detached child so the hook returns inside its budget.
+        // With HEADSTART_DEFER_EXTRACT the runner posts it, with the cost.
+        const payload = extractPayload(events, repoName(cwd));
+        if (payload) {
+          payload.local_id = pr.id;
+          const pending = writePending(cwd, sessionId, payload);
+          if (!process.env.HEADSTART_DEFER_EXTRACT) {
+            const cli = new URL('./cli.ts', import.meta.url).pathname;
+            try { spawn(process.execPath, [cli, 'push', pending, '--store', storePath(cwd)], { cwd, env: process.env, stdio: 'ignore', detached: true }).unref(); } catch {}
+          }
+        }
+      }
       return;
     }
     default:

@@ -119,7 +119,7 @@ td .good { color: var(--good); } td .bad { color: var(--bad); } td .dash { color
 .lane:last-child { border-right: 0; }
 .lane.failed::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--bad); }
 .lane .head { height: 40px; display: flex; align-items: baseline; gap: var(--s2); padding: 0 var(--s3); border-bottom: 1px solid var(--line-fade); font: var(--t-count); font-variant-numeric: tabular-nums; }
-.lane .head .name { font: 500 13px/18px var(--ui); color: var(--fg); }
+.lane .head .name { font: 500 13px/18px var(--ui); color: var(--fg); white-space: nowrap; }
 .lane.hs .head .name { color: var(--good); }
 .lane .head .glyph-box { width: 28px; color: var(--muted); display: inline-flex; align-items: center; }
 .lane .head .s { color: var(--subtle); }

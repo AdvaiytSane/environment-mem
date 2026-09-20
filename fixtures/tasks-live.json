@@ -1,0 +1,130 @@
+[
+  {
+    "id": "migration-1",
+    "shape": "migration",
+    "prompt": "We need a currency on each order. Add a currency field (default 'USD') to every order in src/domain/store.js, then print it as an extra tab-separated column in the list CLI command (src/cli/commands/list.js). Run `node --test test/cli-list.test.js` to confirm the row count is still right, and eyeball `node src/cli/main.js list` for the new column.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "migration-2",
+    "shape": "migration",
+    "prompt": "Same kind of addition on the users side. Add a country field (default 'US') to every user in src/domain/store.js, print it as a fourth column in the users CLI command (src/cli/commands/users.js), and update the hardcoded row in test/cli-users.test.js to match. Run `node --test test/cli-users.test.js` when done.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "migration-1"
+  },
+  {
+    "id": "migration-3",
+    "shape": "migration",
+    "prompt": "Rename the order field amountCents to totalCents everywhere it's read or written. Start with src/domain/store.js and src/domain/orders.js, then grep for the rest (the CLI list/orders/export commands, src/routes/admin/exports.js, src/cli/commands/report/csv.js). Fix any test still asserting on the old name and run `bash ops/check.sh` to confirm the whole suite passes.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "migration-1"
+  },
+  {
+    "id": "migration-4",
+    "shape": "migration",
+    "prompt": "We're dropping email from user records. Remove it from every user in src/domain/store.js, drop it from the users CLI command's output (src/cli/commands/users.js), and update the hardcoded row in test/cli-users.test.js to match. Run `node --test test/cli-users.test.js` when done.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "migration-2"
+  },
+  {
+    "id": "auth-1",
+    "shape": "auth",
+    "prompt": "GET /admin/stats (src/routes/admin/stats.js) returns totals to anyone who asks, no auth at all. Require an x-admin-token header that matches process.env.ADMIN_TOKEN, and return a 401 via sendError from src/lib/http-helpers.js when it's missing or wrong. Start the server with `node src/server.js`, curl the route with and without the header to confirm 401 vs 200, then run `bash ops/check.sh` to make sure the rest of the suite still passes.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "auth-2",
+    "shape": "auth",
+    "prompt": "Same problem on GET /admin/users (src/routes/admin/users.js): it hands back every user's name and email with zero auth. Add the same x-admin-token header check against process.env.ADMIN_TOKEN, 401 via sendError when it doesn't match. Verify with curl against `node src/server.js` (missing header vs correct one), then run `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "auth-1"
+  },
+  {
+    "id": "auth-3",
+    "shape": "auth",
+    "prompt": "GET /admin/orders (src/routes/admin/orders.js) leaks every order's amount and user id to an unauthenticated caller. Add the same x-admin-token header check used on the other admin routes, 401 via sendError on a missing or wrong token. Confirm with curl against `node src/server.js`, then run `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "auth-1"
+  },
+  {
+    "id": "auth-4",
+    "shape": "auth",
+    "prompt": "GET /admin/exports (src/routes/admin/exports.js) dumps the whole orders table as CSV with no auth check either. Lock it down with the same x-admin-token header check against process.env.ADMIN_TOKEN, 401 via sendError when it's absent or wrong. Curl it with and without the header against `node src/server.js` to confirm, then run `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "auth-3"
+  },
+  {
+    "id": "ops-1",
+    "shape": "ops",
+    "prompt": "We keep starting the server by hand just to curl /health. Add a smoke-test script in ops/, next to check.sh, that sets PORT=8099, starts the server with `node src/server.js` in the background, curls http://localhost:8099/health, checks the body is `{ ok: true }`, then kills the server and exits non-zero on failure. Run your script to confirm it passes, then `bash ops/check.sh` for the full suite.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "ops-2",
+    "shape": "ops",
+    "prompt": "GET /health (src/routes/health.js) only ever returns `{ ok: true }`. Add uptimeSeconds (from process.uptime()) and env (from process.env.APP_ENV) to that JSON body. Start the server with `node src/server.js`, curl /health to see the new fields, then run `bash ops/check.sh` (test/routes-health.test.js only checks ok, so it should still pass).",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "ops-1"
+  },
+  {
+    "id": "ops-3",
+    "shape": "ops",
+    "prompt": "Requests hit the router with zero visibility right now. In handle() in src/registry.js, call info() from src/lib/logger.js with the method and path for every request, something like GET /orders. Start the server with `node src/server.js`, hit a couple of routes with curl, and confirm the info lines show up in the terminal, then run `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "ops-4",
+    "shape": "ops",
+    "prompt": "Make that request logging opt-in instead of always-on. In handle() in src/registry.js, only call info() from src/lib/logger.js when a new REQUEST_LOG env var is set: read it with getEnv from src/lib/env.js and check for '1'. Verify `REQUEST_LOG=1 node src/server.js` logs requests while a plain `node src/server.js` stays quiet, then run `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "ops-3"
+  },
+  {
+    "id": "refactor-1",
+    "shape": "refactor",
+    "prompt": "The CLI stats command (src/cli/commands/stats.js) and the GET /admin/stats route (src/routes/admin/stats.js) both compute totalUsers and totalOrders by calling listUsers().length and listOrders().length separately. Pull that into one shared function both call sites use instead of duplicating the counts. Run `node --test test/cli-stats.test.js` to confirm the CLI output is unchanged, then `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "refactor-2",
+    "shape": "refactor",
+    "prompt": "Same duplication on the export side: src/cli/commands/export.js and src/routes/admin/exports.js both hard-code the identical column list ['id', 'userId', 'status', 'amountCents'] for toCsv. Move it into one shared constant both files import instead of repeating the array. Run `node --test test/cli-export.test.js` to confirm the CLI export still prints the same header and rows, then `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": "refactor-1"
+  },
+  {
+    "id": "refactor-3",
+    "shape": "refactor",
+    "prompt": "sendError in src/lib/http-helpers.js reads oddly next to sendJson. Rename it to sendFail everywhere it's defined and called: src/lib/http-helpers.js, src/registry.js, src/routes/users.js, and src/routes/orders.js. Grep for anything you missed, then run `bash ops/check.sh` to confirm the suite still passes.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  },
+  {
+    "id": "refactor-4",
+    "shape": "refactor",
+    "prompt": "src/cli/commands/report/quarterly.js hand-rolls a counts-by-key loop that src/cli/commands/report/daily.js and monthly.js already solve with groupBy from src/lib/collections/group-by.js. Rewrite quarterly.js to use groupBy the same way, keeping its quarterOf key logic. Run `node src/cli/main.js report quarterly` before and after to confirm the output is identical, then `bash ops/check.sh`.",
+    "hidden_test": null,
+    "visible_failing_test": null,
+    "similar_to": null
+  }
+]

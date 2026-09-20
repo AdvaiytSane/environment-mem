@@ -2,6 +2,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, write
 import { spawn, spawnSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { claudeFormatHooks } from './install.ts';
+import { api, extractRemote, pendingPath, readPending } from './api.ts';
 import type { Task } from './eval.ts';
 
 // One live agent session, or a plan of them. Every run is a real Claude Code
@@ -19,15 +20,15 @@ export interface RunSpec {
 export interface RunResult {
   lane: string; agent: Agent; taskId: string; sessionId?: string; calls: number; discovery: number;
   handed: { n: number; from: Array<{ harness?: string; task_id?: string; created_at?: string }>; agree?: unknown } | null;
-  stored: boolean; durationS: number; error?: string;
+  stored: boolean; durationS: number; pushed?: string; error?: string;
 }
-export interface Plan { live?: string; store?: string; repo?: string; model?: string; waves: RunSpec[][] }
+export interface Plan { live?: string; store?: string; repo?: string; model?: string; /** task files, merged; default fixtures/tasks.json */ tasks?: string[]; waves: RunSpec[][] }
 
 const CLI = resolve(new URL('./cli.ts', import.meta.url).pathname);
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 
-export function loadTasks(file = 'fixtures/tasks.json'): Task[] {
-  return JSON.parse(readFileSync(resolve(file), 'utf8')) as Task[];
+export function loadTasks(...files: string[]): Task[] {
+  return (files.length ? files : ['fixtures/tasks.json']).flatMap(f => JSON.parse(readFileSync(resolve(f), 'utf8')) as Task[]);
 }
 export function resolveTask(spec: RunSpec, tasks: Task[]): { id: string; prompt: string } {
   const byId = tasks.find(t => t.id === spec.taskId || t.id === spec.task);
@@ -47,7 +48,8 @@ export function prepareLane(live: string, lane: string, repo: string): string {
   return wd;
 }
 
-function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.ProcessEnv, model: string | undefined, timeoutMs: number, onOut: (s: string) => void): Promise<{ code: number | null; sessionId?: string; err: string }> {
+export interface Cost { input_tokens?: number; cached_input_tokens?: number; output_tokens?: number; model?: string; duration_ms?: number; dollars?: number }
+function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.ProcessEnv, model: string | undefined, timeoutMs: number, onOut: (s: string) => void): Promise<{ code: number | null; sessionId?: string; err: string; cost: Cost }> {
   return new Promise(res => {
     const childEnv: NodeJS.ProcessEnv = { ...process.env, ...env };
     delete childEnv.CLAUDECODE; delete childEnv.CLAUDE_CODE_ENTRYPOINT;
@@ -65,8 +67,22 @@ function spawnAgent(agent: Agent, prompt: string, wd: string, env: NodeJS.Proces
     child.stdout.on('data', d => { const s = String(d); out += s; onOut(s); const m = s.match(/"session_id"\s*:\s*"([^"]+)"/); if (m) sessionId = m[1]; });
     child.stderr.on('data', d => { err += d; });
     const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
-    child.on('close', code => { clearTimeout(timer); res({ code, sessionId, err: err.slice(0, 300) }); });
-    void out;
+    child.on('close', code => {
+      clearTimeout(timer);
+      const cost: Cost = { model };
+      try {
+        if (agent === 'claude') {
+          const last = out.trim().split('\n').filter(l => l.startsWith('{')).map(l => JSON.parse(l)).filter(j => j.type === 'result').pop();
+          const u = last?.usage ?? {};
+          cost.input_tokens = u.input_tokens; cost.cached_input_tokens = u.cache_read_input_tokens; cost.output_tokens = u.output_tokens; cost.dollars = last?.total_cost_usd;
+          if (last?.session_id) sessionId = last.session_id;
+        } else {
+          const m = JSON.parse(readFileSync(join(wd, '.headstart', 'devin-export.json'), 'utf8')).final_metrics ?? {};
+          cost.cached_input_tokens = m.total_cached_tokens ?? 0; cost.input_tokens = (m.total_prompt_tokens ?? 0) - (m.total_cached_tokens ?? 0); cost.output_tokens = m.total_completion_tokens ?? 0;
+        }
+      } catch {}
+      res({ code, sessionId, err: err.slice(0, 300), cost });
+    });
   });
 }
 
@@ -101,17 +117,29 @@ export async function runOne(spec: RunSpec, opts: { live: string; store: string;
   const env: NodeJS.ProcessEnv = {
     HEADSTART_STORE: resolve(opts.store), HEADSTART_REPO: 'live', HEADSTART_TASK_ID: id,
     HEADSTART_INJECT: spec.inject ?? 'full', HEADSTART_RECORD: spec.record === false ? '0' : '1',
+    HEADSTART_DEFER_EXTRACT: '1',
   };
   const t0 = Date.now();
   const r = await spawnAgent(spec.agent, prompt, wd, env, spec.model ?? opts.model, (spec.timeoutMin ?? 12) * 60_000, s => opts.onOut?.(spec.lane, s));
   const o = laneOutcome(wd);
-  return { lane: spec.lane, agent: spec.agent, taskId: id, ...o, sessionId: o.sessionId ?? r.sessionId, durationS: Math.round((Date.now() - t0) / 1000), error: r.code ? `exit ${r.code}: ${r.err}` : undefined };
+  let pushed: string | undefined, pushError: string | undefined;
+  const a = api();
+  if (a && o.sessionId && spec.record !== false) {
+    // The hook left the payload; the runner knows what the session cost.
+    try {
+      const payload = readPending(pendingPath(wd, o.sessionId));
+      payload.cost = { ...payload.cost, ...Object.fromEntries(Object.entries(r.cost).filter(([, v]) => v !== undefined)) };
+      const pr = await extractRemote(a, payload, resolve(opts.store));
+      if (pr.ok) pushed = pr.admitted ? pr.workflow_id : `${pr.workflow_id} (not admitted)`; else pushError = pr.error;
+    } catch (e) { pushError = String((e as Error).message); }
+  }
+  return { lane: spec.lane, agent: spec.agent, taskId: id, ...o, sessionId: o.sessionId ?? r.sessionId, durationS: Math.round((Date.now() - t0) / 1000), pushed, error: r.code ? `exit ${r.code}: ${r.err}` : pushError ? `push: ${pushError}` : undefined };
 }
 
 export function describe(r: RunResult): string {
   const from = r.handed ? r.handed.from.map(f => `${f.harness ?? 'unknown'} ${f.task_id ?? ''}`.trim()).slice(0, 3).join(', ') : '';
   const handed = r.handed ? `handed ${r.handed.n} (${from})` : 'cold';
-  return `${r.lane.padEnd(14)} ${r.agent.padEnd(6)} ${r.taskId.padEnd(12)} ${String(r.calls).padStart(3)} calls ${String(r.discovery).padStart(3)} before first edit  ${String(r.durationS).padStart(4)}s  ${handed}${r.stored ? '  stored' : ''}${r.error ? '  ' + r.error : ''}`;
+  return `${r.lane.padEnd(14)} ${r.agent.padEnd(6)} ${r.taskId.padEnd(12)} ${String(r.calls).padStart(3)} calls ${String(r.discovery).padStart(3)} before first edit  ${String(r.durationS).padStart(4)}s  ${handed}${r.stored ? '  stored' : ''}${r.pushed ? '  hosted' : ''}${r.error ? '  ' + r.error : ''}`;
 }
 
 /** Waves run in order; runs inside a wave run at once. Wave two recalls what wave one stored. */

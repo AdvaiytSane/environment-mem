@@ -2,7 +2,9 @@ export type Cls = 'read' | 'search' | 'write' | 'execute' | 'other';
 
 export interface TraceEvent {
   ts: number;
-  event: 'prompt' | 'tool' | 'stop' | 'start';
+  event: 'prompt' | 'tool' | 'stop' | 'start' | 'recall';
+  /** recall: the hosted procedures handed on this prompt, for recalled_from at extract time. */
+  ids?: string[];
   session_id: string;
   cwd: string;
   tool_name?: string;

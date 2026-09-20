@@ -125,9 +125,12 @@ export function serveLive(o: LiveOpts): void {
           if (!/todo|skill|task|ask_user/i.test(ev.tool_name)) { rc.calls++; if (cls === 'write' && !rc.edited) { rc.edited = true; rc.discovery = rc.calls - 1; } if (!rc.edited) rc.discovery = rc.calls; }
         }
         if (ev.event === 'stop') rc.stopped = true;
+        const rawTarget = String(input.file_path ?? input.path ?? input.pattern ?? input.command ?? '');
+        const wd = resolve(dir) + '/';
         const d = {
           lane: label, session: ev.session_id, event: ev.event, tool: ev.tool_name, ts: ev.ts,
-          target: input.file_path ?? input.path ?? input.pattern ?? input.command ?? '', prompt: ev.prompt,
+          // paths inside the lane's own copy of the repo read as the repo saw them
+          target: rawTarget.split(wd).join(''), prompt: ev.prompt,
         };
         remember(label, 'trace', d);
         broadcast('trace', d);
