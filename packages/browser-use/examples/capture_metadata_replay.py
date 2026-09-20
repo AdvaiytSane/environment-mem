@@ -46,6 +46,7 @@ async def main(args):
         'limitations': [
             'Recorded real screenshots and action events; this is a visual playback, not deterministic action replay.',
             'Before frames are the browser state captured for the model; after frames are taken after a whole model step. A step can contain multiple actions.',
+            'Recall and injection boundaries are assembled from the validated run report in their lifecycle order before Agent.run(); they have no exact event timestamps.',
             'No cursor position or movement is fabricated. Screenshots do not by themselves prove every action succeeded.',
             'Independent final URL and quote-count verification proves the final task, not every unknown tool result.',
             'Storage receipts refer to the existing encrypted local Memorable store; embeddings use its configured production service.',
@@ -150,9 +151,9 @@ async def main(args):
                     'summary': 'Observed CLI recall before agent construction. Returned IDs are from this actual run.',
                     'status': 'observed', 'durationMs': None,
                     'output': {'memoryIds': row.get('recall_ids', []), 'embedding': row.get('recall_embedding')}}
-                chapter['events'].insert(1, recall)
+                chapter['events'].insert(0, recall)
                 if row.get('reference_in_actual_model_messages'):
-                    chapter['events'].insert(2, {'id': f'run-{index+1}-inject', 'kind': 'inject',
+                    chapter['events'].insert(1, {'id': f'run-{index+1}-inject', 'kind': 'inject',
                         'title': 'Memory reached the next model input',
                         'summary': 'The existing verifier inspected the actual model message list for the recalled reference.',
                         'status': 'verified', 'durationMs': None,

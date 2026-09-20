@@ -32,6 +32,11 @@ so these are not per-click videos. Proposed actions and observed tool result
 flags are separate. Unknown mapped actions stay unknown. No cursor or movement
 is invented. Durations cover the callback-to-after-frame interval, including
 screenshot capture; they are not full model latency or a performance benchmark.
+Recall and injection entries are assembled from the validated run report without
+exact event timestamps. They precede the initial frame because the existing
+example recalls and constructs the agent's context before entering `Agent.run()`,
+where that frame is captured. This lifecycle ordering does not claim that the
+later model-message inspection occurred before execution.
 
 This is visual playback of a recorded execution, not deterministic browser replay.
 The second run used more model steps; this is evidence of recall/context delivery,
