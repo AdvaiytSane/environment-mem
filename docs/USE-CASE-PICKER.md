@@ -1,24 +1,17 @@
 # Use case picker
 
-Note for whoever picks this up next. The console currently says "Devin" under the DejaDo wordmark. This is where that lives and how to turn it into a picker.
+Built. The sidebar of the hosted console (https://headstart-demo.vercel.app/dash/enterprise) has a picker under the wordmark: Devin, Claude Code, Codex, Browser Use, Dimensional, Custom agent. Every page shows that use case's sessions. Environments lists its recorded environments (with a replay player for Browser Use and Dimensional) and lets a visitor define a new one.
 
-## Where the name is
+## Where it lives (apps/dashboard in the console source)
 
-- `apps/dashboard/app/enterprise/layout.tsx`, line 20. The value is `org`: it reads the env var `NEXT_PUBLIC_DEMO_ORG_NAME`, then falls back to "Devin" in demo mode, then to the workspace name from the database (that is where "Northwind Platform" came from).
-- It is rendered by `SideNav` in `apps/dashboard/app/enterprise/nav.tsx`, line 43: the small uppercase line under the wordmark.
-- The live site (Vercel project `headstart-demo`) sets `NEXT_PUBLIC_DEMO_ORG_NAME=Devin`. Change it with `vercel env` and redeploy.
+- `lib/enterprise/use-cases.ts`: the list. One entry per use case: `harnesses` (the ids sessions carry), `connection` (how it connects, the command, the doc path in this repo), `evidence` (which recording ships), `sampleTasks`. Add a use case here and it appears in the picker, on Environments and on How it runs.
+- `app/enterprise/use-case.tsx`: the picker. Writes the cookie `dejado_use_case` through `POST /api/enterprise/use-case`, then refreshes.
+- `lib/enterprise/scope.ts`: `enterprisePage()` and `enterprise()` return `useCase`; every reader takes `harnesses?: string[]` and filters sessions before any math; every API route takes `?use_case=<id>`.
+- `app/enterprise/environments/`: the page, the replay player (`player.tsx`), the add dialog (`add.tsx`, saved in the browser; connecting is done from the CLI). Recordings come from `public/evidence/` (copied from `apps/workflow-studio/public/evidence` in this repo).
+- `app/enterprise/extraction/page.tsx`: "Ways to connect", every path in the merged CLI and SDK.
 
-## What to build
+## Adding a use case
 
-Replace that line with a dropdown that picks the use case. Each choice is an environment: which agent produced the sessions, which tasks show in the Run panel, which setup steps the tour shows.
-
-1. New client component `apps/dashboard/app/enterprise/use-case.tsx` on shadcn `Select` (`components/ui/select.tsx`, already installed). Render it in `nav.tsx` in place of the `org` line.
-2. Options, in this order: Devin, Claude Code, Cursor, Browser use, Computer use, Search agents. Put the list in one file, `apps/dashboard/lib/enterprise/use-cases.ts`, as `{ id, name, harness, tasks, setup }` so pages read it instead of hardcoding names.
-3. Store the choice in a cookie named `dejado_use_case`. Read it in `layout.tsx` and pass it down as a prop. A URL param is fine too if you want links to carry it.
-4. Filter the data by it. Every session row has a `harness` column (see `lib/enterprise/types.ts`, `harnessName`) that says which agent recorded it: `devin`, `devin-cloud`, `claude`, `codex`, `cursor`, `browser` (the full map is `HARNESS_NAME` in that file). Pass the chosen harness into the readers in `lib/enterprise/*.ts` the same way `used=month` is passed today (`app/api/enterprise/procedures/route.ts`).
-5. Browser use, Computer use and Search agents have no recorded sessions yet. For those, render the existing `Empty` component (`app/enterprise/parts.tsx`) with one line: "Connect this agent to start recording" and a link to `/enterprise/extraction` (How it runs).
-6. The CLI already takes the agent as a flag: `headstart demo --agent devin|claude --task <id>` and `headstart run --agent claude|devin`. When the picker changes, the Run panel should pass the matching `--agent`.
-
-## Later: question flow instead of a dropdown
-
-The dropdown is the fast path. The friendlier version is a short question flow on first visit: "What do you want to set up?" then one screen per answer (Devin: install the hooks; Claude Code: add the plugin; Cursor: add the rules file; browser or computer use: point the recorder at the agent's action log). Same list from `use-cases.ts`, so both stay in sync. Keep the dropdown in the sidebar so people can switch without redoing the flow.
+1. Add the entry to `USE_CASES` with its harness ids and connect command.
+2. Record sessions with that harness id (hooks, SDK `store()`, or `POST /v1/extract`); they show up under that use case within a minute.
+3. Optional: drop a `memorable.replay.v1` recording under `public/evidence/replays/<id>/replay.json` with its frames and set `evidence.replay` on the entry.
